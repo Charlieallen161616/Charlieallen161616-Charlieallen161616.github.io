@@ -56,6 +56,7 @@
             display: flex;
             gap: 1rem;
             align-items: center;
+            flex-wrap: wrap;
         }
 
         .search-bar {
@@ -72,20 +73,24 @@
             border-color: var(--accent-color);
         }
 
-        .offline-btn {
+        .download-btn {
             background-color: #1e293b;
-            border: 1px solid #3b82f6;
-            color: #38bdf8;
+            border: 1px solid #10b981;
+            color: #34d399;
             padding: 0.5rem 1rem;
             border-radius: 6px;
             cursor: pointer;
             font-size: 0.85rem;
             font-weight: 500;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
             transition: background 0.2s;
         }
 
-        .offline-btn:hover {
-            background-color: #3b82f6;
+        .download-btn:hover {
+            background-color: #10b981;
             color: #fff;
         }
 
@@ -222,7 +227,8 @@
             <span>📚</span> Study Portal
         </div>
         <div class="header-controls">
-            <button class="offline-btn" id="saveOfflineBtn" onclick="saveToOfflineMemory()">📥 Save for Offline</button>
+            <!-- Points directly to your d/site.html file upload -->
+            <a href="d/site.html" download="site.html" class="download-btn">📥 Download site.html</a>
             <input type="text" id="searchInput" class="search-bar" placeholder="Search modules..." onkeyup="filterGames()">
         </div>
     </header>
@@ -306,50 +312,6 @@
         let activeInterval = null;
         let canvas = document.getElementById('gameCanvas');
         let ctx = canvas.getContext('2d');
-
-        // --- OFFLINE CACHE STORAGE (PWA Simulation) ---
-        function saveToOfflineMemory() {
-            try {
-                const pageHTML = document.documentElement.outerHTML;
-                localStorage.setItem('offline_portal_page', pageHTML);
-                
-                // Register local service worker cache if supported
-                if ('serviceWorker' in navigator) {
-                    const blob = new Blob([`
-                        self.addEventListener('install', e => e.waitUntil(self.skipWaiting()));
-                        self.addEventListener('activate', e => e.waitUntil(self.clients.claim()));
-                        self.addEventListener('fetch', e => {
-                            e.respondWith(
-                                caches.match(e.request).then(res => res || fetch(e.request))
-                            );
-                        });
-                    `], { type: 'text/javascript' });
-                    const swUrl = URL.createObjectURL(blob);
-                    navigator.serviceWorker.register(swUrl).catch(() => {});
-                }
-
-                let btn = document.getElementById('saveOfflineBtn');
-                btn.innerText = "✅ Saved for Offline!";
-                btn.style.backgroundColor = "#10b981";
-                btn.style.borderColor = "#10b981";
-                btn.style.color = "#fff";
-                setTimeout(() => {
-                    btn.innerText = "📥 Save for Offline";
-                    btn.style.backgroundColor = "#1e293b";
-                    btn.style.borderColor = "#3b82f6";
-                    btn.style.color = "#38bdf8";
-                }, 3000);
-            } catch (err) {
-                alert("Storage error: Browser memory might be restricted.");
-            }
-        }
-
-        // Check if loaded offline from cache
-        window.addEventListener('load', () => {
-            if (!navigator.onLine && localStorage.getItem('offline_portal_page')) {
-                console.log("Running from offline local memory cache.");
-            }
-        });
 
         function launchGame(type) {
             document.getElementById('game-view').style.display = 'flex';
