@@ -237,6 +237,24 @@
                     <div class="card-desc">Pattern matching cognitive engine</div>
                 </div>
             </div>
+
+            <!-- Game 5: Snake -->
+            <div class="card" onclick="launchGame('snake')">
+                <div class="card-thumb" style="background: linear-gradient(135deg, #1e1e1e, #3a1b4b);">🐍 Vector Simulation</div>
+                <div class="card-body">
+                    <div class="card-title">Retro Snake</div>
+                    <div class="card-desc">Grid-based path traversal algorithm</div>
+                </div>
+            </div>
+
+            <!-- Game 6: Space Blaster -->
+            <div class="card" onclick="launchGame('blaster')">
+                <div class="card-thumb" style="background: linear-gradient(135deg, #1e1e1e, #1b2d4e);">🛸 Tactical Blaster</div>
+                <div class="card-body">
+                    <div class="card-title">Space Blaster</div>
+                    <div class="card-desc">Target interception defense routine</div>
+                </div>
+            </div>
         </div>
     </main>
 
@@ -287,6 +305,14 @@
                 document.getElementById('active-game-title').innerText = "Color Match Matrix";
                 document.title = "Color Match - Study Portal";
                 startColors();
+            } else if (type === 'snake') {
+                document.getElementById('active-game-title').innerText = "Retro Snake";
+                document.title = "Retro Snake - Study Portal";
+                startSnake();
+            } else if (type === 'blaster') {
+                document.getElementById('active-game-title').innerText = "Space Blaster";
+                document.title = "Space Blaster - Study Portal";
+                startBlaster();
             }
         }
 
@@ -309,8 +335,8 @@
             let paddle1Y = 200, paddle2Y = 200;
             const paddleHeight = 100, paddleWidth = 12;
             let score1 = 0, score2 = 0;
-
             let upPressed = false, downPressed = false;
+
             window.onkeydown = (e) => {
                 if (currentGame !== 'pong') return;
                 if (e.key === 'ArrowUp') upPressed = true;
@@ -334,131 +360,77 @@
                 ballY += ballSpeedY;
 
                 if (ballY < 0 || ballY > canvas.height) ballSpeedY = -ballSpeedY;
-
                 if (ballX <= 30 && ballY >= paddle1Y && ballY <= paddle1Y + paddleHeight) {
-                    ballSpeedX = -ballSpeedX;
-                    ballX = 30;
+                    ballSpeedX = -ballSpeedX; ballX = 30;
                 }
                 if (ballX >= canvas.width - 30 - paddleWidth && ballY >= paddle2Y && ballY <= paddle2Y + paddleHeight) {
-                    ballSpeedX = -ballSpeedX;
-                    ballX = canvas.width - 30 - paddleWidth;
+                    ballSpeedX = -ballSpeedX; ballX = canvas.width - 30 - paddleWidth;
                 }
-
                 if (ballX < 0) { score2++; resetBall(); }
                 if (ballX > canvas.width) { score1++; resetBall(); }
 
                 drawPong();
                 animationFrameId = requestAnimationFrame(updatePong);
             }
-
-            function resetBall() {
-                ballX = canvas.width / 2;
-                ballY = canvas.height / 2;
-                ballSpeedX = -ballSpeedX;
-            }
-
+            function resetBall() { ballX = canvas.width / 2; ballY = canvas.height / 2; ballSpeedX = -ballSpeedX; }
             function drawPong() {
-                ctx.fillStyle = '#111';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                ctx.strokeStyle = '#333';
-                ctx.setLineDash([5, 15]);
-                ctx.beginPath();
-                ctx.moveTo(canvas.width / 2, 0);
-                ctx.lineTo(canvas.width / 2, canvas.height);
-                ctx.stroke();
+                ctx.fillStyle = '#111'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.strokeStyle = '#333'; ctx.setLineDash([5, 15]);
+                ctx.beginPath(); ctx.moveTo(canvas.width / 2, 0); ctx.lineTo(canvas.width / 2, canvas.height); ctx.stroke();
                 ctx.setLineDash([]);
-
                 ctx.fillStyle = '#fff';
                 ctx.fillRect(20, paddle1Y, paddleWidth, paddleHeight);
                 ctx.fillRect(canvas.width - 20 - paddleWidth, paddle2Y, paddleWidth, paddleHeight);
-                ctx.beginPath();
-                ctx.arc(ballX, ballY, 8, 0, Math.PI * 2);
-                ctx.fill();
-
-                ctx.font = '32px sans-serif';
-                ctx.fillText(score1, canvas.width / 4, 50);
-                ctx.fillText(score2, (canvas.width / 4) * 3, 50);
-                ctx.font = '12px sans-serif';
-                ctx.fillStyle = '#777';
-                ctx.fillText("Use Up/Down Arrow Keys to Move", 20, canvas.height - 20);
+                ctx.beginPath(); ctx.arc(ballX, ballY, 8, 0, Math.PI * 2); ctx.fill();
+                ctx.font = '32px sans-serif'; ctx.fillText(score1, canvas.width / 4, 50); ctx.fillText(score2, (canvas.width / 4) * 3, 50);
+                ctx.font = '12px sans-serif'; ctx.fillStyle = '#777'; ctx.fillText("Use Up/Down Arrow Keys to Move", 20, canvas.height - 20);
             }
             updatePong();
         }
 
         // --- GAME 2: CLICKER GAME ---
         function startClicker() {
-            let score = 0;
-            let clickPower = 1;
-            let autoClickers = 0;
-
+            let score = 0, clickPower = 1, autoClickers = 0;
             activeInterval = setInterval(() => {
                 if (currentGame !== 'clicker') return;
-                if (autoClickers > 0) {
-                    score += autoClickers;
-                    drawClicker();
-                }
+                if (autoClickers > 0) { score += autoClickers; drawClicker(); }
             }, 1000);
 
             canvas.onclick = (e) => {
                 if (currentGame !== 'clicker') return;
                 let rect = canvas.getBoundingClientRect();
-                let x = e.clientX - rect.left;
-                let y = e.clientY - rect.top;
-
+                let x = e.clientX - rect.left, y = e.clientY - rect.top;
                 let btnX = canvas.width / 2 - 100, btnY = canvas.height / 2 - 50;
                 if (x >= btnX && x <= btnX + 200 && y >= btnY && y <= btnY + 80) score += clickPower;
 
                 let up1X = canvas.width / 2 - 150, up1Y = canvas.height / 2 + 80;
-                if (x >= up1X && x <= up1X + 140 && y >= up1Y && y <= up1Y + 40 && score >= 20) {
-                    score -= 20; clickPower += 1;
-                }
+                if (x >= up1X && x <= up1X + 140 && y >= up1Y && y <= up1Y + 40 && score >= 20) { score -= 20; clickPower += 1; }
 
                 let up2X = canvas.width / 2 + 10, up2Y = canvas.height / 2 + 80;
-                if (x >= up2X && x <= up2X + 140 && y >= up2Y && y <= up2Y + 40 && score >= 50) {
-                    score -= 50; autoClickers += 1;
-                }
+                if (x >= up2X && x <= up2X + 140 && y >= up2Y && y <= up2Y + 40 && score >= 50) { score -= 50; autoClickers += 1; }
                 drawClicker();
             };
 
             function drawClicker() {
-                ctx.fillStyle = '#111';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                ctx.fillStyle = '#fff';
-                ctx.font = 'bold 24px sans-serif';
-                ctx.textAlign = 'center';
+                ctx.fillStyle = '#111'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = '#fff'; ctx.font = 'bold 24px sans-serif'; ctx.textAlign = 'center';
                 ctx.fillText("Clicker Legends", canvas.width / 2, 60);
-                
-                ctx.font = '20px sans-serif';
-                ctx.fillStyle = '#4f46e5';
-                ctx.fillText("Points: " + score, canvas.width / 2, 100);
+                ctx.font = '20px sans-serif'; ctx.fillStyle = '#4f46e5'; ctx.fillText("Points: " + score, canvas.width / 2, 100);
 
                 let btnX = canvas.width / 2 - 100, btnY = canvas.height / 2 - 50;
-                ctx.fillStyle = '#1e1e1e';
-                ctx.strokeStyle = '#4f46e5';
-                ctx.lineWidth = 3;
-                ctx.fillRect(btnX, btnY, 200, 80);
-                ctx.strokeRect(btnX, btnY, 200, 80);
-                ctx.fillStyle = '#fff';
-                ctx.font = 'bold 16px sans-serif';
-                ctx.fillText("CLICK ME!", canvas.width / 2, btnY + 45);
+                ctx.fillStyle = '#1e1e1e'; ctx.strokeStyle = '#4f46e5'; ctx.lineWidth = 3;
+                ctx.fillRect(btnX, btnY, 200, 80); ctx.strokeRect(btnX, btnY, 200, 80);
+                ctx.fillStyle = '#fff'; ctx.font = 'bold 16px sans-serif'; ctx.fillText("CLICK ME!", canvas.width / 2, btnY + 45);
 
                 let up1X = canvas.width / 2 - 150, up1Y = canvas.height / 2 + 80;
-                ctx.fillStyle = score >= 20 ? '#222' : '#151515';
-                ctx.strokeStyle = score >= 20 ? '#10b981' : '#444';
-                ctx.fillRect(up1X, up1Y, 140, 40);
-                ctx.strokeRect(up1X, up1Y, 140, 40);
-                ctx.fillStyle = score >= 20 ? '#fff' : '#666';
-                ctx.font = '13px sans-serif';
-                ctx.fillText("+1 Power (Cost: 20)", up1X + 70, up1Y + 25);
+                ctx.fillStyle = score >= 20 ? '#222' : '#151515'; ctx.strokeStyle = score >= 20 ? '#10b981' : '#444';
+                ctx.fillRect(up1X, up1Y, 140, 40); ctx.strokeRect(up1X, up1Y, 140, 40);
+                ctx.fillStyle = score >= 20 ? '#fff' : '#666'; ctx.font = '13px sans-serif'; ctx.fillText("+1 Power (Cost: 20)", up1X + 70, up1Y + 25);
 
                 let up2X = canvas.width / 2 + 10, up2Y = canvas.height / 2 + 80;
-                ctx.fillStyle = score >= 50 ? '#222' : '#151515';
-                ctx.strokeStyle = score >= 50 ? '#f59e0b' : '#444';
-                ctx.fillRect(up2X, up2Y, 140, 40);
-                ctx.strokeRect(up2X, up2Y, 140, 40);
-                ctx.fillStyle = score >= 50 ? '#fff' : '#666';
-                ctx.font = '13px sans-serif';
-                ctx.fillText("+1 Auto/s (Cost: 50)", up2X + 70, up2Y + 25);
+                ctx.fillStyle = score >= 50 ? '#222' : '#151515'; ctx.strokeStyle = score >= 50 ? '#f59e0b' : '#444';
+                ctx.fillRect(up2X, up2Y, 140, 40); ctx.strokeRect(up2X, up2Y, 140, 40);
+                ctx.fillStyle = score >= 50 ? '#fff' : '#666'; ctx.font = '13px sans-serif'; ctx.fillText("+1 Auto/s (Cost: 50)", up2X + 70, up2Y + 25);
                 ctx.textAlign = 'left';
             }
             drawClicker();
@@ -467,10 +439,8 @@
         // --- GAME 3: NEON DODGE ---
         function startDodge() {
             let player = { x: 400, y: 420, size: 20, speed: 7 };
-            let obstacles = [];
-            let score = 0;
-            let leftPressed = false, rightPressed = false;
-            let gameOver = false;
+            let obstacles = [], score = 0;
+            let leftPressed = false, rightPressed = false, gameOver = false;
 
             window.onkeydown = (e) => {
                 if (currentGame !== 'dodge') return;
@@ -486,12 +456,7 @@
 
             activeInterval = setInterval(() => {
                 if (currentGame !== 'dodge' || gameOver) return;
-                obstacles.push({
-                    x: Math.random() * (canvas.width - 30),
-                    y: -20,
-                    size: Math.random() * 20 + 15,
-                    speed: Math.random() * 4 + 4
-                });
+                obstacles.push({ x: Math.random() * (canvas.width - 30), y: -20, size: Math.random() * 20 + 15, speed: Math.random() * 4 + 4 });
                 score += 10;
             }, 700);
 
@@ -503,52 +468,27 @@
 
                     for (let i = obstacles.length - 1; i >= 0; i--) {
                         obstacles[i].y += obstacles[i].speed;
-                        // Collision check
-                        if (
-                            player.x < obstacles[i].x + obstacles[i].size &&
-                            player.x + player.size > obstacles[i].x &&
-                            player.y < obstacles[i].y + obstacles[i].size &&
-                            player.y + player.size > obstacles[i].y
-                        ) {
+                        if (player.x < obstacles[i].x + obstacles[i].size && player.x + player.size > obstacles[i].x && player.y < obstacles[i].y + obstacles[i].size && player.y + player.size > obstacles[i].y) {
                             gameOver = true;
                         }
                         if (obstacles[i].y > canvas.height) obstacles.splice(i, 1);
                     }
                 }
-
                 drawDodge();
                 if (!gameOver) animationFrameId = requestAnimationFrame(updateDodge);
             }
-
             function drawDodge() {
-                ctx.fillStyle = '#111';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-                // Draw Player
-                ctx.fillStyle = '#4f46e5';
-                ctx.fillRect(player.x, player.y, player.size, player.size);
-
-                // Draw Obstacles
-                ctx.fillStyle = '#ef4444';
-                for (let obs of obstacles) {
-                    ctx.fillRect(obs.x, obs.y, obs.size, obs.size);
-                }
-
-                // Score text
-                ctx.fillStyle = '#fff';
-                ctx.font = '16px sans-serif';
-                ctx.fillText("Score: " + score, 20, 30);
+                ctx.fillStyle = '#111'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = '#4f46e5'; ctx.fillRect(player.x, player.y, player.size, player.size);
+                ctx.fillStyle = '#ef4444'; for (let obs of obstacles) ctx.fillRect(obs.x, obs.y, obs.size, obs.size);
+                ctx.fillStyle = '#fff'; ctx.font = '16px sans-serif'; ctx.fillText("Score: " + score, 20, 30);
                 ctx.fillText("Use Left/Right Arrows or A/D to Dodge", 20, canvas.height - 20);
 
                 if (gameOver) {
-                    ctx.fillStyle = 'rgba(0,0,0,0.8)';
-                    ctx.fillRect(0, 0, canvas.width, canvas.height);
-                    ctx.fillStyle = '#fff';
-                    ctx.font = 'bold 32px sans-serif';
-                    ctx.textAlign = 'center';
+                    ctx.fillStyle = 'rgba(0,0,0,0.8)'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    ctx.fillStyle = '#fff'; ctx.font = 'bold 32px sans-serif'; ctx.textAlign = 'center';
                     ctx.fillText("GAME OVER", canvas.width / 2, canvas.height / 2 - 20);
-                    ctx.font = '16px sans-serif';
-                    ctx.fillText("Press Spacebar to Restart", canvas.width / 2, canvas.height / 2 + 20);
+                    ctx.font = '16px sans-serif'; ctx.fillText("Press Spacebar to Restart", canvas.width / 2, canvas.height / 2 + 20);
                     ctx.textAlign = 'left';
                 }
             }
@@ -557,19 +497,14 @@
 
         // --- GAME 4: COLOR MATCH ---
         function startColors() {
-            let score = 0;
-            let targetColor = "";
-            let options = [];
+            let score = 0, targetColor = "", options = [];
             const colors = [
-                { name: "RED", hex: "#ef4444" },
-                { name: "BLUE", hex: "#3b82f6" },
-                { name: "GREEN", hex: "#10b981" },
-                { name: "YELLOW", hex: "#f59e0b" }
+                { name: "RED", hex: "#ef4444" }, { name: "BLUE", hex: "#3b82f6" },
+                { name: "GREEN", hex: "#10b981" }, { name: "YELLOW", hex: "#f59e0b" }
             ];
 
             function nextRound() {
                 targetColor = colors[Math.floor(Math.random() * colors.length)];
-                // Shuffle options
                 options = [...colors].sort(() => Math.random() - 0.5);
                 drawColors();
             }
@@ -577,67 +512,189 @@
             canvas.onclick = (e) => {
                 if (currentGame !== 'colors') return;
                 let rect = canvas.getBoundingClientRect();
-                let x = e.clientX - rect.left;
-                let y = e.clientY - rect.top;
-
-                // Check clicks on the 4 option boxes
-                let boxWidth = 140, boxHeight = 80;
-                let startX = canvas.width / 2 - 300, startY = 300;
+                let x = e.clientX - rect.left, y = e.clientY - rect.top;
+                let boxWidth = 140, boxHeight = 80, startX = canvas.width / 2 - 300, startY = 300;
 
                 options.forEach((opt, index) => {
-                    let bx = startX + (index * 160);
-                    let by = startY;
+                    let bx = startX + (index * 160), by = startY;
                     if (x >= bx && x <= bx + boxWidth && y >= by && y <= by + boxHeight) {
-                        if (opt.name === targetColor.name) {
-                            score += 100;
-                        } else {
-                            score = Math.max(0, score - 50);
-                        }
+                        if (opt.name === targetColor.name) score += 100;
+                        else score = Math.max(0, score - 50);
                         nextRound();
                     }
                 });
             };
 
             function drawColors() {
-                ctx.fillStyle = '#111';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-                ctx.fillStyle = '#fff';
-                ctx.font = 'bold 24px sans-serif';
-                ctx.textAlign = 'center';
+                ctx.fillStyle = '#111'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = '#fff'; ctx.font = 'bold 24px sans-serif'; ctx.textAlign = 'center';
                 ctx.fillText("Color Match Matrix", canvas.width / 2, 60);
-
-                ctx.font = '16px sans-serif';
-                ctx.fillStyle = '#aaa';
+                ctx.font = '16px sans-serif'; ctx.fillStyle = '#aaa';
                 ctx.fillText("Click the box matching the TARGET COLOR name below:", canvas.width / 2, 110);
 
-                // Target Name display
-                ctx.font = 'bold 48px sans-serif';
-                ctx.fillStyle = targetColor.hex;
+                ctx.font = 'bold 48px sans-serif'; ctx.fillStyle = targetColor.hex;
                 ctx.fillText(targetColor.name, canvas.width / 2, 200);
+                ctx.font = '18px sans-serif'; ctx.fillStyle = '#4f46e5'; ctx.fillText("Score: " + score, canvas.width / 2, 240);
 
-                // Score
-                ctx.font = '18px sans-serif';
-                ctx.fillStyle = '#4f46e5';
-                ctx.fillText("Score: " + score, canvas.width / 2, 240);
-
-                // Draw 4 Choice Boxes
-                let boxWidth = 140, boxHeight = 80;
-                let startX = canvas.width / 2 - 300, startY = 300;
-
+                let boxWidth = 140, boxHeight = 80, startX = canvas.width / 2 - 300, startY = 300;
                 options.forEach((opt, index) => {
-                    let bx = startX + (index * 160);
-                    let by = startY;
-                    ctx.fillStyle = opt.hex;
-                    ctx.fillRect(bx, by, boxWidth, boxHeight);
-                    ctx.strokeStyle = '#fff';
-                    ctx.lineWidth = 2;
-                    ctx.strokeRect(bx, by, boxWidth, boxHeight);
+                    let bx = startX + (index * 160), by = startY;
+                    ctx.fillStyle = opt.hex; ctx.fillRect(bx, by, boxWidth, boxHeight);
+                    ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.strokeRect(bx, by, boxWidth, boxHeight);
                 });
                 ctx.textAlign = 'left';
             }
-
             nextRound();
+        }
+
+        // --- GAME 5: RETRO SNAKE ---
+        function startSnake() {
+            const gridSize = 20;
+            let snake = [{ x: 10, y: 10 }, { x: 9, y: 10 }, { x: 8, y: 10 }];
+            let food = { x: 5, y: 5 };
+            let dx = 1, dy = 0;
+            let score = 0, gameOver = false;
+
+            window.onkeydown = (e) => {
+                if (currentGame !== 'snake') return;
+                if ((e.key === 'ArrowUp' || e.key === 'w') && dy === 0) { dx = 0; dy = -1; }
+                if ((e.key === 'ArrowDown' || e.key === 's') && dy === 0) { dx = 0; dy = 1; }
+                if ((e.key === 'ArrowLeft' || e.key === 'a') && dx === 0) { dx = -1; dy = 0; }
+                if ((e.key === 'ArrowRight' || e.key === 'd') && dx === 0) { dx = 1; dy = 0; }
+                if (e.key === ' ' && gameOver) startSnake();
+            };
+
+            function spawnFood() {
+                food.x = Math.floor(Math.random() * (canvas.width / gridSize));
+                food.y = Math.floor(Math.random() * (canvas.height / gridSize));
+            }
+
+            activeInterval = setInterval(() => {
+                if (currentGame !== 'snake' || gameOver) return;
+                let head = { x: snake[0].x + dx, y: snake[0].y + dy };
+
+                // Wall collision
+                if (head.x < 0 || head.x >= canvas.width / gridSize || head.y < 0 || head.y >= canvas.height / gridSize) {
+                    gameOver = true; return;
+                }
+                // Self collision
+                for (let part of snake) {
+                    if (head.x === part.x && head.y === part.y) { gameOver = true; return; }
+                }
+
+                snake.unshift(head);
+                if (head.x === food.x && head.y === food.y) {
+                    score += 50; spawnFood();
+                } else {
+                    snake.pop();
+                }
+                drawSnake();
+            }, 100);
+
+            function drawSnake() {
+                ctx.fillStyle = '#111'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+                // Draw food
+                ctx.fillStyle = '#ef4444'; ctx.fillRect(food.x * gridSize, food.y * gridSize, gridSize - 2, gridSize - 2);
+                // Draw snake
+                ctx.fillStyle = '#10b981';
+                for (let part of snake) {
+                    ctx.fillRect(part.x * gridSize, part.y * gridSize, gridSize - 2, gridSize - 2);
+                }
+                ctx.fillStyle = '#fff'; ctx.font = '16px sans-serif';
+                ctx.fillText("Score: " + score, 20, 30);
+
+                if (gameOver) {
+                    ctx.fillStyle = 'rgba(0,0,0,0.8)'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    ctx.fillStyle = '#fff'; ctx.font = 'bold 32px sans-serif'; ctx.textAlign = 'center';
+                    ctx.fillText("GAME OVER", canvas.width / 2, canvas.height / 2 - 20);
+                    ctx.font = '16px sans-serif'; ctx.fillText("Press Spacebar to Restart", canvas.width / 2, canvas.height / 2 + 20);
+                    ctx.textAlign = 'left';
+                }
+            }
+            spawnFood();
+        }
+
+        // --- GAME 6: SPACE BLASTER ---
+        function startBlaster() {
+            let ship = { x: 380, y: 440, width: 40, height: 20, speed: 6 };
+            let lasers = [], enemies = [], score = 0;
+            let leftPressed = false, rightPressed = false, gameOver = false;
+
+            window.onkeydown = (e) => {
+                if (currentGame !== 'blaster') return;
+                if (e.key === 'ArrowLeft' || e.key === 'a') leftPressed = true;
+                if (e.key === 'ArrowRight' || e.key === 'd') rightPressed = true;
+                if (e.key === ' ' && !gameOver) {
+                    lasers.push({ x: ship.x + ship.width / 2 - 3, y: ship.y, width: 6, height: 12, speed: 8 });
+                }
+                if (e.key === ' ' && gameOver) startBlaster();
+            };
+            window.onkeyup = (e) => {
+                if (currentGame !== 'blaster') return;
+                if (e.key === 'ArrowLeft' || e.key === 'a') leftPressed = false;
+                if (e.key === 'ArrowRight' || e.key === 'd') rightPressed = false;
+            };
+
+            activeInterval = setInterval(() => {
+                if (currentGame !== 'blaster' || gameOver) return;
+                enemies.push({ x: Math.random() * (canvas.width - 30), y: -20, size: 30, speed: 2 });
+            }, 900);
+
+            function updateBlaster() {
+                if (currentGame !== 'blaster') return;
+                if (!gameOver) {
+                    if (leftPressed && ship.x > 0) ship.x -= ship.speed;
+                    if (rightPressed && ship.x < canvas.width - ship.width) ship.x += ship.speed;
+
+                    // Move lasers
+                    for (let i = lasers.length - 1; i >= 0; i--) {
+                        lasers[i].y -= lasers[i].speed;
+                        if (lasers[i].y < 0) lasers.splice(i, 1);
+                    }
+
+                    // Move enemies & check collisions
+                    for (let i = enemies.length - 1; i >= 0; i--) {
+                        enemies[i].y += enemies[i].speed;
+                        if (enemies[i].y > canvas.height) gameOver = true;
+
+                        // Laser hit enemy check
+                        for (let j = lasers.length - 1; j >= 0; j--) {
+                            let l = lasers[j], en = enemies[i];
+                            if (l.x < en.x + en.size && l.x + l.width > en.x && l.y < en.y + en.size && l.y + l.height > en.y) {
+                                score += 100;
+                                enemies.splice(i, 1);
+                                lasers.splice(j, 1);
+                                break;
+                            }
+                        }
+                    }
+                }
+                drawBlaster();
+                if (!gameOver) animationFrameId = requestAnimationFrame(updateBlaster);
+            }
+
+            function drawBlaster() {
+                ctx.fillStyle = '#111'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+                // Draw ship
+                ctx.fillStyle = '#4f46e5'; ctx.fillRect(ship.x, ship.y, ship.width, ship.height);
+                // Draw lasers
+                ctx.fillStyle = '#38bdf8'; for (let l of lasers) ctx.fillRect(l.x, l.y, l.width, l.height);
+                // Draw enemies
+                ctx.fillStyle = '#ef4444'; for (let en of enemies) ctx.fillRect(en.x, en.y, en.size, en.size);
+
+                ctx.fillStyle = '#fff'; ctx.font = '16px sans-serif';
+                ctx.fillText("Score: " + score, 20, 30);
+                ctx.fillText("Arrows/A-D to Move | Spacebar to Shoot", 20, canvas.height - 20);
+
+                if (gameOver) {
+                    ctx.fillStyle = 'rgba(0,0,0,0.8)'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    ctx.fillStyle = '#fff'; ctx.font = 'bold 32px sans-serif'; ctx.textAlign = 'center';
+                    ctx.fillText("GAME OVER", canvas.width / 2, canvas.height / 2 - 20);
+                    ctx.font = '16px sans-serif'; ctx.fillText("Press Spacebar to Restart", canvas.width / 2, canvas.height / 2 + 20);
+                    ctx.textAlign = 'left';
+                }
+            }
+            updateBlaster();
         }
 
         function filterGames() {
