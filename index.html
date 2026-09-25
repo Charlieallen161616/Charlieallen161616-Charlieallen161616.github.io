@@ -41,7 +41,6 @@
         .logo {
             font-size: 1.25rem;
             font-weight: 600;
-            letter-spacing: -0.025em;
             display: flex;
             align-items: center;
             gap: 0.5rem;
@@ -119,7 +118,7 @@
             color: var(--text-muted);
         }
 
-        /* Game View Overlay */
+        /* In-Page Game View Container */
         #game-view {
             display: none;
             position: fixed;
@@ -155,19 +154,24 @@
             background-color: var(--border-color);
         }
 
-        .game-frame-container {
+        .game-canvas-container {
             flex: 1;
             width: 100%;
-            background: #000;
+            background: #0b0b0b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
         }
 
-        iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
+        canvas {
+            background: #111;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            max-width: 100%;
+            max-height: 100%;
         }
 
-        /* Camouflage / Panic Mode Screen */
+        /* Stealth Camouflage Screen (Triggered by ESC) */
         #stealth-screen {
             display: none;
             position: fixed;
@@ -192,31 +196,29 @@
         <div class="logo">
             <span>📚</span> Study Portal
         </div>
-        <input type="text" id="searchInput" class="search-bar" placeholder="Search files or modules..." onkeyup="filterGames()">
+        <input type="text" id="searchInput" class="search-bar" placeholder="Search modules..." onkeyup="filterGames()">
     </header>
 
     <!-- Game Card Directory -->
     <main>
         <div class="grid" id="gameGrid">
-            <!-- Game Card 1 -->
-            <div class="card" onclick="launchGame('games/mineclone/index.html', 'MineClone Simulator')">
-                <div class="card-thumb">Simulation Module</div>
+            <!-- Game Card 1: Retro Pong -->
+            <div class="card" onclick="launchGame('pong')">
+                <div class="card-thumb" style="background: linear-gradient(135deg, #1e1e1e, #2d1b4e);">⚡ Classic Arcade</div>
                 <div class="card-body">
-                    <div class="card-title">MineClone</div>
-                    <div class="card-desc">Voxel sandbox engine layout</div>
+                    <div class="card-title">Retro Pong Simulator</div>
+                    <div class="card-desc">Interactive physics canvas engine</div>
                 </div>
             </div>
 
-            <!-- Game Card 2 -->
-            <div class="card" onclick="launchGame('games/clicker/index.html', 'Clicker Utility')">
-                <div class="card-thumb">Logic Module</div>
+            <!-- Game Card 2: Clicker Game -->
+            <div class="card" onclick="launchGame('clicker')">
+                <div class="card-thumb" style="background: linear-gradient(135deg, #1e1e1e, #1b3a4b);">⚙️ Logic Module</div>
                 <div class="card-body">
                     <div class="card-title">Clicker Legends</div>
-                    <div class="card-desc">Interactive state engine</div>
+                    <div class="card-desc">State tracking and progression counter</div>
                 </div>
             </div>
-
-            <!-- Add more game cards easily by copying the block above -->
         </div>
     </main>
 
@@ -227,8 +229,8 @@
             <span id="active-game-title" style="font-weight: 500; font-size: 0.9rem;">Module Running</span>
             <div style="width: 70px;"></div>
         </div>
-        <div class="game-frame-container">
-            <iframe id="gameFrame" src=""></iframe>
+        <div class="game-canvas-container">
+            <canvas id="gameCanvas" width="800" height="500"></canvas>
         </div>
     </div>
 
@@ -239,38 +241,248 @@
     </div>
 
     <script>
-        // Disguise tab title immediately upon loading
         document.title = "Google Classroom - Home";
 
-        function launchGame(url, title) {
-            document.getElementById('gameFrame').src = url;
-            document.getElementById('active-game-title').innerText = title;
+        let currentGame = null;
+        let animationFrameId = null;
+        let canvas = document.getElementById('gameCanvas');
+        let ctx = canvas.getContext('2d');
+
+        function launchGame(type) {
             document.getElementById('game-view').style.display = 'flex';
-            document.title = title + " - Study Portal";
+            currentGame = type;
+            
+            if (type === 'pong') {
+                document.getElementById('active-game-title').innerText = "Retro Pong Simulator";
+                document.title = "Retro Pong - Study Portal";
+                startPong();
+            } else if (type === 'clicker') {
+                document.getElementById('active-game-title').innerText = "Clicker Legends";
+                document.title = "Clicker Legends - Study Portal";
+                startClicker();
+            }
         }
 
         function closeGame() {
             document.getElementById('game-view').style.display = 'none';
-            document.getElementById('gameFrame').src = '';
+            if (animationFrameId) cancelAnimationFrame(animationFrameId);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            currentGame = null;
             document.title = "Google Classroom - Home";
+        }
+
+        // --- GAME 1: RETRO PONG ---
+        function startPong() {
+            let ballX = canvas.width / 2, ballY = canvas.height / 2;
+            let ballSpeedX = 4, ballSpeedY = 3;
+            let paddle1Y = 200, paddle2Y = 200;
+            const paddleHeight = 100, paddleWidth = 12;
+            let score1 = 0, score2 = 0;
+
+            let upPressed = false, downPressed = false;
+            window.onkeydown = (e) => {
+                if (currentGame !== 'pong') return;
+                if (e.key === 'ArrowUp') upPressed = true;
+                if (e.key === 'ArrowDown') downPressed = true;
+            };
+            window.onkeyup = (e) => {
+                if (currentGame !== 'pong') return;
+                if (e.key === 'ArrowUp') upPressed = false;
+                if (e.key === 'ArrowDown') downPressed = false;
+            };
+
+            function updatePong() {
+                if (currentGame !== 'pong') return;
+
+                // Move Player Paddle
+                if (upPressed && paddle1Y > 0) paddle1Y -= 6;
+                if (downPressed && paddle1Y < canvas.height - paddleHeight) paddle1Y += 6;
+
+                // AI Opponent tracking
+                let targetY = ballY - paddleHeight / 2;
+                paddle2Y += (targetY - paddle2Y) * 0.08;
+
+                // Move Ball
+                ballX += ballSpeedX;
+                ballY += ballSpeedY;
+
+                // Wall collisions (Top/Bottom)
+                if (ballY < 0 || ballY > canvas.height) ballSpeedY = -ballSpeedY;
+
+                // Paddle 1 collision
+                if (ballX <= 30 && ballY >= paddle1Y && ballY <= paddle1Y + paddleHeight) {
+                    ballSpeedX = -ballSpeedX;
+                    ballX = 30;
+                }
+                // Paddle 2 collision
+                if (ballX >= canvas.width - 30 - paddleWidth && ballY >= paddle2Y && ballY <= paddle2Y + paddleHeight) {
+                    ballSpeedX = -ballSpeedX;
+                    ballX = canvas.width - 30 - paddleWidth;
+                }
+
+                // Scoring
+                if (ballX < 0) { score2++; resetBall(); }
+                if (ballX > canvas.width) { score1++; resetBall(); }
+
+                drawPong();
+                animationFrameId = requestAnimationFrame(updatePong);
+            }
+
+            function resetBall() {
+                ballX = canvas.width / 2;
+                ballY = canvas.height / 2;
+                ballSpeedX = -ballSpeedX;
+            }
+
+            function drawPong() {
+                ctx.fillStyle = '#111';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                // Net
+                ctx.strokeStyle = '#333';
+                ctx.setLineDash([5, 15]);
+                ctx.beginPath();
+                ctx.moveTo(canvas.width / 2, 0);
+                ctx.lineTo(canvas.width / 2, canvas.height);
+                ctx.stroke();
+                ctx.setLineDash([]);
+
+                // Paddles & Ball
+                ctx.fillStyle = '#fff';
+                ctx.fillRect(20, paddle1Y, paddleWidth, paddleHeight);
+                ctx.fillRect(canvas.width - 20 - paddleWidth, paddle2Y, paddleWidth, paddleHeight);
+                ctx.beginPath();
+                ctx.arc(ballX, ballY, 8, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Scores
+                ctx.font = '32px sans-serif';
+                ctx.fillText(score1, canvas.width / 4, 50);
+                ctx.fillText(score2, (canvas.width / 4) * 3, 50);
+                ctx.font = '12px sans-serif';
+                ctx.fillStyle = '#777';
+                ctx.fillText("Use Up/Down Arrow Keys to Move", 20, canvas.height - 20);
+            }
+
+            updatePong();
+        }
+
+        // --- GAME 2: CLICKER GAME ---
+        function startClicker() {
+            let score = 0;
+            let cps = 0;
+            let clickPower = 1;
+            let autoClickers = 0;
+
+            // Auto-clicker interval
+            let timer = setInterval(() => {
+                if (currentGame !== 'clicker') { clearInterval(timer); return; }
+                if (autoClickers > 0) {
+                    score += autoClickers;
+                    drawClicker();
+                }
+            }, 1000);
+
+            canvas.onclick = (e) => {
+                if (currentGame !== 'clicker') return;
+                let rect = canvas.getBoundingClientRect();
+                let x = e.clientX - rect.left;
+                let y = e.clientY - rect.top;
+
+                // Check if clicking the main button (Center)
+                let btnX = canvas.width / 2 - 100;
+                let btnY = canvas.height / 2 - 50;
+                if (x >= btnX && x <= btnX + 200 && y >= btnY && y <= btnY + 80) {
+                    score += clickPower;
+                }
+
+                // Check if buying upgrade 1 (Cost 20)
+                let up1X = canvas.width / 2 - 150;
+                let up1Y = canvas.height / 2 + 80;
+                if (x >= up1X && x <= up1X + 140 && y >= up1Y && y <= up1Y + 40) {
+                    if (score >= 20) {
+                        score -= 20;
+                        clickPower += 1;
+                    }
+                }
+
+                // Check if buying upgrade 2 (Cost 50)
+                let up2X = canvas.width / 2 + 10;
+                let up2Y = canvas.height / 2 + 80;
+                if (x >= up2X && x <= up2X + 140 && y >= up2Y && y <= up2Y + 40) {
+                    if (score >= 50) {
+                        score -= 50;
+                        autoClickers += 1;
+                    }
+                }
+                drawClicker();
+            };
+
+            function drawClicker() {
+                ctx.fillStyle = '#111';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                // Title & Score
+                ctx.fillStyle = '#fff';
+                ctx.font = 'bold 24px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText("Clicker Legends", canvas.width / 2, 60);
+                
+                ctx.font = '20px sans-serif';
+                ctx.fillStyle = '#4f46e5';
+                ctx.fillText("Points: " + score, canvas.width / 2, 100);
+
+                // Main Click Button
+                let btnX = canvas.width / 2 - 100;
+                let btnY = canvas.height / 2 - 50;
+                ctx.fillStyle = '#1e1e1e';
+                ctx.strokeStyle = '#4f46e5';
+                ctx.lineWidth = 3;
+                ctx.fillRect(btnX, btnY, 200, 80);
+                ctx.strokeRect(btnX, btnY, 200, 80);
+
+                ctx.fillStyle = '#fff';
+                ctx.font = 'bold 16px sans-serif';
+                ctx.fillText("CLICK ME!", canvas.width / 2, btnY + 45);
+
+                // Upgrade 1 Button (+1 Power, Cost 20)
+                let up1X = canvas.width / 2 - 150;
+                let up1Y = canvas.height / 2 + 80;
+                ctx.fillStyle = score >= 20 ? '#222' : '#151515';
+                ctx.strokeStyle = score >= 20 ? '#10b981' : '#444';
+                ctx.fillRect(up1X, up1Y, 140, 40);
+                ctx.strokeRect(up1X, up1Y, 140, 40);
+                ctx.fillStyle = score >= 20 ? '#fff' : '#666';
+                ctx.font = '13px sans-serif';
+                ctx.fillText("+1 Power (Cost: 20)", up1X + 70, up1Y + 25);
+
+                // Upgrade 2 Button (+1 Auto/sec, Cost 50)
+                let up2X = canvas.width / 2 + 10;
+                let up2Y = canvas.height / 2 + 80;
+                ctx.fillStyle = score >= 50 ? '#222' : '#151515';
+                ctx.strokeStyle = score >= 50 ? '#f59e0b' : '#444';
+                ctx.fillRect(up2X, up2Y, 140, 40);
+                ctx.strokeRect(up2X, up2Y, 140, 40);
+                ctx.fillStyle = score >= 50 ? '#fff' : '#666';
+                ctx.fillText("+1 Auto/s (Cost: 50)", up2X + 70, up2Y + 25);
+
+                ctx.textAlign = 'left';
+            }
+
+            drawClicker();
         }
 
         function filterGames() {
             let input = document.getElementById('searchInput').value.toLowerCase();
             let cards = document.getElementsByClassName('card');
-            
             for (let i = 0; i < cards.length; i++) {
                 let title = cards[i].getElementsByClassName('card-title')[0].innerText.toLowerCase();
                 let desc = cards[i].getElementsByClassName('card-desc')[0].innerText.toLowerCase();
-                if (title.includes(input) || desc.includes(input)) {
-                    cards[i].style.display = "block";
-                } else {
-                    cards[i].style.display = "none";
-                }
+                cards[i].style.display = (title.includes(input) || desc.includes(input)) ? "block" : "none";
             }
         }
 
-        // Panic / Stealth Switch: Press Escape key to instantly show fake school document
+        // Panic / Stealth Switch: Press Escape key
         let stealthActive = false;
         document.addEventListener('keydown', function(event) {
             if (event.key === 'Escape') {
