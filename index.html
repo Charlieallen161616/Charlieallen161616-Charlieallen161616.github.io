@@ -1,1 +1,290 @@
-<h1>Welcome to modios.online, this was a games website until i switched to a different host</h1>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Classroom - Dashboard</title>
+    <style>
+        :root {
+            --bg-color: #121212;
+            --surface-color: #1e1e1e;
+            --border-color: #333333;
+            --accent-color: #4f46e5;
+            --text-color: #e5e7eb;
+            --text-muted: #9ca3af;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background-color: var(--surface-color);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.25rem;
+            font-weight: 600;
+            letter-spacing: -0.025em;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo span {
+            color: var(--accent-color);
+        }
+
+        .search-bar {
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            color: var(--text-color);
+            width: 300px;
+            outline: none;
+        }
+
+        .search-bar:focus {
+            border-color: var(--accent-color);
+        }
+
+        main {
+            flex: 1;
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .card {
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.15s ease, border-color 0.15s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            border-color: var(--accent-color);
+        }
+
+        .card-thumb {
+            height: 140px;
+            background-color: #262626;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .card-body {
+            padding: 1rem;
+        }
+
+        .card-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .card-desc {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        /* Game View Overlay */
+        #game-view {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: var(--bg-color);
+            z-index: 100;
+            flex-direction: column;
+        }
+
+        .game-header {
+            background-color: var(--surface-color);
+            padding: 0.75rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .back-btn {
+            background: none;
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 0.4rem 0.8rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+
+        .back-btn:hover {
+            background-color: var(--border-color);
+        }
+
+        .game-frame-container {
+            flex: 1;
+            width: 100%;
+            background: #000;
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* Camouflage / Panic Mode Screen */
+        #stealth-screen {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #ffffff;
+            color: #000;
+            z-index: 9999;
+            padding: 3rem;
+            font-family: "Times New Roman", Times, serif;
+        }
+        #stealth-screen h1 { font-size: 2rem; margin-bottom: 1rem; }
+        #stealth-screen p { font-size: 1.1rem; line-height: 1.6; }
+    </style>
+</head>
+<body>
+
+    <!-- Main Navigation / Header -->
+    <header>
+        <div class="logo">
+            <span>📚</span> Study Portal
+        </div>
+        <input type="text" id="searchInput" class="search-bar" placeholder="Search files or modules..." onkeyup="filterGames()">
+    </header>
+
+    <!-- Game Card Directory -->
+    <main>
+        <div class="grid" id="gameGrid">
+            <!-- Game Card 1 -->
+            <div class="card" onclick="launchGame('games/mineclone/index.html', 'MineClone Simulator')">
+                <div class="card-thumb">Simulation Module</div>
+                <div class="card-body">
+                    <div class="card-title">MineClone</div>
+                    <div class="card-desc">Voxel sandbox engine layout</div>
+                </div>
+            </div>
+
+            <!-- Game Card 2 -->
+            <div class="card" onclick="launchGame('games/clicker/index.html', 'Clicker Utility')">
+                <div class="card-thumb">Logic Module</div>
+                <div class="card-body">
+                    <div class="card-title">Clicker Legends</div>
+                    <div class="card-desc">Interactive state engine</div>
+                </div>
+            </div>
+
+            <!-- Add more game cards easily by copying the block above -->
+        </div>
+    </main>
+
+    <!-- Active Game View Container -->
+    <div id="game-view">
+        <div class="game-header">
+            <button class="back-btn" onclick="closeGame()">← Return to Dashboard</button>
+            <span id="active-game-title" style="font-weight: 500; font-size: 0.9rem;">Module Running</span>
+            <div style="width: 70px;"></div>
+        </div>
+        <div class="game-frame-container">
+            <iframe id="gameFrame" src=""></iframe>
+        </div>
+    </div>
+
+    <!-- Stealth Camouflage Screen (Triggered by ESC) -->
+    <div id="stealth-screen">
+        <h1>Document Viewer - Assignment #4</h1>
+        <p>Please review the required reading materials and complete the assessment questions below before the end of the period. Contact your instructor if you run into technical issues with loading the document server.</p>
+    </div>
+
+    <script>
+        // Disguise tab title immediately upon loading
+        document.title = "Google Classroom - Home";
+
+        function launchGame(url, title) {
+            document.getElementById('gameFrame').src = url;
+            document.getElementById('active-game-title').innerText = title;
+            document.getElementById('game-view').style.display = 'flex';
+            document.title = title + " - Study Portal";
+        }
+
+        function closeGame() {
+            document.getElementById('game-view').style.display = 'none';
+            document.getElementById('gameFrame').src = '';
+            document.title = "Google Classroom - Home";
+        }
+
+        function filterGames() {
+            let input = document.getElementById('searchInput').value.toLowerCase();
+            let cards = document.getElementsByClassName('card');
+            
+            for (let i = 0; i < cards.length; i++) {
+                let title = cards[i].getElementsByClassName('card-title')[0].innerText.toLowerCase();
+                let desc = cards[i].getElementsByClassName('card-desc')[0].innerText.toLowerCase();
+                if (title.includes(input) || desc.includes(input)) {
+                    cards[i].style.display = "block";
+                } else {
+                    cards[i].style.display = "none";
+                }
+            }
+        }
+
+        // Panic / Stealth Switch: Press Escape key to instantly show fake school document
+        let stealthActive = false;
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                stealthActive = !stealthActive;
+                let stealthEl = document.getElementById('stealth-screen');
+                if (stealthActive) {
+                    stealthEl.style.display = 'block';
+                    document.title = "Assignment Document - Word Online";
+                } else {
+                    stealthEl.style.display = 'none';
+                    document.title = "Google Classroom - Home";
+                }
+            }
+        });
+    </script>
+</body>
+</html>
