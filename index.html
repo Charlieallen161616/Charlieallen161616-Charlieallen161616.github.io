@@ -36,6 +36,8 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
         }
 
         .logo {
@@ -50,18 +52,41 @@
             color: var(--accent-color);
         }
 
+        .header-controls {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
         .search-bar {
             background-color: var(--bg-color);
             border: 1px solid var(--border-color);
             padding: 0.5rem 1rem;
             border-radius: 6px;
             color: var(--text-color);
-            width: 300px;
+            width: 250px;
             outline: none;
         }
 
         .search-bar:focus {
             border-color: var(--accent-color);
+        }
+
+        .offline-btn {
+            background-color: #1e293b;
+            border: 1px solid #3b82f6;
+            color: #38bdf8;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+
+        .offline-btn:hover {
+            background-color: #3b82f6;
+            color: #fff;
         }
 
         main {
@@ -196,13 +221,15 @@
         <div class="logo">
             <span>📚</span> Study Portal
         </div>
-        <input type="text" id="searchInput" class="search-bar" placeholder="Search modules..." onkeyup="filterGames()">
+        <div class="header-controls">
+            <button class="offline-btn" id="saveOfflineBtn" onclick="saveToOfflineMemory()">📥 Save for Offline</button>
+            <input type="text" id="searchInput" class="search-bar" placeholder="Search modules..." onkeyup="filterGames()">
+        </div>
     </header>
 
     <!-- Game Card Directory -->
     <main>
         <div class="grid" id="gameGrid">
-            <!-- Game 1: Pong -->
             <div class="card" onclick="launchGame('pong')">
                 <div class="card-thumb" style="background: linear-gradient(135deg, #1e1e1e, #2d1b4e);">⚡ Classic Arcade</div>
                 <div class="card-body">
@@ -211,7 +238,6 @@
                 </div>
             </div>
 
-            <!-- Game 2: Clicker -->
             <div class="card" onclick="launchGame('clicker')">
                 <div class="card-thumb" style="background: linear-gradient(135deg, #1e1e1e, #1b3a4b);">⚙️ Logic Module</div>
                 <div class="card-body">
@@ -220,7 +246,6 @@
                 </div>
             </div>
 
-            <!-- Game 3: Neon Dodge -->
             <div class="card" onclick="launchGame('dodge')">
                 <div class="card-thumb" style="background: linear-gradient(135deg, #1e1e1e, #4e1b1b);">🚀 Action Sandbox</div>
                 <div class="card-body">
@@ -229,7 +254,6 @@
                 </div>
             </div>
 
-            <!-- Game 4: Color Match -->
             <div class="card" onclick="launchGame('colors')">
                 <div class="card-thumb" style="background: linear-gradient(135deg, #1e1e1e, #1b4e2d);">🧩 Puzzle Routine</div>
                 <div class="card-body">
@@ -238,7 +262,6 @@
                 </div>
             </div>
 
-            <!-- Game 5: Snake -->
             <div class="card" onclick="launchGame('snake')">
                 <div class="card-thumb" style="background: linear-gradient(135deg, #1e1e1e, #3a1b4b);">🐍 Vector Simulation</div>
                 <div class="card-body">
@@ -247,7 +270,6 @@
                 </div>
             </div>
 
-            <!-- Game 6: Space Blaster -->
             <div class="card" onclick="launchGame('blaster')">
                 <div class="card-thumb" style="background: linear-gradient(135deg, #1e1e1e, #1b2d4e);">🛸 Tactical Blaster</div>
                 <div class="card-body">
@@ -284,6 +306,50 @@
         let activeInterval = null;
         let canvas = document.getElementById('gameCanvas');
         let ctx = canvas.getContext('2d');
+
+        // --- OFFLINE CACHE STORAGE (PWA Simulation) ---
+        function saveToOfflineMemory() {
+            try {
+                const pageHTML = document.documentElement.outerHTML;
+                localStorage.setItem('offline_portal_page', pageHTML);
+                
+                // Register local service worker cache if supported
+                if ('serviceWorker' in navigator) {
+                    const blob = new Blob([`
+                        self.addEventListener('install', e => e.waitUntil(self.skipWaiting()));
+                        self.addEventListener('activate', e => e.waitUntil(self.clients.claim()));
+                        self.addEventListener('fetch', e => {
+                            e.respondWith(
+                                caches.match(e.request).then(res => res || fetch(e.request))
+                            );
+                        });
+                    `], { type: 'text/javascript' });
+                    const swUrl = URL.createObjectURL(blob);
+                    navigator.serviceWorker.register(swUrl).catch(() => {});
+                }
+
+                let btn = document.getElementById('saveOfflineBtn');
+                btn.innerText = "✅ Saved for Offline!";
+                btn.style.backgroundColor = "#10b981";
+                btn.style.borderColor = "#10b981";
+                btn.style.color = "#fff";
+                setTimeout(() => {
+                    btn.innerText = "📥 Save for Offline";
+                    btn.style.backgroundColor = "#1e293b";
+                    btn.style.borderColor = "#3b82f6";
+                    btn.style.color = "#38bdf8";
+                }, 3000);
+            } catch (err) {
+                alert("Storage error: Browser memory might be restricted.");
+            }
+        }
+
+        // Check if loaded offline from cache
+        window.addEventListener('load', () => {
+            if (!navigator.onLine && localStorage.getItem('offline_portal_page')) {
+                console.log("Running from offline local memory cache.");
+            }
+        });
 
         function launchGame(type) {
             document.getElementById('game-view').style.display = 'flex';
@@ -573,11 +639,9 @@
                 if (currentGame !== 'snake' || gameOver) return;
                 let head = { x: snake[0].x + dx, y: snake[0].y + dy };
 
-                // Wall collision
                 if (head.x < 0 || head.x >= canvas.width / gridSize || head.y < 0 || head.y >= canvas.height / gridSize) {
                     gameOver = true; return;
                 }
-                // Self collision
                 for (let part of snake) {
                     if (head.x === part.x && head.y === part.y) { gameOver = true; return; }
                 }
@@ -593,9 +657,7 @@
 
             function drawSnake() {
                 ctx.fillStyle = '#111'; ctx.fillRect(0, 0, canvas.width, canvas.height);
-                // Draw food
                 ctx.fillStyle = '#ef4444'; ctx.fillRect(food.x * gridSize, food.y * gridSize, gridSize - 2, gridSize - 2);
-                // Draw snake
                 ctx.fillStyle = '#10b981';
                 for (let part of snake) {
                     ctx.fillRect(part.x * gridSize, part.y * gridSize, gridSize - 2, gridSize - 2);
@@ -646,18 +708,15 @@
                     if (leftPressed && ship.x > 0) ship.x -= ship.speed;
                     if (rightPressed && ship.x < canvas.width - ship.width) ship.x += ship.speed;
 
-                    // Move lasers
                     for (let i = lasers.length - 1; i >= 0; i--) {
                         lasers[i].y -= lasers[i].speed;
                         if (lasers[i].y < 0) lasers.splice(i, 1);
                     }
 
-                    // Move enemies & check collisions
                     for (let i = enemies.length - 1; i >= 0; i--) {
                         enemies[i].y += enemies[i].speed;
                         if (enemies[i].y > canvas.height) gameOver = true;
 
-                        // Laser hit enemy check
                         for (let j = lasers.length - 1; j >= 0; j--) {
                             let l = lasers[j], en = enemies[i];
                             if (l.x < en.x + en.size && l.x + l.width > en.x && l.y < en.y + en.size && l.y + l.height > en.y) {
@@ -675,11 +734,8 @@
 
             function drawBlaster() {
                 ctx.fillStyle = '#111'; ctx.fillRect(0, 0, canvas.width, canvas.height);
-                // Draw ship
                 ctx.fillStyle = '#4f46e5'; ctx.fillRect(ship.x, ship.y, ship.width, ship.height);
-                // Draw lasers
                 ctx.fillStyle = '#38bdf8'; for (let l of lasers) ctx.fillRect(l.x, l.y, l.width, l.height);
-                // Draw enemies
                 ctx.fillStyle = '#ef4444'; for (let en of enemies) ctx.fillRect(en.x, en.y, en.size, en.size);
 
                 ctx.fillStyle = '#fff'; ctx.font = '16px sans-serif';
