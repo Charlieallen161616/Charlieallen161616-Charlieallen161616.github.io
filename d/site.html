@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Google Classroom - Dashboard</title>
     <style>
         :root {
@@ -19,6 +19,7 @@
             margin: 0;
             padding: 0;
             font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            touch-action: manipulation;
         }
 
         body {
@@ -32,16 +33,16 @@
         header {
             background-color: var(--surface-color);
             border-bottom: 1px solid var(--border-color);
-            padding: 1rem 2rem;
+            padding: 1rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            gap: 1rem;
+            gap: 0.75rem;
             flex-wrap: wrap;
         }
 
         .logo {
-            font-size: 1.25rem;
+            font-size: 1.1rem;
             font-weight: 600;
             display: flex;
             align-items: center;
@@ -54,9 +55,15 @@
 
         .header-controls {
             display: flex;
-            gap: 1rem;
+            gap: 0.5rem;
             align-items: center;
             flex-wrap: wrap;
+            width: 100%;
+        }
+
+        @media(min-width: 600px) {
+            .header-controls { width: auto; }
+            header { padding: 1rem 2rem; }
         }
 
         .search-bar {
@@ -65,7 +72,8 @@
             padding: 0.5rem 1rem;
             border-radius: 6px;
             color: var(--text-color);
-            width: 250px;
+            flex: 1;
+            min-width: 200px;
             outline: none;
         }
 
@@ -77,7 +85,7 @@
             background-color: #1e293b;
             border: 1px solid #10b981;
             color: #34d399;
-            padding: 0.5rem 1rem;
+            padding: 0.5rem 0.8rem;
             border-radius: 6px;
             cursor: pointer;
             font-size: 0.85rem;
@@ -86,12 +94,7 @@
             display: inline-flex;
             align-items: center;
             gap: 0.4rem;
-            transition: background 0.2s;
-        }
-
-        .download-btn:hover {
-            background-color: #10b981;
-            color: #fff;
+            white-space: nowrap;
         }
 
         main {
@@ -99,13 +102,17 @@
             max-width: 1200px;
             width: 100%;
             margin: 0 auto;
-            padding: 2rem;
+            padding: 1rem;
+        }
+
+        @media(min-width: 600px) {
+            main { padding: 2rem; }
         }
 
         .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-            gap: 1.5rem;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 1rem;
         }
 
         .card {
@@ -117,13 +124,12 @@
             transition: transform 0.15s ease, border-color 0.15s ease;
         }
 
-        .card:hover {
-            transform: translateY(-2px);
-            border-color: var(--accent-color);
+        .card:active {
+            transform: scale(0.98);
         }
 
         .card-thumb {
-            height: 140px;
+            height: 120px;
             background-color: #262626;
             display: flex;
             align-items: center;
@@ -163,7 +169,7 @@
 
         .game-header {
             background-color: var(--surface-color);
-            padding: 0.75rem 1.5rem;
+            padding: 0.75rem 1rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -180,25 +186,49 @@
             font-size: 0.85rem;
         }
 
-        .back-btn:hover {
-            background-color: var(--border-color);
-        }
-
         .game-canvas-container {
             flex: 1;
             width: 100%;
             background: #0b0b0b;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             position: relative;
+            padding-bottom: 70px;
         }
 
         canvas {
             background: #111;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
             max-width: 100%;
-            max-height: 100%;
+            max-height: 70vh;
+            object-fit: contain;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        /* On-Screen Mobile Touch Controls Overlay */
+        .mobile-controls {
+            position: absolute;
+            bottom: 10px;
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .ctrl-btn {
+            background: rgba(79, 70, 229, 0.8);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 1.2rem;
+            border-radius: 8px;
+            font-weight: bold;
+            user-select: none;
+        }
+
+        .ctrl-btn:active {
+            background: rgba(79, 70, 229, 1);
         }
 
         /* Stealth Camouflage Screen (Triggered by ESC) */
@@ -212,11 +242,11 @@
             background: #ffffff;
             color: #000;
             z-index: 9999;
-            padding: 3rem;
+            padding: 2rem;
             font-family: "Times New Roman", Times, serif;
         }
-        #stealth-screen h1 { font-size: 2rem; margin-bottom: 1rem; }
-        #stealth-screen p { font-size: 1.1rem; line-height: 1.6; }
+        #stealth-screen h1 { font-size: 1.75rem; margin-bottom: 1rem; }
+        #stealth-screen p { font-size: 1rem; line-height: 1.6; }
     </style>
 </head>
 <body>
@@ -227,7 +257,6 @@
             <span>📚</span> Study Portal
         </div>
         <div class="header-controls">
-            <!-- Points directly to your d/site.html file upload -->
             <a href="d/site.html" download="site.html" class="download-btn">📥 Download site.html</a>
             <input type="text" id="searchInput" class="search-bar" placeholder="Search modules..." onkeyup="filterGames()">
         </div>
@@ -289,12 +318,14 @@
     <!-- Active Game View Container -->
     <div id="game-view">
         <div class="game-header">
-            <button class="back-btn" onclick="closeGame()">← Return to Dashboard</button>
-            <span id="active-game-title" style="font-weight: 500; font-size: 0.9rem;">Module Running</span>
-            <div style="width: 70px;"></div>
+            <button class="back-btn" onclick="closeGame()">← Return</button>
+            <span id="active-game-title" style="font-weight: 500; font-size: 0.85rem;">Module Running</span>
+            <div style="width: 50px;"></div>
         </div>
         <div class="game-canvas-container">
             <canvas id="gameCanvas" width="800" height="500"></canvas>
+            <!-- Dynamic Touch Buttons -->
+            <div class="mobile-controls" id="mobileControls" style="display:none;"></div>
         </div>
     </div>
 
@@ -313,33 +344,45 @@
         let canvas = document.getElementById('gameCanvas');
         let ctx = canvas.getContext('2d');
 
+        function setControls(html) {
+            let container = document.getElementById('mobileControls');
+            container.innerHTML = html;
+            container.style.display = html ? 'flex' : 'none';
+        }
+
         function launchGame(type) {
             document.getElementById('game-view').style.display = 'flex';
             currentGame = type;
             
             if (type === 'pong') {
-                document.getElementById('active-game-title').innerText = "Retro Pong Simulator";
+                document.getElementById('active-game-title').innerText = "Retro Pong";
                 document.title = "Retro Pong - Study Portal";
+                setControls('<button class="ctrl-btn" ontouchstart="p1Up=true" ontouchend="p1Up=false" onmousedown="p1Up=true" onmouseup="p1Up=false">⬆️ Up</button><button class="ctrl-btn" ontouchstart="p1Down=true" ontouchend="p1Down=false" onmousedown="p1Down=true" onmouseup="p1Down=false">⬇️ Down</button>');
                 startPong();
             } else if (type === 'clicker') {
                 document.getElementById('active-game-title').innerText = "Clicker Legends";
                 document.title = "Clicker Legends - Study Portal";
+                setControls('');
                 startClicker();
             } else if (type === 'dodge') {
                 document.getElementById('active-game-title').innerText = "Neon Dodge";
                 document.title = "Neon Dodge - Study Portal";
+                setControls('<button class="ctrl-btn" ontouchstart="dLeft=true" ontouchend="dLeft=false" onmousedown="dLeft=true" onmouseup="dLeft=false">⬅️ Left</button><button class="ctrl-btn" ontouchstart="dRight=true" ontouchend="dRight=false" onmousedown="dRight=true" onmouseup="dRight=false">Right ➡️</button>');
                 startDodge();
             } else if (type === 'colors') {
-                document.getElementById('active-game-title').innerText = "Color Match Matrix";
+                document.getElementById('active-game-title').innerText = "Color Match";
                 document.title = "Color Match - Study Portal";
+                setControls('');
                 startColors();
             } else if (type === 'snake') {
                 document.getElementById('active-game-title').innerText = "Retro Snake";
                 document.title = "Retro Snake - Study Portal";
+                setControls('<button class="ctrl-btn" onclick="sDir(0,-1)">⬆️</button><div><button class="ctrl-btn" onclick="sDir(-1,0)">⬅️</button><button class="ctrl-btn" onclick="sDir(1,0)">➡️</button></div><button class="ctrl-btn" onclick="sDir(0,1)">⬇️</button>');
                 startSnake();
             } else if (type === 'blaster') {
                 document.getElementById('active-game-title').innerText = "Space Blaster";
                 document.title = "Space Blaster - Study Portal";
+                setControls('<button class="ctrl-btn" ontouchstart="bLeft=true" ontouchend="bLeft=false" onmousedown="bLeft=true" onmouseup="bLeft=false">⬅️</button><button class="ctrl-btn" ontouchstart="bShoot=true" ontouchend="bShoot=false" onmousedown="bShoot=true" onmouseup="bShoot=false">🔥 Fire</button><button class="ctrl-btn" ontouchstart="bRight=true" ontouchend="bRight=false" onmousedown="bRight=true" onmouseup="bRight=false">➡️</button>');
                 startBlaster();
             }
         }
@@ -348,6 +391,7 @@
             document.getElementById('game-view').style.display = 'none';
             if (animationFrameId) cancelAnimationFrame(animationFrameId);
             if (activeInterval) clearInterval(activeInterval);
+            setControls('');
             window.onkeydown = null;
             window.onkeyup = null;
             canvas.onclick = null;
@@ -356,30 +400,29 @@
             document.title = "Google Classroom - Home";
         }
 
-        // --- GAME 1: RETRO PONG ---
+        let p1Up = false, p1Down = false;
         function startPong() {
             let ballX = canvas.width / 2, ballY = canvas.height / 2;
             let ballSpeedX = 4, ballSpeedY = 3;
             let paddle1Y = 200, paddle2Y = 200;
             const paddleHeight = 100, paddleWidth = 12;
             let score1 = 0, score2 = 0;
-            let upPressed = false, downPressed = false;
 
             window.onkeydown = (e) => {
                 if (currentGame !== 'pong') return;
-                if (e.key === 'ArrowUp') upPressed = true;
-                if (e.key === 'ArrowDown') downPressed = true;
+                if (e.key === 'ArrowUp') p1Up = true;
+                if (e.key === 'ArrowDown') p1Down = true;
             };
             window.onkeyup = (e) => {
                 if (currentGame !== 'pong') return;
-                if (e.key === 'ArrowUp') upPressed = false;
-                if (e.key === 'ArrowDown') downPressed = false;
+                if (e.key === 'ArrowUp') p1Up = false;
+                if (e.key === 'ArrowDown') p1Down = false;
             };
 
             function updatePong() {
                 if (currentGame !== 'pong') return;
-                if (upPressed && paddle1Y > 0) paddle1Y -= 6;
-                if (downPressed && paddle1Y < canvas.height - paddleHeight) paddle1Y += 6;
+                if (p1Up && paddle1Y > 0) paddle1Y -= 6;
+                if (p1Down && paddle1Y < canvas.height - paddleHeight) paddle1Y += 6;
 
                 let targetY = ballY - paddleHeight / 2;
                 paddle2Y += (targetY - paddle2Y) * 0.08;
@@ -410,13 +453,11 @@
                 ctx.fillRect(20, paddle1Y, paddleWidth, paddleHeight);
                 ctx.fillRect(canvas.width - 20 - paddleWidth, paddle2Y, paddleWidth, paddleHeight);
                 ctx.beginPath(); ctx.arc(ballX, ballY, 8, 0, Math.PI * 2); ctx.fill();
-                ctx.font = '32px sans-serif'; ctx.fillText(score1, canvas.width / 4, 50); ctx.fillText(score2, (canvas.width / 4) * 3, 50);
-                ctx.font = '12px sans-serif'; ctx.fillStyle = '#777'; ctx.fillText("Use Up/Down Arrow Keys to Move", 20, canvas.height - 20);
+                ctx.font = '28px sans-serif'; ctx.fillText(score1, canvas.width / 4, 45); ctx.fillText(score2, (canvas.width / 4) * 3, 45);
             }
             updatePong();
         }
 
-        // --- GAME 2: CLICKER GAME ---
         function startClicker() {
             let score = 0, clickPower = 1, autoClickers = 0;
             activeInterval = setInterval(() => {
@@ -427,7 +468,11 @@
             canvas.onclick = (e) => {
                 if (currentGame !== 'clicker') return;
                 let rect = canvas.getBoundingClientRect();
-                let x = e.clientX - rect.left, y = e.clientY - rect.top;
+                let scaleX = canvas.width / rect.width;
+                let scaleY = canvas.height / rect.height;
+                let x = (e.clientX - rect.left) * scaleX;
+                let y = (e.clientY - rect.top) * scaleY;
+
                 let btnX = canvas.width / 2 - 100, btnY = canvas.height / 2 - 50;
                 if (x >= btnX && x <= btnX + 200 && y >= btnY && y <= btnY + 80) score += clickPower;
 
@@ -453,33 +498,32 @@
                 let up1X = canvas.width / 2 - 150, up1Y = canvas.height / 2 + 80;
                 ctx.fillStyle = score >= 20 ? '#222' : '#151515'; ctx.strokeStyle = score >= 20 ? '#10b981' : '#444';
                 ctx.fillRect(up1X, up1Y, 140, 40); ctx.strokeRect(up1X, up1Y, 140, 40);
-                ctx.fillStyle = score >= 20 ? '#fff' : '#666'; ctx.font = '13px sans-serif'; ctx.fillText("+1 Power (Cost: 20)", up1X + 70, up1Y + 25);
+                ctx.fillStyle = score >= 20 ? '#fff' : '#666'; ctx.font = '13px sans-serif'; ctx.fillText("+1 Power (20)", up1X + 70, up1Y + 25);
 
                 let up2X = canvas.width / 2 + 10, up2Y = canvas.height / 2 + 80;
                 ctx.fillStyle = score >= 50 ? '#222' : '#151515'; ctx.strokeStyle = score >= 50 ? '#f59e0b' : '#444';
                 ctx.fillRect(up2X, up2Y, 140, 40); ctx.strokeRect(up2X, up2Y, 140, 40);
-                ctx.fillStyle = score >= 50 ? '#fff' : '#666'; ctx.font = '13px sans-serif'; ctx.fillText("+1 Auto/s (Cost: 50)", up2X + 70, up2Y + 25);
+                ctx.fillStyle = score >= 50 ? '#fff' : '#666'; ctx.font = '13px sans-serif'; ctx.fillText("+1 Auto (50)", up2X + 70, up2Y + 25);
                 ctx.textAlign = 'left';
             }
             drawClicker();
         }
 
-        // --- GAME 3: NEON DODGE ---
+        let dLeft = false, dRight = false;
         function startDodge() {
             let player = { x: 400, y: 420, size: 20, speed: 7 };
-            let obstacles = [], score = 0;
-            let leftPressed = false, rightPressed = false, gameOver = false;
+            let obstacles = [], score = 0, gameOver = false;
 
             window.onkeydown = (e) => {
                 if (currentGame !== 'dodge') return;
-                if (e.key === 'ArrowLeft' || e.key === 'a') leftPressed = true;
-                if (e.key === 'ArrowRight' || e.key === 'd') rightPressed = true;
+                if (e.key === 'ArrowLeft' || e.key === 'a') dLeft = true;
+                if (e.key === 'ArrowRight' || e.key === 'd') dRight = true;
                 if (e.key === ' ' && gameOver) startDodge();
             };
             window.onkeyup = (e) => {
                 if (currentGame !== 'dodge') return;
-                if (e.key === 'ArrowLeft' || e.key === 'a') leftPressed = false;
-                if (e.key === 'ArrowRight' || e.key === 'd') rightPressed = false;
+                if (e.key === 'ArrowLeft' || e.key === 'a') dLeft = false;
+                if (e.key === 'ArrowRight' || e.key === 'd') dRight = false;
             };
 
             activeInterval = setInterval(() => {
@@ -491,8 +535,8 @@
             function updateDodge() {
                 if (currentGame !== 'dodge') return;
                 if (!gameOver) {
-                    if (leftPressed && player.x > 0) player.x -= player.speed;
-                    if (rightPressed && player.x < canvas.width - player.size) player.x += player.speed;
+                    if (dLeft && player.x > 0) player.x -= player.speed;
+                    if (dRight && player.x < canvas.width - player.size) player.x += player.speed;
 
                     for (let i = obstacles.length - 1; i >= 0; i--) {
                         obstacles[i].y += obstacles[i].speed;
@@ -510,20 +554,17 @@
                 ctx.fillStyle = '#4f46e5'; ctx.fillRect(player.x, player.y, player.size, player.size);
                 ctx.fillStyle = '#ef4444'; for (let obs of obstacles) ctx.fillRect(obs.x, obs.y, obs.size, obs.size);
                 ctx.fillStyle = '#fff'; ctx.font = '16px sans-serif'; ctx.fillText("Score: " + score, 20, 30);
-                ctx.fillText("Use Left/Right Arrows or A/D to Dodge", 20, canvas.height - 20);
 
                 if (gameOver) {
                     ctx.fillStyle = 'rgba(0,0,0,0.8)'; ctx.fillRect(0, 0, canvas.width, canvas.height);
-                    ctx.fillStyle = '#fff'; ctx.font = 'bold 32px sans-serif'; ctx.textAlign = 'center';
-                    ctx.fillText("GAME OVER", canvas.width / 2, canvas.height / 2 - 20);
-                    ctx.font = '16px sans-serif'; ctx.fillText("Press Spacebar to Restart", canvas.width / 2, canvas.height / 2 + 20);
+                    ctx.fillStyle = '#fff'; ctx.font = 'bold 28px sans-serif'; ctx.textAlign = 'center';
+                    ctx.fillText("GAME OVER", canvas.width / 2, canvas.height / 2 - 10);
                     ctx.textAlign = 'left';
                 }
             }
             updateDodge();
         }
 
-        // --- GAME 4: COLOR MATCH ---
         function startColors() {
             let score = 0, targetColor = "", options = [];
             const colors = [
@@ -540,9 +581,12 @@
             canvas.onclick = (e) => {
                 if (currentGame !== 'colors') return;
                 let rect = canvas.getBoundingClientRect();
-                let x = e.clientX - rect.left, y = e.clientY - rect.top;
-                let boxWidth = 140, boxHeight = 80, startX = canvas.width / 2 - 300, startY = 300;
+                let scaleX = canvas.width / rect.width;
+                let scaleY = canvas.height / rect.height;
+                let x = (e.clientX - rect.left) * scaleX;
+                let y = (e.clientY - rect.top) * scaleY;
 
+                let boxWidth = 140, boxHeight = 80, startX = canvas.width / 2 - 300, startY = 300;
                 options.forEach((opt, index) => {
                     let bx = startX + (index * 160), by = startY;
                     if (x >= bx && x <= bx + boxWidth && y >= by && y <= by + boxHeight) {
@@ -555,16 +599,16 @@
 
             function drawColors() {
                 ctx.fillStyle = '#111'; ctx.fillRect(0, 0, canvas.width, canvas.height);
-                ctx.fillStyle = '#fff'; ctx.font = 'bold 24px sans-serif'; ctx.textAlign = 'center';
-                ctx.fillText("Color Match Matrix", canvas.width / 2, 60);
-                ctx.font = '16px sans-serif'; ctx.fillStyle = '#aaa';
-                ctx.fillText("Click the box matching the TARGET COLOR name below:", canvas.width / 2, 110);
+                ctx.fillStyle = '#fff'; ctx.font = 'bold 22px sans-serif'; ctx.textAlign = 'center';
+                ctx.fillText("Color Match Matrix", canvas.width / 2, 50);
+                ctx.font = '14px sans-serif'; ctx.fillStyle = '#aaa';
+                ctx.fillText("Click the box matching the TARGET NAME:", canvas.width / 2, 90);
 
-                ctx.font = 'bold 48px sans-serif'; ctx.fillStyle = targetColor.hex;
-                ctx.fillText(targetColor.name, canvas.width / 2, 200);
-                ctx.font = '18px sans-serif'; ctx.fillStyle = '#4f46e5'; ctx.fillText("Score: " + score, canvas.width / 2, 240);
+                ctx.font = 'bold 42px sans-serif'; ctx.fillStyle = targetColor.hex;
+                ctx.fillText(targetColor.name, canvas.width / 2, 170);
+                ctx.font = '18px sans-serif'; ctx.fillStyle = '#4f46e5'; ctx.fillText("Score: " + score, canvas.width / 2, 210);
 
-                let boxWidth = 140, boxHeight = 80, startX = canvas.width / 2 - 300, startY = 300;
+                let boxWidth = 140, boxHeight = 80, startX = canvas.width / 2 - 300, startY = 260;
                 options.forEach((opt, index) => {
                     let bx = startX + (index * 160), by = startY;
                     ctx.fillStyle = opt.hex; ctx.fillRect(bx, by, boxWidth, boxHeight);
@@ -575,21 +619,26 @@
             nextRound();
         }
 
-        // --- GAME 5: RETRO SNAKE ---
+        let snakeDx = 1, snakeDy = 0;
+        function sDir(x, y) {
+            if (currentGame !== 'snake') return;
+            if (x !== 0 && snakeDx === 0) { snakeDx = x; snakeDy = 0; }
+            if (y !== 0 && snakeDy === 0) { snakeDx = 0; snakeDy = y; }
+        }
+
         function startSnake() {
             const gridSize = 20;
             let snake = [{ x: 10, y: 10 }, { x: 9, y: 10 }, { x: 8, y: 10 }];
             let food = { x: 5, y: 5 };
-            let dx = 1, dy = 0;
+            snakeDx = 1; snakeDy = 0;
             let score = 0, gameOver = false;
 
             window.onkeydown = (e) => {
                 if (currentGame !== 'snake') return;
-                if ((e.key === 'ArrowUp' || e.key === 'w') && dy === 0) { dx = 0; dy = -1; }
-                if ((e.key === 'ArrowDown' || e.key === 's') && dy === 0) { dx = 0; dy = 1; }
-                if ((e.key === 'ArrowLeft' || e.key === 'a') && dx === 0) { dx = -1; dy = 0; }
-                if ((e.key === 'ArrowRight' || e.key === 'd') && dx === 0) { dx = 1; dy = 0; }
-                if (e.key === ' ' && gameOver) startSnake();
+                if ((e.key === 'ArrowUp' || e.key === 'w')) sDir(0, -1);
+                if ((e.key === 'ArrowDown' || e.key === 's')) sDir(0, 1);
+                if ((e.key === 'ArrowLeft' || e.key === 'a')) sDir(-1, 0);
+                if ((e.key === 'ArrowRight' || e.key === 'd')) sDir(1, 0);
             };
 
             function spawnFood() {
@@ -599,7 +648,7 @@
 
             activeInterval = setInterval(() => {
                 if (currentGame !== 'snake' || gameOver) return;
-                let head = { x: snake[0].x + dx, y: snake[0].y + dy };
+                let head = { x: snake[0].x + snakeDx, y: snake[0].y + snakeDy };
 
                 if (head.x < 0 || head.x >= canvas.width / gridSize || head.y < 0 || head.y >= canvas.height / gridSize) {
                     gameOver = true; return;
@@ -609,55 +658,47 @@
                 }
 
                 snake.unshift(head);
-                if (head.x === food.x && head.y === food.y) {
-                    score += 50; spawnFood();
-                } else {
-                    snake.pop();
-                }
+                if (head.x === food.x && head.y === food.y) { score += 50; spawnFood(); } else { snake.pop(); }
                 drawSnake();
-            }, 100);
+            }, 120);
 
             function drawSnake() {
                 ctx.fillStyle = '#111'; ctx.fillRect(0, 0, canvas.width, canvas.height);
                 ctx.fillStyle = '#ef4444'; ctx.fillRect(food.x * gridSize, food.y * gridSize, gridSize - 2, gridSize - 2);
                 ctx.fillStyle = '#10b981';
-                for (let part of snake) {
-                    ctx.fillRect(part.x * gridSize, part.y * gridSize, gridSize - 2, gridSize - 2);
-                }
-                ctx.fillStyle = '#fff'; ctx.font = '16px sans-serif';
-                ctx.fillText("Score: " + score, 20, 30);
+                for (let part of snake) ctx.fillRect(part.x * gridSize, part.y * gridSize, gridSize - 2, gridSize - 2);
+                ctx.fillStyle = '#fff'; ctx.font = '16px sans-serif'; ctx.fillText("Score: " + score, 20, 30);
 
                 if (gameOver) {
                     ctx.fillStyle = 'rgba(0,0,0,0.8)'; ctx.fillRect(0, 0, canvas.width, canvas.height);
-                    ctx.fillStyle = '#fff'; ctx.font = 'bold 32px sans-serif'; ctx.textAlign = 'center';
-                    ctx.fillText("GAME OVER", canvas.width / 2, canvas.height / 2 - 20);
-                    ctx.font = '16px sans-serif'; ctx.fillText("Press Spacebar to Restart", canvas.width / 2, canvas.height / 2 + 20);
+                    ctx.fillStyle = '#fff'; ctx.font = 'bold 28px sans-serif'; ctx.textAlign = 'center';
+                    ctx.fillText("GAME OVER", canvas.width / 2, canvas.height / 2);
                     ctx.textAlign = 'left';
                 }
             }
             spawnFood();
         }
 
-        // --- GAME 6: SPACE BLASTER ---
+        let bLeft = false, bRight = false, bShoot = false, lastShot = 0;
         function startBlaster() {
             let ship = { x: 380, y: 440, width: 40, height: 20, speed: 6 };
-            let lasers = [], enemies = [], score = 0;
-            let leftPressed = false, rightPressed = false, gameOver = false;
+            let lasers = [], enemies = [], score = 0, gameOver = false;
 
             window.onkeydown = (e) => {
                 if (currentGame !== 'blaster') return;
-                if (e.key === 'ArrowLeft' || e.key === 'a') leftPressed = true;
-                if (e.key === 'ArrowRight' || e.key === 'd') rightPressed = true;
-                if (e.key === ' ' && !gameOver) {
-                    lasers.push({ x: ship.x + ship.width / 2 - 3, y: ship.y, width: 6, height: 12, speed: 8 });
-                }
-                if (e.key === ' ' && gameOver) startBlaster();
+                if (e.key === 'ArrowLeft' || e.key === 'a') bLeft = true;
+                if (e.key === 'ArrowRight' || e.key === 'd') bRight = true;
+                if (e.key === ' ' && !gameOver) shootLaser();
             };
             window.onkeyup = (e) => {
                 if (currentGame !== 'blaster') return;
-                if (e.key === 'ArrowLeft' || e.key === 'a') leftPressed = false;
-                if (e.key === 'ArrowRight' || e.key === 'd') rightPressed = false;
+                if (e.key === 'ArrowLeft' || e.key === 'a') bLeft = false;
+                if (e.key === 'ArrowRight' || e.key === 'd') bRight = false;
             };
+
+            function shootLaser() {
+                lasers.push({ x: ship.x + ship.width / 2 - 3, y: ship.y, width: 6, height: 12, speed: 8 });
+            }
 
             activeInterval = setInterval(() => {
                 if (currentGame !== 'blaster' || gameOver) return;
@@ -667,8 +708,9 @@
             function updateBlaster() {
                 if (currentGame !== 'blaster') return;
                 if (!gameOver) {
-                    if (leftPressed && ship.x > 0) ship.x -= ship.speed;
-                    if (rightPressed && ship.x < canvas.width - ship.width) ship.x += ship.speed;
+                    if (bLeft && ship.x > 0) ship.x -= ship.speed;
+                    if (bRight && ship.x < canvas.width - ship.width) ship.x += ship.speed;
+                    if (bShoot && Date.now() - lastShot > 250) { shootLaser(); lastShot = Date.now(); }
 
                     for (let i = lasers.length - 1; i >= 0; i--) {
                         lasers[i].y -= lasers[i].speed;
@@ -699,16 +741,12 @@
                 ctx.fillStyle = '#4f46e5'; ctx.fillRect(ship.x, ship.y, ship.width, ship.height);
                 ctx.fillStyle = '#38bdf8'; for (let l of lasers) ctx.fillRect(l.x, l.y, l.width, l.height);
                 ctx.fillStyle = '#ef4444'; for (let en of enemies) ctx.fillRect(en.x, en.y, en.size, en.size);
-
-                ctx.fillStyle = '#fff'; ctx.font = '16px sans-serif';
-                ctx.fillText("Score: " + score, 20, 30);
-                ctx.fillText("Arrows/A-D to Move | Spacebar to Shoot", 20, canvas.height - 20);
+                ctx.fillStyle = '#fff'; ctx.font = '16px sans-serif'; ctx.fillText("Score: " + score, 20, 30);
 
                 if (gameOver) {
                     ctx.fillStyle = 'rgba(0,0,0,0.8)'; ctx.fillRect(0, 0, canvas.width, canvas.height);
-                    ctx.fillStyle = '#fff'; ctx.font = 'bold 32px sans-serif'; ctx.textAlign = 'center';
-                    ctx.fillText("GAME OVER", canvas.width / 2, canvas.height / 2 - 20);
-                    ctx.font = '16px sans-serif'; ctx.fillText("Press Spacebar to Restart", canvas.width / 2, canvas.height / 2 + 20);
+                    ctx.fillStyle = '#fff'; ctx.font = 'bold 28px sans-serif'; ctx.textAlign = 'center';
+                    ctx.fillText("GAME OVER", canvas.width / 2, canvas.height / 2);
                     ctx.textAlign = 'left';
                 }
             }
