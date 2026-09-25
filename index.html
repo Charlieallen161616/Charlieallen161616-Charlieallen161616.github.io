@@ -202,7 +202,7 @@
     <!-- Game Card Directory -->
     <main>
         <div class="grid" id="gameGrid">
-            <!-- Game Card 1: Retro Pong -->
+            <!-- Game 1: Pong -->
             <div class="card" onclick="launchGame('pong')">
                 <div class="card-thumb" style="background: linear-gradient(135deg, #1e1e1e, #2d1b4e);">⚡ Classic Arcade</div>
                 <div class="card-body">
@@ -211,12 +211,30 @@
                 </div>
             </div>
 
-            <!-- Game Card 2: Clicker Game -->
+            <!-- Game 2: Clicker -->
             <div class="card" onclick="launchGame('clicker')">
                 <div class="card-thumb" style="background: linear-gradient(135deg, #1e1e1e, #1b3a4b);">⚙️ Logic Module</div>
                 <div class="card-body">
                     <div class="card-title">Clicker Legends</div>
                     <div class="card-desc">State tracking and progression counter</div>
+                </div>
+            </div>
+
+            <!-- Game 3: Neon Dodge -->
+            <div class="card" onclick="launchGame('dodge')">
+                <div class="card-thumb" style="background: linear-gradient(135deg, #1e1e1e, #4e1b1b);">🚀 Action Sandbox</div>
+                <div class="card-body">
+                    <div class="card-title">Neon Dodge</div>
+                    <div class="card-desc">Coordinate avoidance simulation</div>
+                </div>
+            </div>
+
+            <!-- Game 4: Color Match -->
+            <div class="card" onclick="launchGame('colors')">
+                <div class="card-thumb" style="background: linear-gradient(135deg, #1e1e1e, #1b4e2d);">🧩 Puzzle Routine</div>
+                <div class="card-body">
+                    <div class="card-title">Color Match Matrix</div>
+                    <div class="card-desc">Pattern matching cognitive engine</div>
                 </div>
             </div>
         </div>
@@ -245,6 +263,7 @@
 
         let currentGame = null;
         let animationFrameId = null;
+        let activeInterval = null;
         let canvas = document.getElementById('gameCanvas');
         let ctx = canvas.getContext('2d');
 
@@ -260,12 +279,24 @@
                 document.getElementById('active-game-title').innerText = "Clicker Legends";
                 document.title = "Clicker Legends - Study Portal";
                 startClicker();
+            } else if (type === 'dodge') {
+                document.getElementById('active-game-title').innerText = "Neon Dodge";
+                document.title = "Neon Dodge - Study Portal";
+                startDodge();
+            } else if (type === 'colors') {
+                document.getElementById('active-game-title').innerText = "Color Match Matrix";
+                document.title = "Color Match - Study Portal";
+                startColors();
             }
         }
 
         function closeGame() {
             document.getElementById('game-view').style.display = 'none';
             if (animationFrameId) cancelAnimationFrame(animationFrameId);
+            if (activeInterval) clearInterval(activeInterval);
+            window.onkeydown = null;
+            window.onkeyup = null;
+            canvas.onclick = null;
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             currentGame = null;
             document.title = "Google Classroom - Home";
@@ -293,34 +324,26 @@
 
             function updatePong() {
                 if (currentGame !== 'pong') return;
-
-                // Move Player Paddle
                 if (upPressed && paddle1Y > 0) paddle1Y -= 6;
                 if (downPressed && paddle1Y < canvas.height - paddleHeight) paddle1Y += 6;
 
-                // AI Opponent tracking
                 let targetY = ballY - paddleHeight / 2;
                 paddle2Y += (targetY - paddle2Y) * 0.08;
 
-                // Move Ball
                 ballX += ballSpeedX;
                 ballY += ballSpeedY;
 
-                // Wall collisions (Top/Bottom)
                 if (ballY < 0 || ballY > canvas.height) ballSpeedY = -ballSpeedY;
 
-                // Paddle 1 collision
                 if (ballX <= 30 && ballY >= paddle1Y && ballY <= paddle1Y + paddleHeight) {
                     ballSpeedX = -ballSpeedX;
                     ballX = 30;
                 }
-                // Paddle 2 collision
                 if (ballX >= canvas.width - 30 - paddleWidth && ballY >= paddle2Y && ballY <= paddle2Y + paddleHeight) {
                     ballSpeedX = -ballSpeedX;
                     ballX = canvas.width - 30 - paddleWidth;
                 }
 
-                // Scoring
                 if (ballX < 0) { score2++; resetBall(); }
                 if (ballX > canvas.width) { score1++; resetBall(); }
 
@@ -337,8 +360,6 @@
             function drawPong() {
                 ctx.fillStyle = '#111';
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-                // Net
                 ctx.strokeStyle = '#333';
                 ctx.setLineDash([5, 15]);
                 ctx.beginPath();
@@ -347,7 +368,6 @@
                 ctx.stroke();
                 ctx.setLineDash([]);
 
-                // Paddles & Ball
                 ctx.fillStyle = '#fff';
                 ctx.fillRect(20, paddle1Y, paddleWidth, paddleHeight);
                 ctx.fillRect(canvas.width - 20 - paddleWidth, paddle2Y, paddleWidth, paddleHeight);
@@ -355,7 +375,6 @@
                 ctx.arc(ballX, ballY, 8, 0, Math.PI * 2);
                 ctx.fill();
 
-                // Scores
                 ctx.font = '32px sans-serif';
                 ctx.fillText(score1, canvas.width / 4, 50);
                 ctx.fillText(score2, (canvas.width / 4) * 3, 50);
@@ -363,20 +382,17 @@
                 ctx.fillStyle = '#777';
                 ctx.fillText("Use Up/Down Arrow Keys to Move", 20, canvas.height - 20);
             }
-
             updatePong();
         }
 
         // --- GAME 2: CLICKER GAME ---
         function startClicker() {
             let score = 0;
-            let cps = 0;
             let clickPower = 1;
             let autoClickers = 0;
 
-            // Auto-clicker interval
-            let timer = setInterval(() => {
-                if (currentGame !== 'clicker') { clearInterval(timer); return; }
+            activeInterval = setInterval(() => {
+                if (currentGame !== 'clicker') return;
                 if (autoClickers > 0) {
                     score += autoClickers;
                     drawClicker();
@@ -389,31 +405,17 @@
                 let x = e.clientX - rect.left;
                 let y = e.clientY - rect.top;
 
-                // Check if clicking the main button (Center)
-                let btnX = canvas.width / 2 - 100;
-                let btnY = canvas.height / 2 - 50;
-                if (x >= btnX && x <= btnX + 200 && y >= btnY && y <= btnY + 80) {
-                    score += clickPower;
+                let btnX = canvas.width / 2 - 100, btnY = canvas.height / 2 - 50;
+                if (x >= btnX && x <= btnX + 200 && y >= btnY && y <= btnY + 80) score += clickPower;
+
+                let up1X = canvas.width / 2 - 150, up1Y = canvas.height / 2 + 80;
+                if (x >= up1X && x <= up1X + 140 && y >= up1Y && y <= up1Y + 40 && score >= 20) {
+                    score -= 20; clickPower += 1;
                 }
 
-                // Check if buying upgrade 1 (Cost 20)
-                let up1X = canvas.width / 2 - 150;
-                let up1Y = canvas.height / 2 + 80;
-                if (x >= up1X && x <= up1X + 140 && y >= up1Y && y <= up1Y + 40) {
-                    if (score >= 20) {
-                        score -= 20;
-                        clickPower += 1;
-                    }
-                }
-
-                // Check if buying upgrade 2 (Cost 50)
-                let up2X = canvas.width / 2 + 10;
-                let up2Y = canvas.height / 2 + 80;
-                if (x >= up2X && x <= up2X + 140 && y >= up2Y && y <= up2Y + 40) {
-                    if (score >= 50) {
-                        score -= 50;
-                        autoClickers += 1;
-                    }
+                let up2X = canvas.width / 2 + 10, up2Y = canvas.height / 2 + 80;
+                if (x >= up2X && x <= up2X + 140 && y >= up2Y && y <= up2Y + 40 && score >= 50) {
+                    score -= 50; autoClickers += 1;
                 }
                 drawClicker();
             };
@@ -421,8 +423,6 @@
             function drawClicker() {
                 ctx.fillStyle = '#111';
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-                // Title & Score
                 ctx.fillStyle = '#fff';
                 ctx.font = 'bold 24px sans-serif';
                 ctx.textAlign = 'center';
@@ -432,22 +432,17 @@
                 ctx.fillStyle = '#4f46e5';
                 ctx.fillText("Points: " + score, canvas.width / 2, 100);
 
-                // Main Click Button
-                let btnX = canvas.width / 2 - 100;
-                let btnY = canvas.height / 2 - 50;
+                let btnX = canvas.width / 2 - 100, btnY = canvas.height / 2 - 50;
                 ctx.fillStyle = '#1e1e1e';
                 ctx.strokeStyle = '#4f46e5';
                 ctx.lineWidth = 3;
                 ctx.fillRect(btnX, btnY, 200, 80);
                 ctx.strokeRect(btnX, btnY, 200, 80);
-
                 ctx.fillStyle = '#fff';
                 ctx.font = 'bold 16px sans-serif';
                 ctx.fillText("CLICK ME!", canvas.width / 2, btnY + 45);
 
-                // Upgrade 1 Button (+1 Power, Cost 20)
-                let up1X = canvas.width / 2 - 150;
-                let up1Y = canvas.height / 2 + 80;
+                let up1X = canvas.width / 2 - 150, up1Y = canvas.height / 2 + 80;
                 ctx.fillStyle = score >= 20 ? '#222' : '#151515';
                 ctx.strokeStyle = score >= 20 ? '#10b981' : '#444';
                 ctx.fillRect(up1X, up1Y, 140, 40);
@@ -456,20 +451,193 @@
                 ctx.font = '13px sans-serif';
                 ctx.fillText("+1 Power (Cost: 20)", up1X + 70, up1Y + 25);
 
-                // Upgrade 2 Button (+1 Auto/sec, Cost 50)
-                let up2X = canvas.width / 2 + 10;
-                let up2Y = canvas.height / 2 + 80;
+                let up2X = canvas.width / 2 + 10, up2Y = canvas.height / 2 + 80;
                 ctx.fillStyle = score >= 50 ? '#222' : '#151515';
                 ctx.strokeStyle = score >= 50 ? '#f59e0b' : '#444';
                 ctx.fillRect(up2X, up2Y, 140, 40);
                 ctx.strokeRect(up2X, up2Y, 140, 40);
                 ctx.fillStyle = score >= 50 ? '#fff' : '#666';
+                ctx.font = '13px sans-serif';
                 ctx.fillText("+1 Auto/s (Cost: 50)", up2X + 70, up2Y + 25);
+                ctx.textAlign = 'left';
+            }
+            drawClicker();
+        }
 
+        // --- GAME 3: NEON DODGE ---
+        function startDodge() {
+            let player = { x: 400, y: 420, size: 20, speed: 7 };
+            let obstacles = [];
+            let score = 0;
+            let leftPressed = false, rightPressed = false;
+            let gameOver = false;
+
+            window.onkeydown = (e) => {
+                if (currentGame !== 'dodge') return;
+                if (e.key === 'ArrowLeft' || e.key === 'a') leftPressed = true;
+                if (e.key === 'ArrowRight' || e.key === 'd') rightPressed = true;
+                if (e.key === ' ' && gameOver) startDodge();
+            };
+            window.onkeyup = (e) => {
+                if (currentGame !== 'dodge') return;
+                if (e.key === 'ArrowLeft' || e.key === 'a') leftPressed = false;
+                if (e.key === 'ArrowRight' || e.key === 'd') rightPressed = false;
+            };
+
+            activeInterval = setInterval(() => {
+                if (currentGame !== 'dodge' || gameOver) return;
+                obstacles.push({
+                    x: Math.random() * (canvas.width - 30),
+                    y: -20,
+                    size: Math.random() * 20 + 15,
+                    speed: Math.random() * 4 + 4
+                });
+                score += 10;
+            }, 700);
+
+            function updateDodge() {
+                if (currentGame !== 'dodge') return;
+                if (!gameOver) {
+                    if (leftPressed && player.x > 0) player.x -= player.speed;
+                    if (rightPressed && player.x < canvas.width - player.size) player.x += player.speed;
+
+                    for (let i = obstacles.length - 1; i >= 0; i--) {
+                        obstacles[i].y += obstacles[i].speed;
+                        // Collision check
+                        if (
+                            player.x < obstacles[i].x + obstacles[i].size &&
+                            player.x + player.size > obstacles[i].x &&
+                            player.y < obstacles[i].y + obstacles[i].size &&
+                            player.y + player.size > obstacles[i].y
+                        ) {
+                            gameOver = true;
+                        }
+                        if (obstacles[i].y > canvas.height) obstacles.splice(i, 1);
+                    }
+                }
+
+                drawDodge();
+                if (!gameOver) animationFrameId = requestAnimationFrame(updateDodge);
+            }
+
+            function drawDodge() {
+                ctx.fillStyle = '#111';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                // Draw Player
+                ctx.fillStyle = '#4f46e5';
+                ctx.fillRect(player.x, player.y, player.size, player.size);
+
+                // Draw Obstacles
+                ctx.fillStyle = '#ef4444';
+                for (let obs of obstacles) {
+                    ctx.fillRect(obs.x, obs.y, obs.size, obs.size);
+                }
+
+                // Score text
+                ctx.fillStyle = '#fff';
+                ctx.font = '16px sans-serif';
+                ctx.fillText("Score: " + score, 20, 30);
+                ctx.fillText("Use Left/Right Arrows or A/D to Dodge", 20, canvas.height - 20);
+
+                if (gameOver) {
+                    ctx.fillStyle = 'rgba(0,0,0,0.8)';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    ctx.fillStyle = '#fff';
+                    ctx.font = 'bold 32px sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.fillText("GAME OVER", canvas.width / 2, canvas.height / 2 - 20);
+                    ctx.font = '16px sans-serif';
+                    ctx.fillText("Press Spacebar to Restart", canvas.width / 2, canvas.height / 2 + 20);
+                    ctx.textAlign = 'left';
+                }
+            }
+            updateDodge();
+        }
+
+        // --- GAME 4: COLOR MATCH ---
+        function startColors() {
+            let score = 0;
+            let targetColor = "";
+            let options = [];
+            const colors = [
+                { name: "RED", hex: "#ef4444" },
+                { name: "BLUE", hex: "#3b82f6" },
+                { name: "GREEN", hex: "#10b981" },
+                { name: "YELLOW", hex: "#f59e0b" }
+            ];
+
+            function nextRound() {
+                targetColor = colors[Math.floor(Math.random() * colors.length)];
+                // Shuffle options
+                options = [...colors].sort(() => Math.random() - 0.5);
+                drawColors();
+            }
+
+            canvas.onclick = (e) => {
+                if (currentGame !== 'colors') return;
+                let rect = canvas.getBoundingClientRect();
+                let x = e.clientX - rect.left;
+                let y = e.clientY - rect.top;
+
+                // Check clicks on the 4 option boxes
+                let boxWidth = 140, boxHeight = 80;
+                let startX = canvas.width / 2 - 300, startY = 300;
+
+                options.forEach((opt, index) => {
+                    let bx = startX + (index * 160);
+                    let by = startY;
+                    if (x >= bx && x <= bx + boxWidth && y >= by && y <= by + boxHeight) {
+                        if (opt.name === targetColor.name) {
+                            score += 100;
+                        } else {
+                            score = Math.max(0, score - 50);
+                        }
+                        nextRound();
+                    }
+                });
+            };
+
+            function drawColors() {
+                ctx.fillStyle = '#111';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                ctx.fillStyle = '#fff';
+                ctx.font = 'bold 24px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText("Color Match Matrix", canvas.width / 2, 60);
+
+                ctx.font = '16px sans-serif';
+                ctx.fillStyle = '#aaa';
+                ctx.fillText("Click the box matching the TARGET COLOR name below:", canvas.width / 2, 110);
+
+                // Target Name display
+                ctx.font = 'bold 48px sans-serif';
+                ctx.fillStyle = targetColor.hex;
+                ctx.fillText(targetColor.name, canvas.width / 2, 200);
+
+                // Score
+                ctx.font = '18px sans-serif';
+                ctx.fillStyle = '#4f46e5';
+                ctx.fillText("Score: " + score, canvas.width / 2, 240);
+
+                // Draw 4 Choice Boxes
+                let boxWidth = 140, boxHeight = 80;
+                let startX = canvas.width / 2 - 300, startY = 300;
+
+                options.forEach((opt, index) => {
+                    let bx = startX + (index * 160);
+                    let by = startY;
+                    ctx.fillStyle = opt.hex;
+                    ctx.fillRect(bx, by, boxWidth, boxHeight);
+                    ctx.strokeStyle = '#fff';
+                    ctx.lineWidth = 2;
+                    ctx.strokeRect(bx, by, boxWidth, boxHeight);
+                });
                 ctx.textAlign = 'left';
             }
 
-            drawClicker();
+            nextRound();
         }
 
         function filterGames() {
@@ -482,7 +650,7 @@
             }
         }
 
-        // Panic / Stealth Switch: Press Escape key
+        // Stealth / Panic Switch (ESC Key)
         let stealthActive = false;
         document.addEventListener('keydown', function(event) {
             if (event.key === 'Escape') {
