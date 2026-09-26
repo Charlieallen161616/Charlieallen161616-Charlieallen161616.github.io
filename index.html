@@ -1,783 +1,753 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-full">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Google Classroom - Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NexusChat - Real-Time Messaging</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --bg-color: #121212;
-            --surface-color: #1e1e1e;
-            --border-color: #333333;
-            --accent-color: #4f46e5;
-            --text-color: #e5e7eb;
-            --text-muted: #9ca3af;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            touch-action: manipulation;
-        }
-
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        header {
-            background-color: var(--surface-color);
-            border-bottom: 1px solid var(--border-color);
-            padding: 1rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 0.75rem;
-            flex-wrap: wrap;
-        }
-
-        .logo {
-            font-size: 1.1rem;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .logo span {
-            color: var(--accent-color);
-        }
-
-        .header-controls {
-            display: flex;
-            gap: 0.5rem;
-            align-items: center;
-            flex-wrap: wrap;
-            width: 100%;
-        }
-
-        @media(min-width: 600px) {
-            .header-controls { width: auto; }
-            header { padding: 1rem 2rem; }
-        }
-
-        .search-bar {
-            background-color: var(--bg-color);
-            border: 1px solid var(--border-color);
-            padding: 0.5rem 1rem;
-            border-radius: 6px;
-            color: var(--text-color);
-            flex: 1;
-            min-width: 200px;
-            outline: none;
-        }
-
-        .search-bar:focus {
-            border-color: var(--accent-color);
-        }
-
-        .download-btn {
-            background-color: #1e293b;
-            border: 1px solid #10b981;
-            color: #34d399;
-            padding: 0.5rem 0.8rem;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.85rem;
-            font-weight: 500;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.4rem;
-            white-space: nowrap;
-        }
-
-        main {
-            flex: 1;
-            max-width: 1200px;
-            width: 100%;
-            margin: 0 auto;
-            padding: 1rem;
-        }
-
-        @media(min-width: 600px) {
-            main { padding: 2rem; }
-        }
-
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 1rem;
-        }
-
-        .card {
-            background-color: var(--surface-color);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            overflow: hidden;
-            cursor: pointer;
-            transition: transform 0.15s ease, border-color 0.15s ease;
-        }
-
-        .card:active {
-            transform: scale(0.98);
-        }
-
-        .card-thumb {
-            height: 120px;
-            background-color: #262626;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--text-muted);
-            font-size: 0.85rem;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .card-body {
-            padding: 1rem;
-        }
-
-        .card-title {
-            font-size: 1rem;
-            font-weight: 600;
-            margin-bottom: 0.25rem;
-        }
-
-        .card-desc {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-        }
-
-        /* In-Page Game View Container */
-        #game-view {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background-color: var(--bg-color);
-            z-index: 100;
-            flex-direction: column;
-        }
-
-        .game-header {
-            background-color: var(--surface-color);
-            padding: 0.75rem 1rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .back-btn {
-            background: none;
-            border: 1px solid var(--border-color);
-            color: var(--text-color);
-            padding: 0.4rem 0.8rem;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.85rem;
-        }
-
-        .game-canvas-container {
-            flex: 1;
-            width: 100%;
-            background: #0b0b0b;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            padding-bottom: 70px;
-        }
-
-        canvas {
-            background: #111;
-            max-width: 100%;
-            max-height: 70vh;
-            object-fit: contain;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
-
-        /* On-Screen Mobile Touch Controls Overlay */
-        .mobile-controls {
-            position: absolute;
-            bottom: 10px;
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            width: 100%;
-        }
-
-        .ctrl-btn {
-            background: rgba(79, 70, 229, 0.8);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            font-size: 1.2rem;
-            border-radius: 8px;
-            font-weight: bold;
-            user-select: none;
-        }
-
-        .ctrl-btn:active {
-            background: rgba(79, 70, 229, 1);
-        }
-
-        /* Stealth Camouflage Screen (Triggered by ESC) */
-        #stealth-screen {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: #ffffff;
-            color: #000;
-            z-index: 9999;
-            padding: 2rem;
-            font-family: "Times New Roman", Times, serif;
-        }
-        #stealth-screen h1 { font-size: 1.75rem; margin-bottom: 1rem; }
-        #stealth-screen p { font-size: 1rem; line-height: 1.6; }
+        body { font-family: 'Inter', sans-serif; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+        .dark ::-webkit-scrollbar-thumb { background: #475569; }
     </style>
 </head>
-<body>
+<body class="h-full bg-slate-900 text-slate-100 antialiased selection:bg-brand-500 selection:text-white">
 
-    <!-- Main Navigation / Header -->
-    <header>
-        <div class="logo">
-            <span>📚</span> Study Portal
+    <div id="app" class="h-full flex flex-col overflow-hidden">
+        
+        <!-- Auth View (Hidden by default when logged in) -->
+        <div id="auth-view" class="fixed inset-0 z-50 bg-slate-950 flex items-center justify-center p-4">
+            <div class="w-full max-w-md bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-8 transform transition-all">
+                <div class="text-center mb-8">
+                    <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-brand-600 text-white text-2xl font-bold mb-4 shadow-lg shadow-brand-500/30">
+                        <i class="fa-solid fa-comments"></i>
+                    </div>
+                    <h1 class="text-2xl font-bold tracking-tight text-white">Welcome to NexusChat</h1>
+                    <p class="text-sm text-slate-400 mt-1">Connect in real-time with peers around the world</p>
+                </div>
+
+                <!-- Custom Alert Banner -->
+                <div id="auth-alert" class="hidden mb-4 p-3 rounded-lg text-sm bg-rose-500/10 border border-rose-500/20 text-rose-400 flex items-center gap-2">
+                    <i class="fa-solid fa-circle-exclamation flex-shrink-0"></i>
+                    <span id="auth-alert-msg">Error message goes here</span>
+                </div>
+
+                <form id="auth-form" class="space-y-4" onsubmit="handleAuthSubmit(event)">
+                    <div id="name-field-container" class="hidden">
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Display Name</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-500"><i class="fa-solid fa-user"></i></span>
+                            <input type="text" id="display-name" placeholder="John Doe" class="w-full bg-slate-800/50 border border-slate-700/80 rounded-xl px-4 py-3 pl-10 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Email Address</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-500"><i class="fa-solid fa-envelope"></i></span>
+                            <input type="email" id="auth-email" required placeholder="name@example.com" class="w-full bg-slate-800/50 border border-slate-700/80 rounded-xl px-4 py-3 pl-10 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Password</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-500"><i class="fa-solid fa-lock"></i></span>
+                            <input type="password" id="auth-password" required placeholder="••••••••" class="w-full bg-slate-800/50 border border-slate-700/80 rounded-xl px-4 py-3 pl-10 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition">
+                        </div>
+                    </div>
+
+                    <button type="submit" id="auth-submit-btn" class="w-full mt-2 py-3 px-4 bg-brand-600 hover:bg-brand-500 text-white font-medium rounded-xl shadow-lg shadow-brand-600/20 transition duration-200">
+                        Sign In
+                    </button>
+                </form>
+
+                <div class="mt-6 text-center">
+                    <button onclick="toggleAuthMode()" id="auth-toggle-btn" class="text-xs text-brand-400 hover:text-brand-300 font-medium transition">
+                        Don't have an account? <span class="underline">Sign up</span>
+                    </button>
+                </div>
+                
+                <div class="mt-4 pt-4 border-t border-slate-800/80 text-center">
+                    <button onclick="loginAsGuest()" class="text-xs text-slate-400 hover:text-slate-200 transition">
+                        Or continue anonymously as <span id="guest-name-preview" class="underline">Guest</span>
+                    </button>
+                </div>
+            </div>
         </div>
-        <div class="header-controls">
-            <a href="d/site.html" download="site.html" class="download-btn">📥 Download site.html</a>
-            <input type="text" id="searchInput" class="search-bar" placeholder="Search modules..." onkeyup="filterGames()">
-        </div>
-    </header>
 
-    <!-- Game Card Directory -->
-    <main>
-        <div class="grid" id="gameGrid">
-            <div class="card" onclick="launchGame('pong')">
-                <div class="card-thumb" style="background: linear-gradient(135deg, #1e1e1e, #2d1b4e);">⚡ Classic Arcade</div>
-                <div class="card-body">
-                    <div class="card-title">Retro Pong Simulator</div>
-                    <div class="card-desc">Interactive physics canvas engine</div>
-                </div>
-            </div>
-
-            <div class="card" onclick="launchGame('clicker')">
-                <div class="card-thumb" style="background: linear-gradient(135deg, #1e1e1e, #1b3a4b);">⚙️ Logic Module</div>
-                <div class="card-body">
-                    <div class="card-title">Clicker Legends</div>
-                    <div class="card-desc">State tracking and progression counter</div>
-                </div>
-            </div>
-
-            <div class="card" onclick="launchGame('dodge')">
-                <div class="card-thumb" style="background: linear-gradient(135deg, #1e1e1e, #4e1b1b);">🚀 Action Sandbox</div>
-                <div class="card-body">
-                    <div class="card-title">Neon Dodge</div>
-                    <div class="card-desc">Coordinate avoidance simulation</div>
-                </div>
-            </div>
-
-            <div class="card" onclick="launchGame('colors')">
-                <div class="card-thumb" style="background: linear-gradient(135deg, #1e1e1e, #1b4e2d);">🧩 Puzzle Routine</div>
-                <div class="card-body">
-                    <div class="card-title">Color Match Matrix</div>
-                    <div class="card-desc">Pattern matching cognitive engine</div>
-                </div>
-            </div>
-
-            <div class="card" onclick="launchGame('snake')">
-                <div class="card-thumb" style="background: linear-gradient(135deg, #1e1e1e, #3a1b4b);">🐍 Vector Simulation</div>
-                <div class="card-body">
-                    <div class="card-title">Retro Snake</div>
-                    <div class="card-desc">Grid-based path traversal algorithm</div>
-                </div>
-            </div>
-
-            <div class="card" onclick="launchGame('blaster')">
-                <div class="card-thumb" style="background: linear-gradient(135deg, #1e1e1e, #1b2d4e);">🛸 Tactical Blaster</div>
-                <div class="card-body">
-                    <div class="card-title">Space Blaster</div>
-                    <div class="card-desc">Target interception defense routine</div>
-                </div>
-            </div>
-        </div>
-    </main>
-
-    <!-- Active Game View Container -->
-    <div id="game-view">
-        <div class="game-header">
-            <button class="back-btn" onclick="closeGame()">← Return</button>
-            <span id="active-game-title" style="font-weight: 500; font-size: 0.85rem;">Module Running</span>
-            <div style="width: 50px;"></div>
-        </div>
-        <div class="game-canvas-container">
-            <canvas id="gameCanvas" width="800" height="500"></canvas>
-            <!-- Dynamic Touch Buttons -->
-            <div class="mobile-controls" id="mobileControls" style="display:none;"></div>
-        </div>
-    </div>
-
-    <!-- Stealth Camouflage Screen (Triggered by ESC) -->
-    <div id="stealth-screen">
-        <h1>Document Viewer - Assignment #4</h1>
-        <p>Please review the required reading materials and complete the assessment questions below before the end of the period. Contact your instructor if you run into technical issues with loading the document server.</p>
-    </div>
-
-    <script>
-        document.title = "Google Classroom - Home";
-
-        let currentGame = null;
-        let animationFrameId = null;
-        let activeInterval = null;
-        let canvas = document.getElementById('gameCanvas');
-        let ctx = canvas.getContext('2d');
-
-        function setControls(html) {
-            let container = document.getElementById('mobileControls');
-            container.innerHTML = html;
-            container.style.display = html ? 'flex' : 'none';
-        }
-
-        function launchGame(type) {
-            document.getElementById('game-view').style.display = 'flex';
-            currentGame = type;
+        <div id="main-app" class="hidden h-full flex flex-row relative overflow-hidden">
             
-            if (type === 'pong') {
-                document.getElementById('active-game-title').innerText = "Retro Pong";
-                document.title = "Retro Pong - Study Portal";
-                setControls('<button class="ctrl-btn" ontouchstart="p1Up=true" ontouchend="p1Up=false" onmousedown="p1Up=true" onmouseup="p1Up=false">⬆️ Up</button><button class="ctrl-btn" ontouchstart="p1Down=true" ontouchend="p1Down=false" onmousedown="p1Down=true" onmouseup="p1Down=false">⬇️ Down</button>');
-                startPong();
-            } else if (type === 'clicker') {
-                document.getElementById('active-game-title').innerText = "Clicker Legends";
-                document.title = "Clicker Legends - Study Portal";
-                setControls('');
-                startClicker();
-            } else if (type === 'dodge') {
-                document.getElementById('active-game-title').innerText = "Neon Dodge";
-                document.title = "Neon Dodge - Study Portal";
-                setControls('<button class="ctrl-btn" ontouchstart="dLeft=true" ontouchend="dLeft=false" onmousedown="dLeft=true" onmouseup="dLeft=false">⬅️ Left</button><button class="ctrl-btn" ontouchstart="dRight=true" ontouchend="dRight=false" onmousedown="dRight=true" onmouseup="dRight=false">Right ➡️</button>');
-                startDodge();
-            } else if (type === 'colors') {
-                document.getElementById('active-game-title').innerText = "Color Match";
-                document.title = "Color Match - Study Portal";
-                setControls('');
-                startColors();
-            } else if (type === 'snake') {
-                document.getElementById('active-game-title').innerText = "Retro Snake";
-                document.title = "Retro Snake - Study Portal";
-                setControls('<button class="ctrl-btn" onclick="sDir(0,-1)">⬆️</button><div><button class="ctrl-btn" onclick="sDir(-1,0)">⬅️</button><button class="ctrl-btn" onclick="sDir(1,0)">➡️</button></div><button class="ctrl-btn" onclick="sDir(0,1)">⬇️</button>');
-                startSnake();
-            } else if (type === 'blaster') {
-                document.getElementById('active-game-title').innerText = "Space Blaster";
-                document.title = "Space Blaster - Study Portal";
-                setControls('<button class="ctrl-btn" ontouchstart="bLeft=true" ontouchend="bLeft=false" onmousedown="bLeft=true" onmouseup="bLeft=false">⬅️</button><button class="ctrl-btn" ontouchstart="bShoot=true" ontouchend="bShoot=false" onmousedown="bShoot=true" onmouseup="bShoot=false">🔥 Fire</button><button class="ctrl-btn" ontouchstart="bRight=true" ontouchend="bRight=false" onmousedown="bRight=true" onmouseup="bRight=false">➡️</button>');
-                startBlaster();
+            <!-- Mobile Sidebar Backdrop -->
+            <div id="sidebar-backdrop" onclick="toggleSidebar()" class="fixed inset-0 bg-black/60 z-30 md:hidden hidden transition-opacity"></div>
+
+            <!-- Sidebar Navigation -->
+            <aside id="sidebar" class="fixed md:static inset-y-0 left-0 z-40 w-80 bg-slate-950 border-r border-slate-800 flex flex-col transform -translate-x-full md:translate-x-0 transition-transform duration-200 ease-in-out">
+                <!-- User Profile Header -->
+                <div class="p-4 border-b border-slate-800/80 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="relative">
+                            <div id="user-avatar" class="w-10 h-10 rounded-full bg-gradient-to-tr from-brand-600 to-indigo-400 flex items-center justify-center font-bold text-white shadow-inner">
+                                U
+                            </div>
+                            <span class="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 border-2 border-slate-950 rounded-full"></span>
+                        </div>
+                        <div class="overflow-hidden">
+                            <h3 id="current-user-name" class="font-semibold text-sm truncate text-white">Loading...</h3>
+                            <p class="text-xs text-emerald-400 flex items-center gap-1 font-medium">Online</p>
+                        </div>
+                    </div>
+                    <button onclick="logout()" title="Sign Out" class="p-2 text-slate-400 hover:text-rose-400 hover:bg-slate-900 rounded-lg transition">
+                        <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                    </button>
+                </div>
+
+                <!-- Rooms & Direct Messages Navigation -->
+                <div class="flex-1 overflow-y-auto p-4 space-y-6">
+                    <!-- Rooms Section -->
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Chat Rooms</span>
+                            <button onclick="openCreateRoomModal()" title="Create Room" class="text-xs text-brand-400 hover:text-brand-300 p-1"><i class="fa-solid fa-plus"></i></button>
+                        </div>
+                        <div id="rooms-list" class="space-y-1">
+                            <!-- Populated via JS -->
+                        </div>
+                    </div>
+
+                    <!-- Direct Messages Section -->
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Direct Messages</span>
+                            <span class="text-xs text-slate-500" id="online-count">0 online</span>
+                        </div>
+                        <div id="users-list" class="space-y-1">
+                            <!-- Populated via JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- App Footer info -->
+                <div class="p-3 border-t border-slate-800/80 text-center text-xs text-slate-500">
+                    NexusChat v2.5 • Secured by Firebase
+                </div>
+            </aside>
+
+            <main class="flex-1 flex flex-col h-full bg-slate-900 overflow-hidden relative">
+                <!-- Chat Header -->
+                <header class="h-16 px-4 bg-slate-900/90 backdrop-blur border-b border-slate-800 flex items-center justify-between z-10">
+                    <div class="flex items-center gap-3">
+                        <button onclick="toggleSidebar()" class="md:hidden p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800">
+                            <i class="fa-solid fa-bars text-lg"></i>
+                        </button>
+                        <div class="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center text-brand-400 font-bold" id="active-chat-icon">
+                            <i class="fa-solid fa-hashtag"></i>
+                        </div>
+                        <div>
+                            <h2 id="active-chat-title" class="font-bold text-white text-base">General Chat</h2>
+                            <p id="active-chat-subtitle" class="text-xs text-slate-400">Public discussion room</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <button onclick="clearChatHistory()" title="Clear local view" class="p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition">
+                            <i class="fa-solid fa-rotate-right"></i>
+                        </button>
+                    </div>
+                </header>
+
+                <!-- Messages Feed -->
+                <div id="messages-container" class="flex-1 overflow-y-auto p-4 md:p-6 space-y-4 flex flex-col">
+                    <!-- Populated via JS -->
+                </div>
+
+                <!-- Typing indicator -->
+                <div id="typing-indicator" class="hidden px-6 py-1 text-xs text-slate-400 italic">
+                    Someone is typing...
+                </div>
+
+                <!-- Message Input Footer -->
+                <footer class="p-4 bg-slate-900 border-t border-slate-800">
+                    <form id="message-form" onsubmit="handleSendMessage(event)" class="flex items-end gap-2 relative">
+                        <!-- Emoji Picker Popover -->
+                        <div id="emoji-picker" class="hidden absolute bottom-16 left-0 bg-slate-800 border border-slate-700 rounded-xl shadow-2xl p-3 grid grid-cols-6 gap-2 z-20 w-64">
+                            <!-- Emojis injected via JS -->
+                        </div>
+
+                        <div class="flex items-center gap-1 pb-2">
+                            <button type="button" onclick="toggleEmojiPicker()" title="Insert Emoji" class="p-2.5 text-slate-400 hover:text-white hover:bg-slate-800 rounded-xl transition">
+                                <i class="fa-regular fa-face-smile text-lg"></i>
+                            </button>
+                            <button type="button" onclick="triggerMediaUpload()" title="Attach Media" class="p-2.5 text-slate-400 hover:text-white hover:bg-slate-800 rounded-xl transition">
+                                <i class="fa-solid fa-paperclip text-lg"></i>
+                            </button>
+                            <input type="file" id="media-input" class="hidden" onchange="handleMediaSelect(event)">
+                        </div>
+
+                        <div class="flex-1 bg-slate-800/60 border border-slate-700/80 rounded-2xl focus-within:border-brand-500 focus-within:ring-1 focus-within:ring-brand-500 transition flex items-center px-4 py-2">
+                            <textarea id="message-input" rows="1" placeholder="Type your message..." onkeydown="handleKeyDown(event)" class="w-full bg-transparent text-white placeholder-slate-500 focus:outline-none resize-none max-h-32 text-sm py-1"></textarea>
+                        </div>
+
+                        <button type="submit" id="send-btn" class="p-3 bg-brand-600 hover:bg-brand-500 text-white rounded-2xl shadow-lg shadow-brand-600/20 transition flex items-center justify-center mb-0.5">
+                            <i class="fa-solid fa-paper-plane"></i>
+                        </button>
+                    </form>
+                </footer>
+            </main>
+        </div>
+
+        <!-- Custom Notification Toast -->
+        <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none bg-slate-800 border border-slate-700 text-white px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3">
+            <i id="toast-icon" class="fa-solid fa-circle-check text-emerald-400"></i>
+            <span id="toast-msg" class="text-sm font-medium">Notification message</span>
+        </div>
+
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { 
+            getAuth, 
+            signInAnonymously, 
+            signInWithCustomToken, 
+            signInWithEmailAndPassword, 
+            createUserWithEmailAndPassword, 
+            signOut, 
+            onAuthStateChanged,
+            updateProfile
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { 
+            getFirestore, 
+            collection, 
+            doc, 
+            addDoc, 
+            setDoc, 
+            getDoc, 
+            getDocs, 
+            onSnapshot, 
+            query, 
+            serverTimestamp 
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Global configuration from environment
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'nexus-chat-demo-app';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
+            apiKey: "AIzaSyDummyKeyForDevelopmentPurposesOnly12345",
+            authDomain: "nexuschat.firebaseapp.com",
+            projectId: "nexuschat",
+            storageBucket: "nexuschat.appspot.com",
+            messagingSenderId: "123456789",
+            appId: "1:123456789:web:abcdef"
+        };
+
+        // Initialize Firebase
+        let app, auth, db;
+        try {
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+        } catch (e) {
+            console.error("Firebase initialization error:", e);
+        }
+
+        // Application State
+        window.appState = {
+            currentUser: null,
+            isSignUp: false,
+            activeChatId: 'general',
+            activeChatType: 'room', // 'room' or 'dm'
+            activeChatName: 'General Chat',
+            rooms: [
+                { id: 'general', name: 'General Chat', desc: 'Public community discussion', icon: 'fa-hashtag' },
+                { id: 'tech', name: 'Tech & Code', desc: 'Development and tech talk', icon: 'fa-code' },
+                { id: 'random', name: 'Random Lounge', desc: 'Chill and casual chat', icon: 'fa-mug-hot' }
+            ],
+            users: [],
+            unsubscribeMessages: null,
+            unsubscribeUsers: null
+        };
+
+        // Guest name fallback
+        const randomGuestNum = Math.floor(1000 + Math.random() * 9000);
+        document.getElementById('guest-name-preview').textContent = `Guest_${randomGuestNum}`;
+
+        // Initialize Auth Listener
+        window.onload = async () => {
+            // Setup Emoji list
+            populateEmojis();
+
+            if (!auth) {
+                showAuthError("Firebase failed to load properly.");
+                return;
             }
-        }
 
-        function closeGame() {
-            document.getElementById('game-view').style.display = 'none';
-            if (animationFrameId) cancelAnimationFrame(animationFrameId);
-            if (activeInterval) clearInterval(activeInterval);
-            setControls('');
-            window.onkeydown = null;
-            window.onkeyup = null;
-            canvas.onclick = null;
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            currentGame = null;
-            document.title = "Google Classroom - Home";
-        }
-
-        let p1Up = false, p1Down = false;
-        function startPong() {
-            let ballX = canvas.width / 2, ballY = canvas.height / 2;
-            let ballSpeedX = 4, ballSpeedY = 3;
-            let paddle1Y = 200, paddle2Y = 200;
-            const paddleHeight = 100, paddleWidth = 12;
-            let score1 = 0, score2 = 0;
-
-            window.onkeydown = (e) => {
-                if (currentGame !== 'pong') return;
-                if (e.key === 'ArrowUp') p1Up = true;
-                if (e.key === 'ArrowDown') p1Down = true;
-            };
-            window.onkeyup = (e) => {
-                if (currentGame !== 'pong') return;
-                if (e.key === 'ArrowUp') p1Up = false;
-                if (e.key === 'ArrowDown') p1Down = false;
-            };
-
-            function updatePong() {
-                if (currentGame !== 'pong') return;
-                if (p1Up && paddle1Y > 0) paddle1Y -= 6;
-                if (p1Down && paddle1Y < canvas.height - paddleHeight) paddle1Y += 6;
-
-                let targetY = ballY - paddleHeight / 2;
-                paddle2Y += (targetY - paddle2Y) * 0.08;
-
-                ballX += ballSpeedX;
-                ballY += ballSpeedY;
-
-                if (ballY < 0 || ballY > canvas.height) ballSpeedY = -ballSpeedY;
-                if (ballX <= 30 && ballY >= paddle1Y && ballY <= paddle1Y + paddleHeight) {
-                    ballSpeedX = -ballSpeedX; ballX = 30;
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
                 }
-                if (ballX >= canvas.width - 30 - paddleWidth && ballY >= paddle2Y && ballY <= paddle2Y + paddleHeight) {
-                    ballSpeedX = -ballSpeedX; ballX = canvas.width - 30 - paddleWidth;
-                }
-                if (ballX < 0) { score2++; resetBall(); }
-                if (ballX > canvas.width) { score1++; resetBall(); }
-
-                drawPong();
-                animationFrameId = requestAnimationFrame(updatePong);
-            }
-            function resetBall() { ballX = canvas.width / 2; ballY = canvas.height / 2; ballSpeedX = -ballSpeedX; }
-            function drawPong() {
-                ctx.fillStyle = '#111'; ctx.fillRect(0, 0, canvas.width, canvas.height);
-                ctx.strokeStyle = '#333'; ctx.setLineDash([5, 15]);
-                ctx.beginPath(); ctx.moveTo(canvas.width / 2, 0); ctx.lineTo(canvas.width / 2, canvas.height); ctx.stroke();
-                ctx.setLineDash([]);
-                ctx.fillStyle = '#fff';
-                ctx.fillRect(20, paddle1Y, paddleWidth, paddleHeight);
-                ctx.fillRect(canvas.width - 20 - paddleWidth, paddle2Y, paddleWidth, paddleHeight);
-                ctx.beginPath(); ctx.arc(ballX, ballY, 8, 0, Math.PI * 2); ctx.fill();
-                ctx.font = '28px sans-serif'; ctx.fillText(score1, canvas.width / 4, 45); ctx.fillText(score2, (canvas.width / 4) * 3, 45);
-            }
-            updatePong();
-        }
-
-        function startClicker() {
-            let score = 0, clickPower = 1, autoClickers = 0;
-            activeInterval = setInterval(() => {
-                if (currentGame !== 'clicker') return;
-                if (autoClickers > 0) { score += autoClickers; drawClicker(); }
-            }, 1000);
-
-            canvas.onclick = (e) => {
-                if (currentGame !== 'clicker') return;
-                let rect = canvas.getBoundingClientRect();
-                let scaleX = canvas.width / rect.width;
-                let scaleY = canvas.height / rect.height;
-                let x = (e.clientX - rect.left) * scaleX;
-                let y = (e.clientY - rect.top) * scaleY;
-
-                let btnX = canvas.width / 2 - 100, btnY = canvas.height / 2 - 50;
-                if (x >= btnX && x <= btnX + 200 && y >= btnY && y <= btnY + 80) score += clickPower;
-
-                let up1X = canvas.width / 2 - 150, up1Y = canvas.height / 2 + 80;
-                if (x >= up1X && x <= up1X + 140 && y >= up1Y && y <= up1Y + 40 && score >= 20) { score -= 20; clickPower += 1; }
-
-                let up2X = canvas.width / 2 + 10, up2Y = canvas.height / 2 + 80;
-                if (x >= up2X && x <= up2X + 140 && y >= up2Y && y <= up2Y + 40 && score >= 50) { score -= 50; autoClickers += 1; }
-                drawClicker();
-            };
-
-            function drawClicker() {
-                ctx.fillStyle = '#111'; ctx.fillRect(0, 0, canvas.width, canvas.height);
-                ctx.fillStyle = '#fff'; ctx.font = 'bold 24px sans-serif'; ctx.textAlign = 'center';
-                ctx.fillText("Clicker Legends", canvas.width / 2, 60);
-                ctx.font = '20px sans-serif'; ctx.fillStyle = '#4f46e5'; ctx.fillText("Points: " + score, canvas.width / 2, 100);
-
-                let btnX = canvas.width / 2 - 100, btnY = canvas.height / 2 - 50;
-                ctx.fillStyle = '#1e1e1e'; ctx.strokeStyle = '#4f46e5'; ctx.lineWidth = 3;
-                ctx.fillRect(btnX, btnY, 200, 80); ctx.strokeRect(btnX, btnY, 200, 80);
-                ctx.fillStyle = '#fff'; ctx.font = 'bold 16px sans-serif'; ctx.fillText("CLICK ME!", canvas.width / 2, btnY + 45);
-
-                let up1X = canvas.width / 2 - 150, up1Y = canvas.height / 2 + 80;
-                ctx.fillStyle = score >= 20 ? '#222' : '#151515'; ctx.strokeStyle = score >= 20 ? '#10b981' : '#444';
-                ctx.fillRect(up1X, up1Y, 140, 40); ctx.strokeRect(up1X, up1Y, 140, 40);
-                ctx.fillStyle = score >= 20 ? '#fff' : '#666'; ctx.font = '13px sans-serif'; ctx.fillText("+1 Power (20)", up1X + 70, up1Y + 25);
-
-                let up2X = canvas.width / 2 + 10, up2Y = canvas.height / 2 + 80;
-                ctx.fillStyle = score >= 50 ? '#222' : '#151515'; ctx.strokeStyle = score >= 50 ? '#f59e0b' : '#444';
-                ctx.fillRect(up2X, up2Y, 140, 40); ctx.strokeRect(up2X, up2Y, 140, 40);
-                ctx.fillStyle = score >= 50 ? '#fff' : '#666'; ctx.font = '13px sans-serif'; ctx.fillText("+1 Auto (50)", up2X + 70, up2Y + 25);
-                ctx.textAlign = 'left';
-            }
-            drawClicker();
-        }
-
-        let dLeft = false, dRight = false;
-        function startDodge() {
-            let player = { x: 400, y: 420, size: 20, speed: 7 };
-            let obstacles = [], score = 0, gameOver = false;
-
-            window.onkeydown = (e) => {
-                if (currentGame !== 'dodge') return;
-                if (e.key === 'ArrowLeft' || e.key === 'a') dLeft = true;
-                if (e.key === 'ArrowRight' || e.key === 'd') dRight = true;
-                if (e.key === ' ' && gameOver) startDodge();
-            };
-            window.onkeyup = (e) => {
-                if (currentGame !== 'dodge') return;
-                if (e.key === 'ArrowLeft' || e.key === 'a') dLeft = false;
-                if (e.key === 'ArrowRight' || e.key === 'd') dRight = false;
-            };
-
-            activeInterval = setInterval(() => {
-                if (currentGame !== 'dodge' || gameOver) return;
-                obstacles.push({ x: Math.random() * (canvas.width - 30), y: -20, size: Math.random() * 20 + 15, speed: Math.random() * 4 + 4 });
-                score += 10;
-            }, 700);
-
-            function updateDodge() {
-                if (currentGame !== 'dodge') return;
-                if (!gameOver) {
-                    if (dLeft && player.x > 0) player.x -= player.speed;
-                    if (dRight && player.x < canvas.width - player.size) player.x += player.speed;
-
-                    for (let i = obstacles.length - 1; i >= 0; i--) {
-                        obstacles[i].y += obstacles[i].speed;
-                        if (player.x < obstacles[i].x + obstacles[i].size && player.x + player.size > obstacles[i].x && player.y < obstacles[i].y + obstacles[i].size && player.y + player.size > obstacles[i].y) {
-                            gameOver = true;
-                        }
-                        if (obstacles[i].y > canvas.height) obstacles.splice(i, 1);
-                    }
-                }
-                drawDodge();
-                if (!gameOver) animationFrameId = requestAnimationFrame(updateDodge);
-            }
-            function drawDodge() {
-                ctx.fillStyle = '#111'; ctx.fillRect(0, 0, canvas.width, canvas.height);
-                ctx.fillStyle = '#4f46e5'; ctx.fillRect(player.x, player.y, player.size, player.size);
-                ctx.fillStyle = '#ef4444'; for (let obs of obstacles) ctx.fillRect(obs.x, obs.y, obs.size, obs.size);
-                ctx.fillStyle = '#fff'; ctx.font = '16px sans-serif'; ctx.fillText("Score: " + score, 20, 30);
-
-                if (gameOver) {
-                    ctx.fillStyle = 'rgba(0,0,0,0.8)'; ctx.fillRect(0, 0, canvas.width, canvas.height);
-                    ctx.fillStyle = '#fff'; ctx.font = 'bold 28px sans-serif'; ctx.textAlign = 'center';
-                    ctx.fillText("GAME OVER", canvas.width / 2, canvas.height / 2 - 10);
-                    ctx.textAlign = 'left';
-                }
-            }
-            updateDodge();
-        }
-
-        function startColors() {
-            let score = 0, targetColor = "", options = [];
-            const colors = [
-                { name: "RED", hex: "#ef4444" }, { name: "BLUE", hex: "#3b82f6" },
-                { name: "GREEN", hex: "#10b981" }, { name: "YELLOW", hex: "#f59e0b" }
-            ];
-
-            function nextRound() {
-                targetColor = colors[Math.floor(Math.random() * colors.length)];
-                options = [...colors].sort(() => Math.random() - 0.5);
-                drawColors();
+            } catch (err) {
+                console.warn("Custom token login failed, falling back:", err);
             }
 
-            canvas.onclick = (e) => {
-                if (currentGame !== 'colors') return;
-                let rect = canvas.getBoundingClientRect();
-                let scaleX = canvas.width / rect.width;
-                let scaleY = canvas.height / rect.height;
-                let x = (e.clientX - rect.left) * scaleX;
-                let y = (e.clientY - rect.top) * scaleY;
-
-                let boxWidth = 140, boxHeight = 80, startX = canvas.width / 2 - 300, startY = 300;
-                options.forEach((opt, index) => {
-                    let bx = startX + (index * 160), by = startY;
-                    if (x >= bx && x <= bx + boxWidth && y >= by && y <= by + boxHeight) {
-                        if (opt.name === targetColor.name) score += 100;
-                        else score = Math.max(0, score - 50);
-                        nextRound();
-                    }
-                });
-            };
-
-            function drawColors() {
-                ctx.fillStyle = '#111'; ctx.fillRect(0, 0, canvas.width, canvas.height);
-                ctx.fillStyle = '#fff'; ctx.font = 'bold 22px sans-serif'; ctx.textAlign = 'center';
-                ctx.fillText("Color Match Matrix", canvas.width / 2, 50);
-                ctx.font = '14px sans-serif'; ctx.fillStyle = '#aaa';
-                ctx.fillText("Click the box matching the TARGET NAME:", canvas.width / 2, 90);
-
-                ctx.font = 'bold 42px sans-serif'; ctx.fillStyle = targetColor.hex;
-                ctx.fillText(targetColor.name, canvas.width / 2, 170);
-                ctx.font = '18px sans-serif'; ctx.fillStyle = '#4f46e5'; ctx.fillText("Score: " + score, canvas.width / 2, 210);
-
-                let boxWidth = 140, boxHeight = 80, startX = canvas.width / 2 - 300, startY = 260;
-                options.forEach((opt, index) => {
-                    let bx = startX + (index * 160), by = startY;
-                    ctx.fillStyle = opt.hex; ctx.fillRect(bx, by, boxWidth, boxHeight);
-                    ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.strokeRect(bx, by, boxWidth, boxHeight);
-                });
-                ctx.textAlign = 'left';
-            }
-            nextRound();
-        }
-
-        let snakeDx = 1, snakeDy = 0;
-        function sDir(x, y) {
-            if (currentGame !== 'snake') return;
-            if (x !== 0 && snakeDx === 0) { snakeDx = x; snakeDy = 0; }
-            if (y !== 0 && snakeDy === 0) { snakeDx = 0; snakeDy = y; }
-        }
-
-        function startSnake() {
-            const gridSize = 20;
-            let snake = [{ x: 10, y: 10 }, { x: 9, y: 10 }, { x: 8, y: 10 }];
-            let food = { x: 5, y: 5 };
-            snakeDx = 1; snakeDy = 0;
-            let score = 0, gameOver = false;
-
-            window.onkeydown = (e) => {
-                if (currentGame !== 'snake') return;
-                if ((e.key === 'ArrowUp' || e.key === 'w')) sDir(0, -1);
-                if ((e.key === 'ArrowDown' || e.key === 's')) sDir(0, 1);
-                if ((e.key === 'ArrowLeft' || e.key === 'a')) sDir(-1, 0);
-                if ((e.key === 'ArrowRight' || e.key === 'd')) sDir(1, 0);
-            };
-
-            function spawnFood() {
-                food.x = Math.floor(Math.random() * (canvas.width / gridSize));
-                food.y = Math.floor(Math.random() * (canvas.height / gridSize));
-            }
-
-            activeInterval = setInterval(() => {
-                if (currentGame !== 'snake' || gameOver) return;
-                let head = { x: snake[0].x + snakeDx, y: snake[0].y + snakeDy };
-
-                if (head.x < 0 || head.x >= canvas.width / gridSize || head.y < 0 || head.y >= canvas.height / gridSize) {
-                    gameOver = true; return;
-                }
-                for (let part of snake) {
-                    if (head.x === part.x && head.y === part.y) { gameOver = true; return; }
-                }
-
-                snake.unshift(head);
-                if (head.x === food.x && head.y === food.y) { score += 50; spawnFood(); } else { snake.pop(); }
-                drawSnake();
-            }, 120);
-
-            function drawSnake() {
-                ctx.fillStyle = '#111'; ctx.fillRect(0, 0, canvas.width, canvas.height);
-                ctx.fillStyle = '#ef4444'; ctx.fillRect(food.x * gridSize, food.y * gridSize, gridSize - 2, gridSize - 2);
-                ctx.fillStyle = '#10b981';
-                for (let part of snake) ctx.fillRect(part.x * gridSize, part.y * gridSize, gridSize - 2, gridSize - 2);
-                ctx.fillStyle = '#fff'; ctx.font = '16px sans-serif'; ctx.fillText("Score: " + score, 20, 30);
-
-                if (gameOver) {
-                    ctx.fillStyle = 'rgba(0,0,0,0.8)'; ctx.fillRect(0, 0, canvas.width, canvas.height);
-                    ctx.fillStyle = '#fff'; ctx.font = 'bold 28px sans-serif'; ctx.textAlign = 'center';
-                    ctx.fillText("GAME OVER", canvas.width / 2, canvas.height / 2);
-                    ctx.textAlign = 'left';
-                }
-            }
-            spawnFood();
-        }
-
-        let bLeft = false, bRight = false, bShoot = false, lastShot = 0;
-        function startBlaster() {
-            let ship = { x: 380, y: 440, width: 40, height: 20, speed: 6 };
-            let lasers = [], enemies = [], score = 0, gameOver = false;
-
-            window.onkeydown = (e) => {
-                if (currentGame !== 'blaster') return;
-                if (e.key === 'ArrowLeft' || e.key === 'a') bLeft = true;
-                if (e.key === 'ArrowRight' || e.key === 'd') bRight = true;
-                if (e.key === ' ' && !gameOver) shootLaser();
-            };
-            window.onkeyup = (e) => {
-                if (currentGame !== 'blaster') return;
-                if (e.key === 'ArrowLeft' || e.key === 'a') bLeft = false;
-                if (e.key === 'ArrowRight' || e.key === 'd') bRight = false;
-            };
-
-            function shootLaser() {
-                lasers.push({ x: ship.x + ship.width / 2 - 3, y: ship.y, width: 6, height: 12, speed: 8 });
-            }
-
-            activeInterval = setInterval(() => {
-                if (currentGame !== 'blaster' || gameOver) return;
-                enemies.push({ x: Math.random() * (canvas.width - 30), y: -20, size: 30, speed: 2 });
-            }, 900);
-
-            function updateBlaster() {
-                if (currentGame !== 'blaster') return;
-                if (!gameOver) {
-                    if (bLeft && ship.x > 0) ship.x -= ship.speed;
-                    if (bRight && ship.x < canvas.width - ship.width) ship.x += ship.speed;
-                    if (bShoot && Date.now() - lastShot > 250) { shootLaser(); lastShot = Date.now(); }
-
-                    for (let i = lasers.length - 1; i >= 0; i--) {
-                        lasers[i].y -= lasers[i].speed;
-                        if (lasers[i].y < 0) lasers.splice(i, 1);
-                    }
-
-                    for (let i = enemies.length - 1; i >= 0; i--) {
-                        enemies[i].y += enemies[i].speed;
-                        if (enemies[i].y > canvas.height) gameOver = true;
-
-                        for (let j = lasers.length - 1; j >= 0; j--) {
-                            let l = lasers[j], en = enemies[i];
-                            if (l.x < en.x + en.size && l.x + l.width > en.x && l.y < en.y + en.size && l.y + l.height > en.y) {
-                                score += 100;
-                                enemies.splice(i, 1);
-                                lasers.splice(j, 1);
-                                break;
-                            }
-                        }
-                    }
-                }
-                drawBlaster();
-                if (!gameOver) animationFrameId = requestAnimationFrame(updateBlaster);
-            }
-
-            function drawBlaster() {
-                ctx.fillStyle = '#111'; ctx.fillRect(0, 0, canvas.width, canvas.height);
-                ctx.fillStyle = '#4f46e5'; ctx.fillRect(ship.x, ship.y, ship.width, ship.height);
-                ctx.fillStyle = '#38bdf8'; for (let l of lasers) ctx.fillRect(l.x, l.y, l.width, l.height);
-                ctx.fillStyle = '#ef4444'; for (let en of enemies) ctx.fillRect(en.x, en.y, en.size, en.size);
-                ctx.fillStyle = '#fff'; ctx.font = '16px sans-serif'; ctx.fillText("Score: " + score, 20, 30);
-
-                if (gameOver) {
-                    ctx.fillStyle = 'rgba(0,0,0,0.8)'; ctx.fillRect(0, 0, canvas.width, canvas.height);
-                    ctx.fillStyle = '#fff'; ctx.font = 'bold 28px sans-serif'; ctx.textAlign = 'center';
-                    ctx.fillText("GAME OVER", canvas.width / 2, canvas.height / 2);
-                    ctx.textAlign = 'left';
-                }
-            }
-            updateBlaster();
-        }
-
-        function filterGames() {
-            let input = document.getElementById('searchInput').value.toLowerCase();
-            let cards = document.getElementsByClassName('card');
-            for (let i = 0; i < cards.length; i++) {
-                let title = cards[i].getElementsByClassName('card-title')[0].innerText.toLowerCase();
-                let desc = cards[i].getElementsByClassName('card-desc')[0].innerText.toLowerCase();
-                cards[i].style.display = (title.includes(input) || desc.includes(input)) ? "block" : "none";
-            }
-        }
-
-        // Stealth / Panic Switch (ESC Key)
-        let stealthActive = false;
-        document.addEventListener('keydown', function(event) {
-            if (event.key === 'Escape') {
-                stealthActive = !stealthActive;
-                let stealthEl = document.getElementById('stealth-screen');
-                if (stealthActive) {
-                    stealthEl.style.display = 'block';
-                    document.title = "Assignment Document - Word Online";
+            onAuthStateChanged(auth, async (user) => {
+                if (user) {
+                    window.appState.currentUser = user;
+                    // Ensure user presence record
+                    await registerUserPresence(user);
+                    
+                    // Switch UI to main app
+                    document.getElementById('auth-view').classList.add('hidden');
+                    document.getElementById('main-app').classList.remove('hidden');
+                    
+                    updateUserProfileUI(user);
+                    initChatListeners();
                 } else {
-                    stealthEl.style.display = 'none';
-                    document.title = "Google Classroom - Home";
+                    window.appState.currentUser = null;
+                    document.getElementById('auth-view').classList.remove('hidden');
+                    document.getElementById('main-app').classList.add('hidden');
                 }
+            });
+        };
+
+        // Auth Mode Toggle
+        window.toggleAuthMode = function() {
+            window.appState.isSignUp = !window.appState.isSignUp;
+            const isUp = window.appState.isSignUp;
+            document.getElementById('name-field-container').classList.toggle('hidden', !isUp);
+            document.getElementById('auth-submit-btn').textContent = isUp ? 'Create Account' : 'Sign In';
+            document.getElementById('auth-toggle-btn').innerHTML = isUp 
+                ? 'Already have an account? <span class="underline">Sign in</span>' 
+                : "Don't have an account? <span class=\"underline\">Sign up</span>";
+        };
+
+        // Handle Form Submit for Auth
+        window.handleAuthSubmit = async function(event) {
+            event.preventDefault();
+            const email = document.getElementById('auth-email').value.trim();
+            const password = document.getElementById('auth-password').value;
+            const name = document.getElementById('display-name').value.trim();
+            
+            hideAuthError();
+
+            try {
+                if (window.appState.isSignUp) {
+                    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                    const displayName = name || `User_${Math.floor(100 + Math.random() * 900)}`;
+                    await updateProfile(userCredential.user, { displayName });
+                    showToast('Account created successfully!');
+                } else {
+                    await signInWithEmailAndPassword(auth, email, password);
+                    showToast('Signed in successfully!');
+                }
+            } catch (error) {
+                showAuthError(error.message);
             }
-        });
+        };
+
+        // Login as Guest
+        window.loginAsGuest = async function() {
+            try {
+                const guestName = `Guest_${randomGuestNum}`;
+                const res = await signInAnonymously(auth);
+                await updateProfile(res.user, { displayName: guestName });
+                showToast(`Logged in as ${guestName}`);
+            } catch (err) {
+                showAuthError(err.message);
+            }
+        };
+
+        window.logout = async function() {
+            try {
+                if (window.appState.unsubscribeMessages) window.appState.unsubscribeMessages();
+                if (window.appState.unsubscribeUsers) window.appState.unsubscribeUsers();
+                await signOut(auth);
+                showToast('Signed out successfully');
+            } catch (err) {
+                console.error("Sign out error", err);
+            }
+        };
+
+        function showAuthError(msg) {
+            const alert = document.getElementById('auth-alert');
+            document.getElementById('auth-alert-msg').textContent = msg;
+            alert.classList.remove('hidden');
+        }
+
+        function hideAuthError() {
+            document.getElementById('auth-alert').classList.add('hidden');
+        }
+
+        // Register user presence in Firestore
+        async function registerUserPresence(user) {
+            try {
+                const userRef = doc(db, 'artifacts', appId, 'public', 'data', 'users_presence', user.uid);
+                await setDoc(userRef, {
+                    uid: user.uid,
+                    displayName: user.displayName || 'Anonymous',
+                    email: user.email || 'guest@nexus.chat',
+                    lastSeen: serverTimestamp(),
+                    status: 'online'
+                }, { merge: true });
+            } catch (err) {
+                console.error("Presence error:", err);
+            }
+        }
+
+        function updateUserProfileUI(user) {
+            const name = user.displayName || 'Nexus User';
+            document.getElementById('current-user-name').textContent = name;
+            document.getElementById('user-avatar').textContent = name.charAt(0).toUpperCase();
+        }
+
+        // Initialize Chat Rooms and Users listeners
+        function initChatListeners() {
+            renderRoomsList();
+            setupUsersListener();
+            switchChat('general', 'room', 'General Chat');
+        }
+
+        function renderRoomsList() {
+            const container = document.getElementById('rooms-list');
+            container.innerHTML = '';
+            window.appState.rooms.forEach(room => {
+                const isActive = window.appState.activeChatId === room.id && window.appState.activeChatType === 'room';
+                const btn = document.createElement('button');
+                btn.className = `w-full text-left px-3 py-2.5 rounded-xl flex items-center gap-3 transition ${isActive ? 'bg-brand-600/10 text-brand-400 font-semibold border border-brand-500/20' : 'text-slate-300 hover:bg-slate-900 hover:text-white'}`;
+                btn.innerHTML = `
+                    <div class="w-8 h-8 rounded-lg ${isActive ? 'bg-brand-600 text-white' : 'bg-slate-900 text-slate-400'} flex items-center justify-center text-sm">
+                        <i class="fa-solid ${room.icon}"></i>
+                    </div>
+                    <div class="overflow-hidden flex-1">
+                        <p class="text-sm truncate">${room.name}</p>
+                        <p class="text-xs text-slate-500 truncate">${room.desc}</p>
+                    </div>
+                `;
+                btn.onclick = () => switchChat(room.id, 'room', room.name);
+                container.appendChild(btn);
+            });
+        }
+
+        function setupUsersListener() {
+            const usersRef = collection(db, 'artifacts', appId, 'public', 'data', 'users_presence');
+            window.appState.unsubscribeUsers = onSnapshot(usersRef, (snapshot) => {
+                const usersList = [];
+                snapshot.forEach(docSnap => {
+                    const data = docSnap.data();
+                    if (data.uid !== window.appState.currentUser?.uid) {
+                        usersList.push(data);
+                    }
+                });
+                window.appState.users = usersList;
+                document.getElementById('online-count').textContent = `${usersList.length} online`;
+                renderUsersList();
+            }, (error) => {
+                console.error("Users listener error:", error);
+            });
+        }
+
+        function renderUsersList() {
+            const container = document.getElementById('users-list');
+            container.innerHTML = '';
+            if (window.appState.users.length === 0) {
+                container.innerHTML = `<p class="text-xs text-slate-500 px-3 py-2 italic">No other users online</p>`;
+                return;
+            }
+            window.appState.users.forEach(user => {
+                const isDmActive = window.appState.activeChatId === user.uid && window.appState.activeChatType === 'dm';
+                // Deterministic DM channel ID composition
+                const dmId = [window.appState.currentUser.uid, user.uid].sort().join('_');
+                
+                const btn = document.createElement('button');
+                btn.className = `w-full text-left px-3 py-2.5 rounded-xl flex items-center gap-3 transition ${isDmActive ? 'bg-brand-600/10 text-brand-400 font-semibold border border-brand-500/20' : 'text-slate-300 hover:bg-slate-900 hover:text-white'}`;
+                btn.innerHTML = `
+                    <div class="relative">
+                        <div class="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center font-bold text-slate-300 text-xs">
+                            ${(user.displayName || 'U').charAt(0).toUpperCase()}
+                        </div>
+                        <span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 border-2 border-slate-950 rounded-full"></span>
+                    </div>
+                    <div class="overflow-hidden flex-1">
+                        <p class="text-sm truncate">${user.displayName}</p>
+                        <p class="text-xs text-slate-500 truncate">Direct Message</p>
+                    </div>
+                `;
+                btn.onclick = () => switchChat(dmId, 'dm', user.displayName);
+                container.appendChild(btn);
+            });
+        }
+
+        // Switch Active Chat Channel
+        window.switchChat = function(chatId, type, chatName) {
+            window.appState.activeChatId = chatId;
+            window.appState.activeChatType = type;
+            window.appState.activeChatName = chatName;
+
+            // Update UI Header
+            document.getElementById('active-chat-title').textContent = chatName;
+            document.getElementById('active-chat-subtitle').textContent = type === 'room' ? 'Public discussion room' : 'Direct encrypted peer chat';
+            document.getElementById('active-chat-icon').innerHTML = type === 'room' ? '<i class="fa-solid fa-hashtag"></i>' : '<i class="fa-solid fa-user"></i>';
+
+            renderRoomsList();
+            renderUsersList();
+
+            // Close mobile sidebar if open
+            const sidebar = document.getElementById('sidebar');
+            const backdrop = document.getElementById('sidebar-backdrop');
+            if (!sidebar.classList.contains('-translate-x-full')) {
+                sidebar.classList.add('-translate-x-full');
+                backdrop.classList.add('hidden');
+            }
+
+            // Subscribe to Messages for this channel
+            if (window.appState.unsubscribeMessages) {
+                window.appState.unsubscribeMessages();
+            }
+
+            const messagesRef = collection(db, 'artifacts', appId, 'public', 'data', `chat_${chatId}_messages`);
+            window.appState.unsubscribeMessages = onSnapshot(messagesRef, (snapshot) => {
+                const messages = [];
+                snapshot.forEach(docSnap => {
+                    messages.push({ id: docSnap.id, ...docSnap.data() });
+                });
+                // Sort client-side by timestamp
+                messages.sort((a, b) => (a.createdAt?.seconds || 0) - (b.createdAt?.seconds || 0));
+                renderMessages(messages);
+            }, (error) => {
+                console.error("Messages fetch error:", error);
+            });
+        };
+
+        // Render Messages in feed
+        function renderMessages(messages) {
+            const container = document.getElementById('messages-container');
+            container.innerHTML = '';
+
+            if (messages.length === 0) {
+                container.innerHTML = `
+                    <div class="flex-1 flex flex-col items-center justify-center text-center p-8 text-slate-500">
+                        <div class="w-16 h-16 rounded-2xl bg-slate-800/50 flex items-center justify-center text-slate-400 text-2xl mb-3">
+                            <i class="fa-regular fa-comment-dots"></i>
+                        </div>
+                        <p class="text-sm font-medium text-slate-300">No messages here yet</p>
+                        <p class="text-xs text-slate-500 mt-1">Start the conversation by sending a message below!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            messages.forEach(msg => {
+                const isMe = msg.senderId === window.appState.currentUser?.uid;
+                const timeStr = msg.createdAt ? new Date(msg.createdAt.seconds * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Just now';
+
+                const msgDiv = document.createElement('div');
+                msgDiv.className = `flex gap-3 max-w-[85%] md:max-w-[70%] ${isMe ? 'ml-auto flex-row-reverse' : ''}`;
+                
+                let contentHTML = `<p class="text-sm leading-relaxed whitespace-pre-wrap break-words">${escapeHtml(msg.text || '')}</p>`;
+                if (msg.mediaUrl) {
+                    contentHTML += `<div class="mt-2 rounded-lg overflow-hidden border border-slate-700 bg-slate-950 p-2 flex items-center gap-3">
+                        <i class="fa-solid fa-file-arrow-down text-brand-400 text-xl"></i>
+                        <div class="overflow-hidden">
+                            <p class="text-xs font-semibold text-white truncate">${escapeHtml(msg.mediaName || 'Attachment')}</p>
+                            <a href="${msg.mediaUrl}" target="_blank" class="text-[10px] text-brand-400 hover:underline">Download / View Media</a>
+                        </div>
+                    </div>`;
+                }
+
+                msgDiv.innerHTML = `
+                    <div class="w-8 h-8 rounded-full ${isMe ? 'bg-brand-600' : 'bg-slate-700'} flex-shrink-0 flex items-center justify-center font-bold text-xs text-white">
+                        ${(msg.senderName || 'U').charAt(0).toUpperCase()}
+                    </div>
+                    <div class="${isMe ? 'items-end' : 'items-start'} flex flex-col">
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="text-xs font-semibold text-slate-300">${escapeHtml(msg.senderName || 'Anonymous')}</span>
+                            <span class="text-[10px] text-slate-500">${timeStr}</span>
+                        </div>
+                        <div class="p-3.5 rounded-2xl ${isMe ? 'bg-brand-600 text-white rounded-tr-none' : 'bg-slate-800 text-slate-100 border border-slate-700/80 rounded-tl-none'} shadow-sm">
+                            ${contentHTML}
+                        </div>
+                    </div>
+                `;
+                container.appendChild(msgDiv);
+            });
+
+            // Scroll to bottom
+            container.scrollTop = container.scrollHeight;
+        }
+
+        // Send Message Handler
+        window.handleSendMessage = async function(event) {
+            event.preventDefault();
+            const input = document.getElementById('message-input');
+            const text = input.value.trim();
+            if (!text && !window.pendingMedia) return;
+
+            const user = window.appState.currentUser;
+            if (!user) return;
+
+            const messageData = {
+                senderId: user.uid,
+                senderName: user.displayName || 'Anonymous',
+                text: text,
+                createdAt: serverTimestamp()
+            };
+
+            if (window.pendingMedia) {
+                messageData.mediaUrl = window.pendingMedia.url;
+                messageData.mediaName = window.pendingMedia.name;
+                window.pendingMedia = null;
+            }
+
+            input.value = '';
+            input.style.height = 'auto';
+
+            try {
+                const messagesRef = collection(db, 'artifacts', appId, 'public', 'data', `chat_${window.appState.activeChatId}_messages`);
+                await addDoc(messagesRef, messageData);
+            } catch (err) {
+                console.error("Send message error:", err);
+                showToast('Failed to send message', 'error');
+            }
+        };
+
+        // Key down handler for text input
+        window.handleKeyDown = function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                document.getElementById('message-form').dispatchEvent(new Event('submit', { cancelable: true }));
+            }
+        };
+
+        // Emoji Picker Logic
+        const emojis = ['😀', '😂', '😍', '🔥', '👍', '🎉', '🚀', '😎', '💡', '❤️', '✨', '🙌', '☕', '💻', '🥳', '💯', '👏', '⭐'];
+        function populateEmojis() {
+            const picker = document.getElementById('emoji-picker');
+            picker.innerHTML = '';
+            emojis.forEach(emoji => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'text-xl hover:scale-125 transition transform p-1 rounded hover:bg-slate-700 flex items-center justify-center';
+                btn.textContent = emoji;
+                btn.onclick = () => {
+                    const input = document.getElementById('message-input');
+                    input.value += emoji;
+                    input.focus();
+                    toggleEmojiPicker();
+                };
+                picker.appendChild(btn);
+            });
+        }
+
+        window.toggleEmojiPicker = function() {
+            const picker = document.getElementById('emoji-picker');
+            picker.classList.toggle('hidden');
+        };
+
+        // Media attachment placeholder simulation
+        window.triggerMediaUpload = function() {
+            document.getElementById('media-input').click();
+        };
+
+        window.handleMediaSelect = function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // Simulate file blob object URL for demo media placeholder
+            const fileUrl = URL.createObjectURL(file);
+            window.pendingMedia = {
+                url: fileUrl,
+                name: file.name
+            };
+
+            showToast(`Attached: ${file.name}`);
+            event.target.value = '';
+        };
+
+        // Clear local messages view
+        window.clearChatHistory = function() {
+            document.getElementById('messages-container').innerHTML = `
+                <div class="flex-1 flex flex-col items-center justify-center text-center p-8 text-slate-500">
+                    <p class="text-sm font-medium text-slate-300">View cleared locally</p>
+                </div>
+            `;
+            showToast('Chat view cleared');
+        };
+
+        // Mobile Sidebar Toggle
+        window.toggleSidebar = function() {
+            const sidebar = document.getElementById('sidebar');
+            const backdrop = document.getElementById('sidebar-backdrop');
+            sidebar.classList.toggle('-translate-x-full');
+            backdrop.classList.toggle('hidden');
+        };
+
+        // Create Custom Room Modal helper
+        window.openCreateRoomModal = function() {
+            const roomName = prompt("Enter new room name:");
+            if (!roomName || !roomName.trim()) return;
+            const roomId = roomName.trim().toLowerCase().replace(/\s+/g, '-');
+            
+            if (window.appState.rooms.some(r => r.id === roomId)) {
+                showToast('Room already exists!', 'error');
+                return;
+            }
+
+            window.appState.rooms.push({
+                id: roomId,
+                name: roomName.trim(),
+                desc: 'Custom user room',
+                icon: 'fa-comments'
+            });
+
+            renderRoomsList();
+            switchChat(roomId, 'room', roomName.trim());
+            showToast(`Created room #${roomName.trim()}`);
+        };
+
+        // Toast Notification Helper
+        function showToast(msg, type = 'success') {
+            const toast = document.getElementById('toast');
+            const icon = document.getElementById('toast-icon');
+            document.getElementById('toast-msg').textContent = msg;
+
+            if (type === 'error') {
+                icon.className = 'fa-solid fa-circle-exclamation text-rose-400';
+            } else {
+                icon.className = 'fa-solid fa-circle-check text-emerald-400';
+            }
+
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+
+        function escapeHtml(str) {
+            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        }
     </script>
 </body>
 </html>
