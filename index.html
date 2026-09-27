@@ -19,7 +19,7 @@
             position: relative;
         }
 
-        /* Desktop Background */
+        /* Desktop Background - ONLY wall.png */
         .desktop {
             width: 100%;
             height: calc(100vh - 40px);
@@ -66,7 +66,7 @@
             max-height: 32px;
         }
 
-        /* Taskbar */
+        /* Taskbar - Original gradient styling */
         .taskbar {
             position: fixed;
             bottom: 0;
@@ -143,14 +143,6 @@
             box-shadow: inset 0 1px 2px rgba(0,0,0,0.2);
         }
 
-        .taskbar-item-icon {
-            width: 20px;
-            height: 20px;
-            background-size: contain;
-            background-repeat: no-repeat;
-            background-position: center;
-        }
-
         .taskbar-separator {
             width: 1px;
             height: 28px;
@@ -194,15 +186,6 @@
             display: flex;
         }
 
-        .start-menu-header {
-            background: rgba(45, 90, 140, 0.8);
-            color: white;
-            padding: 12px 15px;
-            font-weight: bold;
-            font-size: 14px;
-            border-bottom: 1px solid #c0c0c0;
-        }
-
         .start-menu-item {
             padding: 8px 15px;
             display: flex;
@@ -220,15 +203,6 @@
             background: linear-gradient(to right, #3d6ba8 0%, #2d5a8c 100%);
             color: white;
             border: 1px solid #005a9e;
-        }
-
-        .start-menu-item-icon {
-            width: 24px;
-            height: 24px;
-            background-size: contain;
-            background-repeat: no-repeat;
-            background-position: center;
-            flex-shrink: 0;
         }
 
         .start-menu-item-label {
@@ -321,7 +295,6 @@
             font-size: 12px;
         }
 
-        /* Welcome/About Content */
         .welcome-content {
             padding: 15px;
             line-height: 1.6;
@@ -338,7 +311,6 @@
             color: #333;
         }
 
-        /* Modal overlay */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -353,7 +325,6 @@
             display: block;
         }
 
-        /* Animations */
         @keyframes fadeIn {
             from {
                 opacity: 0;
@@ -369,7 +340,6 @@
             animation: fadeIn 0.15s ease-out;
         }
 
-        /* Scrollbar styling */
         ::-webkit-scrollbar {
             width: 16px;
         }
@@ -433,7 +403,7 @@
                 <h2>Welcome to Modios Online</h2>
                 <p>A nostalgic Windows 7 desktop experience brought to the web.</p>
                 <p><strong>Version:</strong> 1.0</p>
-                <p><strong>About:</strong> Modios is a web-based simulation of the classic Windows 7 operating system interface. Explore the desktop and experience the simplicity of vintage computing.</p>
+                <p><strong>About:</strong> Modios is a web-based simulation of the classic Windows 7 operating system interface.</p>
             </div>
         </div>
     </div>
@@ -462,4 +432,25 @@
                 <button onclick="appendCalc('3')">3</button>
                 <button onclick="appendCalc('-')">-</button>
                 <button onclick="appendCalc('0')">0</button>
-                <button onclick="appendCalc('.')">.</button
+                <button onclick="appendCalc('.')">.</button>
+                <button onclick="clearCalc()" style="grid-column: span 2;">C</button>
+                <button onclick="equalCalc()" style="grid-column: span 2;">=</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="window" id="notepadWindow">
+        <div class="window-title">
+            <span class="window-title-text">Notepad</span>
+            <div class="window-buttons">
+                <button class="window-button" onclick="minimizeWindow('notepadWindow')">_</button>
+                <button class="window-button window-close" onclick="closeWindow('notepadWindow')">×</button>
+            </div>
+        </div>
+        <div class="window-content">
+            <textarea id="notepadText" style="width: 100%; height: 100%; border: none; padding: 5px; font-family: Courier New; font-size: 12px; resize: none;"></textarea>
+        </div>
+    </div>
+
+    <div class="window" id="helpWindow">
+        <div class="window-title
