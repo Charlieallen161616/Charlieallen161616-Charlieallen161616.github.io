@@ -3,296 +3,469 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Discord Clone - Chat App</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Modios - Windows 7 Online Desktop</title>
     <style>
-        /* Custom scrollbar matching Discord dark theme */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #2e3136; }
-        ::-webkit-scrollbar-thumb { background: #202225; border-radius: 4px; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+            background: linear-gradient(135deg, #0078d4 0%, #00a4ef 100%);
+            height: 100vh;
+            width: 100vw;
+            position: relative;
+        }
+
+        /* Desktop Background */
+        .desktop {
+            width: 100%;
+            height: calc(100vh - 40px);
+            position: relative;
+            background: linear-gradient(135deg, #0078d4 0%, #00a4ef 100%);
+            overflow: hidden;
+        }
+
+        .desktop::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 150px;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 300"><path d="M0,200 Q480,150 960,200 T1920,200 L1920,300 L0,300 Z" fill="%23ffffff" opacity="0.1"/></svg>');
+            background-size: cover;
+            pointer-events: none;
+        }
+
+        /* Desktop Icons */
+        .desktop-icon {
+            position: absolute;
+            width: 80px;
+            text-align: center;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.2s;
+        }
+
+        .desktop-icon:hover {
+            opacity: 0.8;
+        }
+
+        .desktop-icon:active {
+            transform: scale(0.95);
+        }
+
+        .icon-image {
+            width: 48px;
+            height: 48px;
+            margin: 0 auto 8px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            filter: drop-shadow(1px 1px 1px rgba(0,0,0,0.3));
+        }
+
+        .icon-label {
+            font-size: 12px;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.7);
+            word-wrap: break-word;
+            overflow: hidden;
+            max-height: 32px;
+        }
+
+        /* Taskbar */
+        .taskbar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 40px;
+            background: linear-gradient(to bottom, #f0f0f0 0%, #e0e0e0 100%);
+            border-top: 1px solid #c0c0c0;
+            display: flex;
+            align-items: center;
+            padding: 0 5px;
+            gap: 3px;
+            box-shadow: 0 -1px 3px rgba(0,0,0,0.2);
+            z-index: 1000;
+        }
+
+        .start-button {
+            background: linear-gradient(to bottom, #2d7f2d 0%, #1e5c1e 100%);
+            color: white;
+            border: 2px outset #3d9f3d;
+            border-radius: 3px;
+            padding: 4px 12px;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.1s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            min-width: 60px;
+            justify-content: center;
+        }
+
+        .start-button:hover {
+            background: linear-gradient(to bottom, #3d9f3d 0%, #2d7f2d 100%);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.3);
+        }
+
+        .start-button:active {
+            border-style: inset;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .start-icon {
+            width: 20px;
+            height: 20px;
+            display: inline-block;
+        }
+
+        .taskbar-item {
+            height: 32px;
+            padding: 0 8px;
+            background: linear-gradient(to bottom, #f5f5f5 0%, #e0e0e0 100%);
+            border: 1px solid #a0a0a0;
+            border-radius: 2px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            user-select: none;
+            transition: all 0.1s;
+            max-width: 150px;
+        }
+
+        .taskbar-item:hover {
+            background: linear-gradient(to bottom, #ffffff 0%, #e8e8e8 100%);
+            border-color: #5d5d5d;
+        }
+
+        .taskbar-item:active {
+            background: linear-gradient(to bottom, #d0d0d0 0%, #c0c0c0 100%);
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.2);
+        }
+
+        .taskbar-item-icon {
+            width: 20px;
+            height: 20px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+
+        .taskbar-separator {
+            width: 1px;
+            height: 28px;
+            background: linear-gradient(to bottom, transparent 0%, #a0a0a0 50%, transparent 100%);
+            margin: 0 2px;
+        }
+
+        .notification-area {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding-right: 10px;
+        }
+
+        .clock {
+            padding: 0 8px;
+            font-size: 12px;
+            color: #333;
+        }
+
+        /* Start Menu */
+        .start-menu {
+            position: fixed;
+            bottom: 40px;
+            left: 0;
+            width: 320px;
+            background: linear-gradient(to right, #f0f0f0 0%, #e8e8e8 100%);
+            border: 2px solid;
+            border-color: #dfdfdf #808080 #808080 #dfdfdf;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+            display: none;
+            flex-direction: column;
+            z-index: 2000;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .start-menu.open {
+            display: flex;
+        }
+
+        .start-menu-header {
+            background: linear-gradient(to right, #2d5a8c 0%, #1e3c5a 100%);
+            color: white;
+            padding: 12px 15px;
+            font-weight: bold;
+            font-size: 14px;
+            border-bottom: 1px solid #c0c0c0;
+        }
+
+        .start-menu-item {
+            padding: 8px 15px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            font-size: 13px;
+            color: #000;
+            border: 1px solid transparent;
+            transition: all 0.1s;
+        }
+
+        .start-menu-item:hover {
+            background: linear-gradient(to right, #3d6ba8 0%, #2d5a8c 100%);
+            color: white;
+            border: 1px solid #005a9e;
+        }
+
+        .start-menu-item-icon {
+            width: 24px;
+            height: 24px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            flex-shrink: 0;
+        }
+
+        .start-menu-item-label {
+            flex-grow: 1;
+        }
+
+        .start-menu-divider {
+            height: 1px;
+            background: linear-gradient(to right, transparent 0%, #c0c0c0 50%, transparent 100%);
+            margin: 4px 0;
+        }
+
+        /* Window Styles */
+        .window {
+            position: fixed;
+            background: linear-gradient(to bottom, #f0f0f0 0%, #e8e8e8 100%);
+            border: 2px solid;
+            border-color: #dfdfdf #808080 #808080 #dfdfdf;
+            box-shadow: 0 0 10px rgba(0,0,0,0.3);
+            display: none;
+            flex-direction: column;
+            z-index: 100;
+            min-width: 300px;
+        }
+
+        .window.open {
+            display: flex;
+        }
+
+        .window-title {
+            background: linear-gradient(to right, #0078d4 0%, #0095d8 100%);
+            color: white;
+            padding: 3px 2px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: move;
+            user-select: none;
+            min-height: 24px;
+            gap: 2px;
+        }
+
+        .window-title-text {
+            flex-grow: 1;
+            padding: 2px 4px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .window-buttons {
+            display: flex;
+            gap: 2px;
+        }
+
+        .window-button {
+            width: 24px;
+            height: 20px;
+            background: linear-gradient(to bottom, #f0f0f0 0%, #d8d8d8 100%);
+            border: 1px outset #c0c0c0;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: bold;
+            color: #000;
+            transition: all 0.1s;
+        }
+
+        .window-button:hover {
+            background: linear-gradient(to bottom, #f8f8f8 0%, #e0e0e0 100%);
+        }
+
+        .window-button:active {
+            border-style: inset;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.2);
+        }
+
+        .window-close {
+            background: linear-gradient(to bottom, #f0f0f0 0%, #d8d8d8 100%);
+        }
+
+        .window-close:hover {
+            background: #d8534a;
+            color: white;
+        }
+
+        .window-content {
+            flex-grow: 1;
+            padding: 2px;
+            overflow: auto;
+            background: #f0f0f0;
+            border: 1px solid #dfdfdf;
+            font-size: 12px;
+        }
+
+        /* Welcome/About Content */
+        .welcome-content {
+            padding: 15px;
+            line-height: 1.6;
+        }
+
+        .welcome-content h2 {
+            color: #0078d4;
+            margin: 10px 0;
+            font-size: 16px;
+        }
+
+        .welcome-content p {
+            margin: 10px 0;
+            color: #333;
+        }
+
+        /* Modal overlay for start menu close */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 999;
+            display: none;
+        }
+
+        .modal-overlay.active {
+            display: block;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .window.open {
+            animation: fadeIn 0.15s ease-out;
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 16px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #e0e0e0;
+            border: 1px solid #c0c0c0;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(to bottom, #f0f0f0, #d0d0d0);
+            border: 1px solid #a0a0a0;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(to bottom, #f8f8f8, #d8d8d8);
+        }
     </style>
 </head>
-<body class="bg-[#36393f] text-[#dcddde] h-screen flex flex-col overflow-hidden font-sans">
+<body>
+    <div class="desktop" id="desktop"></div>
 
-    <!-- LOGIN SCREEN -->
-    <div id="login-screen" class="fixed inset-0 bg-[#2f3136] z-50 flex items-center justify-center">
-        <div class="bg-[#36393f] p-8 rounded-lg shadow-2xl w-full max-w-md text-center border border-[#202225]">
-            <h1 class="text-2xl font-bold text-white mb-2">Welcome to Discord Web</h1>
-            <p class="text-[#8e9297] text-sm mb-6">Connect instantly with a mock Google account, no MFA or API keys needed.</p>
-            
-            <button onclick="loginWithGoogle()" class="w-full flex items-center justify-center gap-3 bg-white text-[#36393f] font-semibold py-3 px-4 rounded-md hover:bg-gray-100 transition shadow">
-                <svg class="w-5 h-5" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.13 0-5.78-2.11-6.73-4.96H1.2v3.15C3.15 21.32 7.23 24 12 24z"/><path fill="#FBBC05" d="M5.27 14.24c-.25-.72-.38-1.49-.38-2.24s.13-1.52.38-2.24V6.6H1.2C.43 8.15 0 9.89 0 12s.43 3.85 1.2 5.4l4.07-3.16z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.23 0 3.15 2.68 1.2 6.6l4.07 3.15c.95-2.85 3.6-4.96 6.73-4.96z"/></svg>
-                Sign in with Google
-            </button>
+    <div class="modal-overlay" id="modalOverlay"></div>
+
+    <div class="start-menu" id="startMenu">
+        <div class="start-menu-header">☼ All Programs</div>
+        <div class="start-menu-item" data-action="about">
+            <div class="start-menu-item-icon">📋</div>
+            <div class="start-menu-item-label">About Modios</div>
+        </div>
+        <div class="start-menu-item" data-action="calculator">
+            <div class="start-menu-item-icon">🧮</div>
+            <div class="start-menu-item-label">Calculator</div>
+        </div>
+        <div class="start-menu-item" data-action="notepad">
+            <div class="start-menu-item-icon">📝</div>
+            <div class="start-menu-item-label">Notepad</div>
+        </div>
+        <div class="start-menu-item" data-action="about">
+            <div class="start-menu-item-icon">🖼️</div>
+            <div class="start-menu-item-label">View Desktop</div>
+        </div>
+        <div class="start-menu-divider"></div>
+        <div class="start-menu-item" data-action="help">
+            <div class="start-menu-item-icon">❓</div>
+            <div class="start-menu-item-label">Help and Support</div>
         </div>
     </div>
 
-    <!-- MAIN DISCORD INTERFACE -->
-    <div id="app-screen" class="hidden flex h-full w-full">
-        
-        <!-- 1. SERVERS SIDEBAR -->
-        <div class="w-[72px] bg-[#202225] flex flex-col items-center py-3 gap-2 flex-shrink-0">
-            <!-- Home / Direct Messages Icon -->
-            <button onclick="switchServer('Home')" class="w-12 h-12 rounded-3xl bg-[#36393f] hover:rounded-2xl hover:bg-[#5865f2] hover:text-white transition-all flex items-center justify-center text-white font-bold group relative">
-                💬
-                <span class="absolute left-16 bg-[#18191c] text-white text-xs px-2 py-1 rounded shadow-md opacity-0 group-hover:opacity-100 transition whitespace-nowrap z-50 pointer-events-none">Direct Messages</span>
-            </button>
-            <div class="w-8 h-[2px] bg-[#36393f] rounded"></div>
-            <!-- Server 1 -->
-            <button onclick="switchServer('General Lounge')" class="w-12 h-12 rounded-3xl bg-[#2f3136] hover:rounded-2xl hover:bg-[#5865f2] hover:text-white transition-all flex items-center justify-center text-white font-bold group relative">
-                GL
-                <span class="absolute left-16 bg-[#18191c] text-white text-xs px-2 py-1 rounded shadow-md opacity-0 group-hover:opacity-100 transition whitespace-nowrap z-50 pointer-events-none">General Lounge</span>
-            </button>
-            <!-- Server 2 -->
-            <button onclick="switchServer('Developers Hub')" class="w-12 h-12 rounded-3xl bg-[#2f3136] hover:rounded-2xl hover:bg-[#5865f2] hover:text-white transition-all flex items-center justify-center text-white font-bold group relative">
-                DH
-                <span class="absolute left-16 bg-[#18191c] text-white text-xs px-2 py-1 rounded shadow-md opacity-0 group-hover:opacity-100 transition whitespace-nowrap z-50 pointer-events-none">Developers Hub</span>
-            </button>
+    <div class="taskbar">
+        <button class="start-button" id="startButton">
+            <span class="start-icon">⊞</span>
+            start
+        </button>
+        <div class="taskbar-separator"></div>
+        <div class="notification-area">
+            <div class="clock" id="clock">00:00</div>
         </div>
-
-        <!-- 2. CHANNELS SIDEBAR -->
-        <div class="w-60 bg-[#2f3136] flex flex-col flex-shrink-0">
-            <!-- Server Title Header -->
-            <div class="h-12 border-b border-[#202225] flex items-center px-4 font-bold text-white shadow-sm justify-between">
-                <span id="current-server-title">Home</span>
-            </div>
-
-            <!-- Channels List -->
-            <div class="flex-1 overflow-y-auto px-2 py-3 space-y-1">
-                <div class="text-xs font-semibold text-[#8e9297] px-2 mb-1 uppercase tracking-wider">Text Channels</div>
-                <div id="channels-container" class="space-y-[2px]">
-                    <!-- Injected via JS -->
-                </div>
-
-                <div class="text-xs font-semibold text-[#8e9297] px-2 mt-4 mb-1 uppercase tracking-wider">Voice Channels</div>
-                <div onclick="alert('Voice channel simulation: Connected!')" class="flex items-center gap-2 px-2 py-1.5 rounded text-[#8e9297] hover:bg-[#34373c] hover:text-[#dcddde] cursor-pointer text-sm">
-                    🔊 General Voice
-                </div>
-            </div>
-
-            <!-- User Footer Profile Card -->
-            <div class="h-14 bg-[#292b2f] px-2 flex items-center justify-between">
-                <div class="flex items-center gap-2 overflow-hidden">
-                    <div id="user-avatar" class="w-8 h-8 rounded-full bg-[#5865f2] flex items-center justify-center font-bold text-white text-sm">U</div>
-                    <div class="overflow-hidden">
-                        <div id="footer-username" class="text-sm font-bold text-white truncate">Username</div>
-                        <div class="text-xs text-[#b9bbbe]">Online</div>
-                    </div>
-                </div>
-                <button onclick="logout()" title="Log Out" class="text-[#b9bbbe] hover:text-white text-sm p-1">🚪</button>
-            </div>
-        </div>
-
-        <!-- 3. CHAT MAIN WINDOW -->
-        <div class="flex-1 flex flex-col bg-[#36393f]">
-            <!-- Chat Header -->
-            <div class="h-12 border-b border-[#202225] flex items-center px-4 shadow-sm font-bold text-white gap-2">
-                <span class="text-[#8e9297] text-xl">#</span>
-                <span id="current-channel-title">general</span>
-            </div>
-
-            <!-- Messages Stream Area -->
-            <div id="messages-container" class="flex-1 overflow-y-auto p-4 space-y-4">
-                <!-- Messages injected here -->
-            </div>
-
-            <!-- Message Input Form -->
-            <div class="p-4 bg-[#36393f]">
-                <form id="message-form" onsubmit="sendMessage(event)" class="bg-[#40444b] rounded-lg flex items-center px-4 py-2.5">
-                    <input type="text" id="message-input" placeholder="Message #general" class="w-full bg-transparent text-[#dcddde] focus:outline-none placeholder-[#72767d] text-sm" autocomplete="off">
-                    <button type="submit" class="bg-[#5865f2] hover:bg-[#4752c4] text-white px-4 py-1.5 rounded text-sm font-medium transition ml-2">Send</button>
-                </form>
-            </div>
-        </div>
-
-        <!-- 4. ACTIVE MEMBERS SIDEBAR -->
-        <div class="w-60 bg-[#2f3136] flex flex-col flex-shrink-0 p-4 border-l border-[#202225]">
-            <div class="text-xs font-semibold text-[#8e9297] uppercase tracking-wider mb-2">Online — 2</div>
-            <div class="space-y-2">
-                <div class="flex items-center gap-3 px-1 py-1 rounded hover:bg-[#34373c] cursor-pointer">
-                    <div class="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center font-bold text-white text-xs">🤖</div>
-                    <span class="text-sm text-[#dcddde] font-medium">Discord Bot</span>
-                </div>
-                <div class="flex items-center gap-3 px-1 py-1 rounded hover:bg-[#34373c] cursor-pointer">
-                    <div id="sidebar-user-avatar" class="w-8 h-8 rounded-full bg-[#5865f2] flex items-center justify-center font-bold text-white text-xs">U</div>
-                    <span id="sidebar-username" class="text-sm text-[#dcddde] font-medium">Username</span>
-                </div>
-            </div>
-        </div>
-
     </div>
 
-    <script>
-        // State variables
-        let currentUser = null;
-        let currentServer = 'Home';
-        let currentChannel = 'welcome';
-        
-        // Mock databases stored in localStorage for multi-tab testing sync
-        const channels = {
-            'Home': ['welcome', 'direct-messages'],
-            'General Lounge': ['general', 'memes', 'gaming'],
-            'Developers Hub': ['announcements', 'coding-help', 'showcase']
-        };
+    <!-- Windows -->
+    <div class="window" id="aboutWindow">
+        <div class="window-title">
+            <span class="window-title-text">About Modios</span>
+            <div class="window-buttons">
+                <button class="window-button window-close" onclick="closeWindow('aboutWindow')">×</button>
+            </div>
+        </div>
+        <div class="window-content">
+            <div class="welcome-content">
+                <h2>Welcome to Modios Online</h2>
+                <p>A nostalgic Windows 7 desktop experience brought to the web.</p>
+                <p><strong>Version:</strong> 1.0</p>
+                <p><strong>About:</strong> Modios is a web-based simulation of the classic Windows 7 operating system interface. Explore the desktop, use applications, and experience the simplicity of vintage computing.</p>
+                <p style="margin-top: 20px; color: #666; font-size: 11px;">© 2024 Modios Project. This is a fan-made homage to Windows 7.</p>
+            </div>
+        </div>
+    </div>
 
-        const channelNames = {
-            'welcome': 'Welcome',
-            'direct-messages': 'Direct Messages',
-            'general': 'general',
-            'memes': 'memes',
-            'gaming': 'gaming',
-            'announcements': 'announcements',
-            'coding-help': 'coding-help',
-            'showcase': 'showcase'
-        };
-
-        function loginWithGoogle() {
-            // Simulated secure Google Profile credentials without MFA challenges
-            const randomNames = ["Alex Rider", "Sarah Connor", "Neo Anderson", "Elena Fisher", "Marcus Vance"];
-            const chosenName = randomNames[Math.floor(Math.random() * randomNames.length)];
-            
-            currentUser = {
-                name: chosenName,
-                email: chosenName.toLowerCase().replace(' ', '.') + '@gmail.com',
-                avatar: chosenName.charAt(0)
-            };
-
-            localStorage.setItem('discord_user', JSON.stringify(currentUser));
-            initApp();
-        }
-
-        function logout() {
-            localStorage.removeItem('discord_user');
-            currentUser = null;
-            document.getElementById('app-screen').classList.add('hidden');
-            document.getElementById('login-screen').classList.remove('hidden');
-        }
-
-        function initApp() {
-            document.getElementById('login-screen').classList.add('hidden');
-            document.getElementById('app-screen').classList.remove('hidden');
-
-            document.getElementById('user-avatar').textContent = currentUser.avatar;
-            document.getElementById('footer-username').textContent = currentUser.name;
-            document.getElementById('sidebar-user-avatar').textContent = currentUser.avatar;
-            document.getElementById('sidebar-username').textContent = currentUser.name;
-
-            switchServer('Home');
-        }
-
-        function switchServer(serverName) {
-            currentServer = serverName;
-            document.getElementById('current-server-title').textContent = serverName;
-            
-            // Switch to the first channel of this server automatically
-            const serverChannels = channels[serverName];
-            switchChannel(serverChannels[0]);
-            renderChannels();
-        }
-
-        function renderChannels() {
-            const container = document.getElementById('channels-container');
-            container.innerHTML = '';
-            
-            channels[currentServer].forEach(chanKey => {
-                const isActive = chanKey === currentChannel;
-                const activeClass = isActive ? 'bg-[#393c43] text-white' : 'text-[#8e9297] hover:bg-[#34373c] hover:text-[#dcddde]';
-                
-                const div = document.createElement('div');
-                div.className = `flex items-center gap-2 px-2 py-1.5 rounded cursor-pointer text-sm font-medium transition ${activeClass}`;
-                div.innerHTML = `<span class="text-lg text-[#72767d]">#</span> ${channelNames[chanKey] || chanKey}`;
-                div.onclick = () => switchChannel(chanKey);
-                container.appendChild(div);
-            });
-        }
-
-        function switchChannel(chanKey) {
-            currentChannel = chanKey;
-            document.getElementById('current-channel-title').textContent = channelNames[chanKey] || chanKey;
-            document.getElementById('message-input').placeholder = `Message #${channelNames[chanKey] || chanKey}`;
-            renderChannels();
-            renderMessages();
-        }
-
-        function sendMessage(e) {
-            e.preventDefault();
-            const input = document.getElementById('message-input');
-            const text = input.value.trim();
-            if (!text) return;
-
-            const message = {
-                id: Date.now(),
-                user: currentUser.name,
-                avatar: currentUser.avatar,
-                text: text,
-                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-            };
-
-            // Retrieve current channel message array from localStorage
-            const storageKey = `messages_${currentChannel}`;
-            let messages = JSON.parse(localStorage.getItem(storageKey)) || [];
-            messages.push(message);
-            localStorage.setItem(storageKey, JSON.stringify(messages));
-
-            input.value = '';
-            renderMessages();
-        }
-
-        function renderMessages() {
-            const container = document.getElementById('messages-container');
-            container.innerHTML = '';
-
-            const storageKey = `messages_${currentChannel}`;
-            let messages = JSON.parse(localStorage.getItem(storageKey)) || [];
-
-            // Add default welcome message if empty
-            if (messages.length === 0) {
-                messages.push({
-                    user: 'Discord Bot',
-                    avatar: '🤖',
-                    text: `Welcome to #${channelNames[currentChannel] || currentChannel}! This is the start of your channel history.`,
-                    time: '12:00 PM'
-                });
-            }
-
-            messages.forEach(msg => {
-                const item = document.createElement('div');
-                item.className = 'flex items-start gap-4 mt-4 hover:bg-[#32353b] p-1 rounded transition';
-                item.innerHTML = `
-                    <div class="w-10 h-10 rounded-full bg-[#5865f2] flex items-center justify-center font-bold text-white flex-shrink-0">${msg.avatar}</div>
-                    <div>
-                        <div class="flex items-center gap-2">
-                            <span class="font-semibold text-white text-sm">${msg.user}</span>
-                            <span class="text-xs text-[#72767d]">${msg.time}</span>
-                        </div>
-                        <p class="text-sm text-[#dcddde] mt-1">${escapeHtml(msg.text)}</p>
-                    </div>
-                `;
-                container.appendChild(item);
-            });
-
-            container.scrollTop = container.scrollHeight;
-        }
-
-        function escapeHtml(text) {
-            return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-        }
-
-        // Live multi-tab sync listener via localStorage events
-        window.addEventListener('storage', (e) => {
-            if (e.key === `messages_${currentChannel}`) {
-                renderMessages();
-            }
-        });
-
-        // Auto-login check on page refresh
-        window.onload = () => {
-            const saved = localStorage.getItem('discord_user');
-            if (saved) {
-                currentUser = JSON.parse(saved);
-                initApp();
-            }
-        };
-    </script>
-</body>
-</html>
+    <div class="window" id="calculatorWindow">
+        <div class="window-title">
+            <span class="window-title-text">Calculator</span>
+            <div class="window-buttons">
+                <button class="window-button" onclick="minimizeWindow('calculatorWindow')">_</button>
+                <button class="window-button window-close" onclick="closeWindow
