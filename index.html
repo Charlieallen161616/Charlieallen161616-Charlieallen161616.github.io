@@ -3,7 +3,7 @@
 
 <head>
 	<meta charset="utf-8">
-	<meta name="viewport" content="initial-scale=1.0,maximum-scale=1.0">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta name="referrer" content="no-referrer">
 	<title>IPA Archive</title>
 	<link rel="shortcut icon" href="./favicon.ico">
@@ -13,53 +13,113 @@
 </head>
 
 <body>
-	<button style="float: right; margin: 0 16px" onclick="randomIPA()">Random</button>
-	<h1>IPA Archive</h1>
-	<form onsubmit="event.preventDefault(); searchIPA(); return false;" autocomplete="off">
-		<input id="page" hidden>
-		<input id="minid" hidden>
-		<label for="search">Search: <input id="search" placeholder="Search"></label>
-		<label for="bundleid">BundleId: <input id="bundleid" placeholder="com.gameloft."></label>
-		<label for="unique">Unique: <input id="unique" type="checkbox" checked></label>
-		<label for="minos">min OS: <input id="minos" placeholder="1.0"></label>
-		<label for="maxos">max OS: <input id="maxos" placeholder="5.1.1"></label>
-		<label for="device">Device: <select id="device">
-				<option value="">Any</option>
-				<option value="1">iPhone</option>
-				<option value="2">iPad</option>
-				<option value="3">TV</option>
-				<option value="4">Watch</option>
-			</select></label>
-		<button type="submit">Search</button>
-	</form>
+	<header class="app-header">
+		<div class="header-content">
+			<div class="logo-area">
+				<h1>📦 IPA Archive</h1>
+				<span class="badge">Legacy Hub</span>
+			</div>
+			<button class="btn btn-secondary" onclick="randomIPA()">🎲 Random App</button>
+		</div>
+	</header>
 
-	<div id="content">JavaScript disabled?</div>
+	<main class="main-container">
+		<section class="search-section">
+			<form onsubmit="event.preventDefault(); searchIPA(); return false;" autocomplete="off" class="search-form">
+				<input id="page" hidden>
+				<input id="minid" hidden>
+				
+				<div class="search-grid">
+					<div class="input-group full-width">
+						<label for="search">Keyword Search</label>
+						<input id="search" placeholder="Search apps, games, utilities...">
+					</div>
+					
+					<div class="input-group">
+						<label for="bundleid">Bundle ID</label>
+						<input id="bundleid" placeholder="com.gameloft.">
+					</div>
 
+					<div class="input-group inline-group">
+						<label for="unique">
+							<input id="unique" type="checkbox" checked> Unique Versions Only
+						</label>
+					</div>
+
+					<div class="input-group">
+						<label for="minos">Min iOS</label>
+						<input id="minos" placeholder="1.0">
+					</div>
+
+					<div class="input-group">
+						<label for="maxos">Max iOS</label>
+						<input id="maxos" placeholder="5.1.1">
+					</div>
+
+					<div class="input-group">
+						<label for="device">Target Device</label>
+						<select id="device">
+							<option value="">Any Device</option>
+							<option value="1">iPhone</option>
+							<option value="2">iPad</option>
+							<option value="3">Apple TV</option>
+							<option value="4">Apple Watch</option>
+						</select>
+					</div>
+				</div>
+
+				<div class="form-actions">
+					<button type="submit" class="btn btn-primary">Search Archive</button>
+				</div>
+			</form>
+		</section>
+
+		<!-- Easter Egg / "I Am Rich" Featured Card -->
+		<section class="featured-section">
+			<div class="featured-card">
+				<div class="featured-icon">💎</div>
+				<div class="featured-details">
+					<h3>I Am Rich (Legacy Edition)</h3>
+					<p>Show off your elite status with the classic luxury app. Fully archived and ready for deployment.</p>
+				</div>
+				<!-- Download points to your d/ folder -->
+				<a href="d/iamrich.ipa" class="btn btn-accent" download>Download IPA</a>
+			</div>
+		</section>
+
+		<section class="results-section">
+			<div id="content">JavaScript disabled?</div>
+		</section>
+	</main>
+
+	<!-- Templates Keep Exact IDs and Classes for script.js Compatibility -->
 	<div id="templates" hidden>
 		<div class="entry full">
-			<div>
-				<img XSRC="$IMG" onerror="onImgError(this)">
-				<button onclick="installIPA($IDX)">Install</button>
+			<div class="entry-media">
+				<img XSRC="$IMG" onerror="onImgError(this)" alt="App Icon">
+				<button class="btn btn-sm btn-primary" onclick="installIPA($IDX)">Install</button>
 			</div>
 			<div class="info">
 				<h4>$TITLE</h4>
-				<div>BundleId: $BUNDLEID</div>
-				<div>Version: v$VERSION – $SIZE</div>
-				<div>Device: $PLATFORM</div>
-				<div>Minimum OS: $MINOS</div>
-				<div>Link: <a href="$URL" rel="noopener noreferrer nofollow">$URLNAME</a></div>
+				<div class="meta-tag">BundleId: $BUNDLEID</div>
+				<div class="meta-tag">Version: v$VERSION – $SIZE</div>
+				<div class="meta-tag">Device: $PLATFORM</div>
+				<div class="meta-tag">Minimum OS: $MINOS</div>
+				<div class="meta-link">Link: <a href="$URL" rel="noopener noreferrer nofollow">$URLNAME</a></div>
 			</div>
 		</div>
+
 		<div class="entry short">
-			<div><img XSRC="$IMG" onerror="onImgError(this)"></div>
+			<div class="entry-media"><img XSRC="$IMG" onerror="onImgError(this)" alt="App Icon"></div>
 			<div class="info">
 				<h4>$TITLE</h4>
-				<div>BundleId: $BUNDLEID</div>
-				<div>Device: $PLATFORM</div>
-				<div>Minimum OS: $MINOS</div>
-				<div><a onclick="searchBundle($IDX)">Show all</a></div>
+				<div class="meta-tag">BundleId: $BUNDLEID</div>
+				<div class="meta-tag">Device: $PLATFORM</div>
+				<div class="meta-tag">Minimum OS: $MINOS</div>
+				<div class="meta-link"><a onclick="searchBundle($IDX)">Show all versions</a></div>
 			</div>
 		</div>
+
 		<div class="itunes">
 			<h4>iTunes Info:</h4>
 			<div>Genre: $GENRES</div>
@@ -69,36 +129,41 @@
 			<div>Current Version: <b>$VERSION</b> (last update: $DATE)</div>
 			<div>Price: $PRICE</div>
 			<div>Link: <a href="$URL" rel="noopener noreferrer nofollow">iTunes</a></div>
-			<div>$IMG</div>
+			<div class="itunes-img">$IMG</div>
 			<p>$DESCRIPTION</p>
 		</div>
-		<a class="screenshot" href="$REF" target="_blank"><img XSRC="$URL" crossorigin="anonymous"
-				referrerpolicy="no-referrer"></a>
+
+		<a class="screenshot" href="$REF" target="_blank"><img XSRC="$URL" crossorigin="anonymous" referrerpolicy="no-referrer"></a>
+		
 		<div class="randomAction">
-			Actions:
-			<button onclick="searchBundle($IDX, '&random=$IDX')">Show all versions</button>
-			<button onclick="randomIPA()">Next Random</button>
+			<span>Actions:</span>
+			<button class="btn btn-sm btn-secondary" onclick="searchBundle($IDX, '&random=$IDX')">Show all versions</button>
+			<button class="btn btn-sm btn-primary" onclick="randomIPA()">Next Random</button>
 		</div>
+
 		<div class="no-itunes">
 			<p>iTunes search disabled. No plist server configured.</p>
-			<a onclick="installIPA()">Configure now</a>
+			<a class="text-link" onclick="installIPA()">Configure now</a>
 		</div>
 	</div>
 
 	<div id="overlay" hidden>
-		<div id="installMsg">
+		<div id="installMsg" class="modal-box">
 			<h3>Install on device</h3>
 			<p>
-				Unfortunatelly, this function is not possible with static HTML+JS.
-				You must provided a plist generator URL.
-				See <a href="https://github.com/stuffed18/ipa-archive-updated?tab=readme-ov-file#starting-plist-server" target="_blank">Readme</a> file for further instructions on how to set up such a
-				service.
+				Unfortunately, this function is not possible with static HTML+JS.
+				You must provide a plist generator URL.
+				See the <a href="https://github.com/stuffed18/ipa-archive-updated?tab=readme-ov-file#starting-plist-server" target="_blank">Readme</a> file for further instructions on how to set up such a service.
 			</p>
 			<form onsubmit="event.preventDefault(); setPlistGen(); return false;" autocomplete="off">
-				<label for="plistServer">Generator URL:</label>
-				<input id="plistServer" placeholder="http://192.168.0.1/">
-				<button type="submit">Save</button>
-				<button type="button" onclick="document.getElementById('overlay').hidden=true">Abort</button>
+				<div class="input-group">
+					<label for="plistServer">Generator URL:</label>
+					<input id="plistServer" placeholder="http://192.168.0.1/">
+				</div>
+				<div class="modal-actions">
+					<button type="submit" class="btn btn-primary">Save</button>
+					<button type="button" class="btn btn-secondary" onclick="document.getElementById('overlay').hidden=true">Abort</button>
+				</div>
 			</form>
 		</div>
 	</div>
