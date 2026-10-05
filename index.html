@@ -3,7 +3,7 @@
 
 <head>
 	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="viewport" content="initial-scale=1.0,maximum-scale=1.0">
 	<meta name="referrer" content="no-referrer">
 	<title>IPA Archive</title>
 	<link rel="shortcut icon" href="./favicon.ico">
@@ -19,11 +19,12 @@
 				<h1>📦 IPA Archive</h1>
 				<span class="badge">Legacy Hub</span>
 			</div>
-			<button class="btn btn-secondary" onclick="randomIPA()">🎲 Random App</button>
+			<button class="btn btn-secondary" onclick="randomIPA()">🎲 Random</button>
 		</div>
 	</header>
 
 	<main class="main-container">
+		<!-- Search Panel -->
 		<section class="search-section">
 			<form onsubmit="event.preventDefault(); searchIPA(); return false;" autocomplete="off" class="search-form">
 				<input id="page" hidden>
@@ -31,45 +32,34 @@
 				
 				<div class="search-grid">
 					<div class="input-group full-width">
-						<label for="search">Keyword Search</label>
-						<input id="search" placeholder="Search apps, games, utilities...">
+						<label for="search">Search: <input id="search" placeholder="Search apps, games..."></label>
 					</div>
-					
 					<div class="input-group">
-						<label for="bundleid">Bundle ID</label>
-						<input id="bundleid" placeholder="com.gameloft.">
+						<label for="bundleid">BundleId: <input id="bundleid" placeholder="com.gameloft."></label>
 					</div>
-
 					<div class="input-group inline-group">
-						<label for="unique">
-							<input id="unique" type="checkbox" checked> Unique Versions Only
+						<label for="unique">Unique: <input id="unique" type="checkbox" checked></label>
+					</div>
+					<div class="input-group">
+						<label for="minos">min OS: <input id="minos" placeholder="1.0"></label>
+					</div>
+					<div class="input-group">
+						<label for="maxos">max OS: <input id="maxos" placeholder="5.1.1"></label>
+					</div>
+					<div class="input-group">
+						<label for="device">Device: 
+							<select id="device">
+								<option value="">Any</option>
+								<option value="1">iPhone</option>
+								<option value="2">iPad</option>
+								<option value="3">TV</option>
+								<option value="4">Watch</option>
+							</select>
 						</label>
 					</div>
-
-					<div class="input-group">
-						<label for="minos">Min iOS</label>
-						<input id="minos" placeholder="1.0">
-					</div>
-
-					<div class="input-group">
-						<label for="maxos">Max iOS</label>
-						<input id="maxos" placeholder="5.1.1">
-					</div>
-
-					<div class="input-group">
-						<label for="device">Target Device</label>
-						<select id="device">
-							<option value="">Any Device</option>
-							<option value="1">iPhone</option>
-							<option value="2">iPad</option>
-							<option value="3">Apple TV</option>
-							<option value="4">Apple Watch</option>
-						</select>
-					</div>
 				</div>
-
 				<div class="form-actions">
-					<button type="submit" class="btn btn-primary">Search Archive</button>
+					<button type="submit" class="btn btn-primary">Search</button>
 				</div>
 			</form>
 		</section>
@@ -82,44 +72,42 @@
 					<h3>I Am Rich (Legacy Edition)</h3>
 					<p>Show off your elite status with the classic luxury app. Fully archived and ready for download.</p>
 				</div>
-				<!-- Points to your d/ folder -->
 				<a href="d/iamrich.ipa" class="btn btn-accent" download>Download IPA</a>
 			</div>
 		</section>
 
+		<!-- Results Container -->
 		<section class="results-section">
-			<div id="content">Loading database...</div>
+			<div id="content">JavaScript disabled?</div>
 		</section>
 	</main>
 
-	<!-- Hidden Templates maintaining exact element IDs/Classes for script.js compatibility -->
+	<!-- Original Templates (IDs and classes preserved completely for script.js) -->
 	<div id="templates" hidden>
 		<div class="entry full">
-			<div class="entry-media">
-				<img XSRC="$IMG" onerror="onImgError(this)" alt="App Icon">
-				<button class="btn btn-sm btn-primary" onclick="installIPA($IDX)">Download</button>
+			<div>
+				<img XSRC="$IMG" onerror="onImgError(this)">
+				<button onclick="installIPA($IDX)">Install</button>
 			</div>
 			<div class="info">
 				<h4>$TITLE</h4>
-				<div class="meta-tag">BundleId: $BUNDLEID</div>
-				<div class="meta-tag">Version: v$VERSION – $SIZE</div>
-				<div class="meta-tag">Device: $PLATFORM</div>
-				<div class="meta-tag">Minimum OS: $MINOS</div>
-				<div class="meta-link">Link: <a href="$URL" rel="noopener noreferrer nofollow">$URLNAME</a></div>
+				<div>BundleId: $BUNDLEID</div>
+				<div>Version: v$VERSION – $SIZE</div>
+				<div>Device: $PLATFORM</div>
+				<div>Minimum OS: $MINOS</div>
+				<div>Link: <a href="$URL" rel="noopener noreferrer nofollow">$URLNAME</a></div>
 			</div>
 		</div>
-
 		<div class="entry short">
-			<div class="entry-media"><img XSRC="$IMG" onerror="onImgError(this)" alt="App Icon"></div>
+			<div><img XSRC="$IMG" onerror="onImgError(this)"></div>
 			<div class="info">
 				<h4>$TITLE</h4>
-				<div class="meta-tag">BundleId: $BUNDLEID</div>
-				<div class="meta-tag">Device: $PLATFORM</div>
-				<div class="meta-tag">Minimum OS: $MINOS</div>
-				<div class="meta-link"><a onclick="searchBundle($IDX)">Show all versions</a></div>
+				<div>BundleId: $BUNDLEID</div>
+				<div>Device: $PLATFORM</div>
+				<div>Minimum OS: $MINOS</div>
+				<div><a onclick="searchBundle($IDX)">Show all</a></div>
 			</div>
 		</div>
-
 		<div class="itunes">
 			<h4>iTunes Info:</h4>
 			<div>Genre: $GENRES</div>
@@ -129,33 +117,41 @@
 			<div>Current Version: <b>$VERSION</b> (last update: $DATE)</div>
 			<div>Price: $PRICE</div>
 			<div>Link: <a href="$URL" rel="noopener noreferrer nofollow">iTunes</a></div>
-			<div class="itunes-img">$IMG</div>
+			<div>$IMG</div>
 			<p>$DESCRIPTION</p>
 		</div>
-
-		<a class="screenshot" href="$REF" target="_blank"><img XSRC="$URL" crossorigin="anonymous" referrerpolicy="no-referrer"></a>
-		
+		<a class="screenshot" href="$REF" target="_blank"><img XSRC="$URL" crossorigin="anonymous"
+				referrerpolicy="no-referrer"></a>
 		<div class="randomAction">
-			<span>Actions:</span>
-			<button class="btn btn-sm btn-secondary" onclick="searchBundle($IDX, '&random=$IDX')">Show all versions</button>
-			<button class="btn btn-sm btn-primary" onclick="randomIPA()">Next Random</button>
+			Actions:
+			<button onclick="searchBundle($IDX, '&random=$IDX')">Show all versions</button>
+			<button onclick="randomIPA()">Next Random</button>
 		</div>
-
 		<div class="no-itunes">
-			<p>iTunes search disabled.</p>
+			<p>iTunes search disabled. No plist server configured.</p>
+			<a onclick="installIPA()">Configure now</a>
 		</div>
 	</div>
 
-	<!-- Direct download override script -->
-	<script>
-		window.addEventListener('DOMContentLoaded', () => {
-			window.installIPA = function(idx) {
-				if (window.DB && window.DB[idx] && window.DB[idx].url) {
-					window.location.href = window.DB[idx].url;
-				}
-			};
-		});
-	</script>
+	<!-- Overlay left intact so script.js doesn't crash, but can be bypassed if clicked -->
+	<div id="overlay" hidden>
+		<div id="installMsg">
+			<h3>Install on device</h3>
+			<p>
+				Unfortunately, this function is not possible with static HTML+JS.
+				You must provide a plist generator URL.
+				See <a href="https://github.com/stuffed18/ipa-archive-updated?tab=readme-ov-file#starting-plist-server" target="_blank">Readme</a> file for further instructions on how to set up such a service.
+			</p>
+			<form onsubmit="event.preventDefault(); setPlistGen(); return false;" autocomplete="off">
+				<label for="plistServer">Generator URL:</label>
+				<input id="plistServer" placeholder="http://192.168.0.1/">
+				<button type="submit">Save</button>
+				<button type="button" onclick="document.getElementById('overlay').hidden=true">Abort</button>
+			</form>
+		</div>
+	</div>
+
+	<script>loadDB()</script>
 </body>
 
 </html>
