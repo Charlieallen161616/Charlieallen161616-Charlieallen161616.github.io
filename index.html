@@ -146,17 +146,12 @@
 		</div>
 	</div>
 
-	<!-- Dummy Overlay element kept hidden so script.js doesn't throw null errors if it tries to reference it -->
-	<div id="overlay" hidden></div>
-
-	<!-- Bypass Script: Overrides installIPA to trigger direct file download instead of triggering the plist server popup -->
+	<!-- Direct download override script -->
 	<script>
 		window.addEventListener('DOMContentLoaded', () => {
 			window.installIPA = function(idx) {
 				if (window.DB && window.DB[idx] && window.DB[idx].url) {
 					window.location.href = window.DB[idx].url;
-				} else {
-					console.warn("Direct URL not resolved for index:", idx);
 				}
 			};
 		});
