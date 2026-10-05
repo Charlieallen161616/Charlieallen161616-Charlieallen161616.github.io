@@ -74,30 +74,30 @@
 			</form>
 		</section>
 
-		<!-- Easter Egg / "I Am Rich" Featured Card -->
+		<!-- Featured "I Am Rich" App Section -->
 		<section class="featured-section">
 			<div class="featured-card">
 				<div class="featured-icon">💎</div>
 				<div class="featured-details">
 					<h3>I Am Rich (Legacy Edition)</h3>
-					<p>Show off your elite status with the classic luxury app. Fully archived and ready for deployment.</p>
+					<p>Show off your elite status with the classic luxury app. Fully archived and ready for download.</p>
 				</div>
-				<!-- Download points to your d/ folder -->
+				<!-- Points to your d/ folder -->
 				<a href="d/iamrich.ipa" class="btn btn-accent" download>Download IPA</a>
 			</div>
 		</section>
 
 		<section class="results-section">
-			<div id="content">JavaScript disabled?</div>
+			<div id="content">Loading database...</div>
 		</section>
 	</main>
 
-	<!-- Templates Keep Exact IDs and Classes for script.js Compatibility -->
+	<!-- Hidden Templates maintaining exact element IDs/Classes for script.js compatibility -->
 	<div id="templates" hidden>
 		<div class="entry full">
 			<div class="entry-media">
 				<img XSRC="$IMG" onerror="onImgError(this)" alt="App Icon">
-				<button class="btn btn-sm btn-primary" onclick="installIPA($IDX)">Install</button>
+				<button class="btn btn-sm btn-primary" onclick="installIPA($IDX)">Download</button>
 			</div>
 			<div class="info">
 				<h4>$TITLE</h4>
@@ -142,33 +142,25 @@
 		</div>
 
 		<div class="no-itunes">
-			<p>iTunes search disabled. No plist server configured.</p>
-			<a class="text-link" onclick="installIPA()">Configure now</a>
+			<p>iTunes search disabled.</p>
 		</div>
 	</div>
 
-	<div id="overlay" hidden>
-		<div id="installMsg" class="modal-box">
-			<h3>Install on device</h3>
-			<p>
-				Unfortunately, this function is not possible with static HTML+JS.
-				You must provide a plist generator URL.
-				See the <a href="https://github.com/stuffed18/ipa-archive-updated?tab=readme-ov-file#starting-plist-server" target="_blank">Readme</a> file for further instructions on how to set up such a service.
-			</p>
-			<form onsubmit="event.preventDefault(); setPlistGen(); return false;" autocomplete="off">
-				<div class="input-group">
-					<label for="plistServer">Generator URL:</label>
-					<input id="plistServer" placeholder="http://192.168.0.1/">
-				</div>
-				<div class="modal-actions">
-					<button type="submit" class="btn btn-primary">Save</button>
-					<button type="button" class="btn btn-secondary" onclick="document.getElementById('overlay').hidden=true">Abort</button>
-				</div>
-			</form>
-		</div>
-	</div>
+	<!-- Dummy Overlay element kept hidden so script.js doesn't throw null errors if it tries to reference it -->
+	<div id="overlay" hidden></div>
 
-	<script>loadDB()</script>
+	<!-- Bypass Script: Overrides installIPA to trigger direct file download instead of triggering the plist server popup -->
+	<script>
+		window.addEventListener('DOMContentLoaded', () => {
+			window.installIPA = function(idx) {
+				if (window.DB && window.DB[idx] && window.DB[idx].url) {
+					window.location.href = window.DB[idx].url;
+				} else {
+					console.warn("Direct URL not resolved for index:", idx);
+				}
+			};
+		});
+	</script>
 </body>
 
 </html>
