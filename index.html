@@ -1,5 +1,9 @@
-<title>Home of Modios.online</title>
-<style>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Home of Modios.online</title>
+  <style>
     /* Apply to the whole page */
     body {
       font-family: "Comic Sans MS", "Comic Sans", cursive, sans-serif;
@@ -10,8 +14,31 @@
       font-family: "Comic Sans MS", "Comic Sans", cursive, sans-serif;
       font-weight: bold;
     }
+
+    /* IE9-compatible button styling */
+    .ie9-button {
+      display: inline-block;
+      padding: 6px 12px;
+      background-color: #e1e1e1; /* Classic grey button color */
+      color: #000000;
+      text-decoration: none;
+      border: 1px solid #707070;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    
+    .ie9-button:hover {
+      background-color: #e5f1fb; /* Light blue hover effect supported by IE9 */
+      border-color: #0078d7;
+    }
   </style>
+</head>
+<body>
+
   <p>Welcome to modios.online</p>
-  <a href="ipa/">
-  <button type="button">Open IPA Archive</button>
-</a>
+  
+  <!-- Safe IE9 Link Button -->
+  <a href="ipa/" class="ie9-button">Open IPA Folder</a>
+
+</body>
+</html>
