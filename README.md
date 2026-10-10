@@ -1,8 +1,9 @@
 # This is a remake of the ipa archive, updates here 👇
 * New ui
+* Url Change
 
 # Upcoming Updates
-* URL Change
+* None
 
 
 # There is a privacy error, Here is how to fix it
