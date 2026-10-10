@@ -1,0 +1,130 @@
+:root {
+    --bg-color: #0b0f19;
+    --surface-color: #161e2e;
+    --surface-hover: #1f293d;
+    --border-color: #2a374a;
+    --text-primary: #f3f4f6;
+    --text-secondary: #9ca3af;
+    --accent-glow: rgba(59, 130, 246, 0.15);
+    --primary: #3b82f6;
+    --primary-hover: #2563eb;
+    --accent: #10b981;
+    --accent-hover: #059669;
+    --radius: 12px;
+    --transition: all 0.2s ease;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+    line-height: 1.5;
+    min-height: 100vh;
+    padding: 2rem;
+}
+
+/* Form & Layout adjustments */
+form {
+    background: var(--surface-color);
+    border: 1px solid var(--border-color);
+    padding: 1.5rem;
+    border-radius: var(--radius);
+    margin-bottom: 1.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: center;
+}
+
+input[type="text"], select {
+    background: var(--bg-color);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    padding: 0.5rem;
+    border-radius: 6px;
+}
+
+button {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+button:hover {
+    background: var(--primary-hover);
+}
+
+/* Featured Section ("I Am Rich") */
+.featured-section {
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    border: 1px solid #3b82f644;
+    border-radius: var(--radius);
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.featured-section h3 {
+    color: #60a5fa;
+    margin-bottom: 0.25rem;
+}
+
+.featured-section p {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    margin-bottom: 0.75rem;
+}
+
+.featured-section a {
+    color: var(--accent);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.featured-section a:hover {
+    text-decoration: underline;
+}
+
+/* Entry Cards */
+#content {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1rem;
+}
+
+.entry {
+    background: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    padding: 1rem;
+    display: flex;
+    gap: 1rem;
+}
+
+.entry img {
+    width: 64px;
+    height: 64px;
+    border-radius: 12px;
+    object-fit: cover;
+    background: var(--bg-color);
+}
+
+.info {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.info h4 {
+    color: var(--text-primary);
+    font-size: 1rem;
+    margin-bottom: 0.25rem;
+}
