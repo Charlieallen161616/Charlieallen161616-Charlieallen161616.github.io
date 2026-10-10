@@ -1,91 +1,97 @@
-:root {
-    --bg-color: #0b0f19;
-    --surface-color: #161e2e;
-    --surface-hover: #1f293d;
-    --border-color: #2a374a;
-    --text-primary: #f3f4f6;
-    --text-secondary: #9ca3af;
-    --accent-glow: rgba(59, 130, 246, 0.15);
-    --primary: #3b82f6;
-    --primary-hover: #2563eb;
-    --accent: #10b981;
-    --accent-hover: #059669;
-    --radius: 12px;
-    --transition: all 0.2s ease;
-}
-
+/* --- IE9 Fallback Variables (Hardcoded Alternative) --- */
 * {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
     box-sizing: border-box;
     margin: 0;
     padding: 0;
 }
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    background-color: var(--bg-color);
-    color: var(--text-primary);
+    /* Safe fallback font stack including Comic Sans from your previous requests */
+    font-family: "Comic Sans MS", "Comic Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    background-color: #0b0f19; /* fallback for --bg-color */
+    color: #f3f4f6; /* fallback for --text-primary */
     line-height: 1.5;
-    min-height: 100vh;
-    padding: 2rem;
+    padding: 20px; /* IE9 prefers px over rem for container spacing stability */
 }
 
 /* Form & Layout adjustments */
 form {
-    background: var(--surface-color);
-    border: 1px solid var(--border-color);
-    padding: 1.5rem;
-    border-radius: var(--radius);
-    margin-bottom: 1.5rem;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-    align-items: center;
+    background: #161e2e; /* fallback for --surface-color */
+    border: 1px solid #2a374a; /* fallback for --border-color */
+    padding: 20px;
+    border-radius: 12px; /* fallback for --radius */
+    margin-bottom: 20px;
+    
+    /* IE9 Flexbox Fallback */
+    display: block;
+}
+
+/* Float styling so inputs align horizontally in IE9 */
+form input[type="text"], 
+form select, 
+form button,
+form .ie9-btn-link {
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 10px;
+    margin-bottom: 10px;
 }
 
 input[type="text"], select {
-    background: var(--bg-color);
-    border: 1px solid var(--border-color);
-    color: var(--text-primary);
-    padding: 0.5rem;
+    background: #0b0f19;
+    border: 1px solid #2a374a;
+    color: #f3f4f6;
+    padding: 8px;
     border-radius: 6px;
+    height: 34px; /* Explicit height ensures layout consistency in IE9 */
 }
 
-button {
-    background: var(--primary);
-    color: white;
+/* Standard Button & Link styled as Button for IE9 */
+button, .ie9-btn-link {
+    background: #3b82f6; /* fallback for --primary */
+    color: #ffffff;
     border: none;
-    padding: 0.5rem 1rem;
+    padding: 6px 16px;
     border-radius: 6px;
     cursor: pointer;
     font-weight: 600;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
 }
 
-button:hover {
-    background: var(--primary-hover);
+button:hover, .ie9-btn-link:hover {
+    background: #2563eb; /* fallback for --primary-hover */
 }
 
 /* Featured Section ("I Am Rich") */
 .featured-section {
+    /* Multi-layered fallback gradient approach for older rendering engines */
+    background: #101726; 
+    background: -webkit-linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    background: -o-linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
     background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-    border: 1px solid #3b82f644;
-    border-radius: var(--radius);
-    padding: 1.25rem 1.5rem;
-    margin-bottom: 1.5rem;
+    border: 1px solid #3b82f6; /* IE9 doesn't support alpha values like 44 inside hex codes */
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
 }
 
 .featured-section h3 {
     color: #60a5fa;
-    margin-bottom: 0.25rem;
+    margin-bottom: 4px;
 }
 
 .featured-section p {
-    color: var(--text-secondary);
-    font-size: 0.9rem;
-    margin-bottom: 0.75rem;
+    color: #9ca3af; /* fallback for --text-secondary */
+    font-size: 14px;
+    margin-bottom: 12px;
 }
 
 .featured-section a {
-    color: var(--accent);
+    color: #10b981; /* fallback for --accent */
     font-weight: 600;
     text-decoration: none;
 }
@@ -94,37 +100,49 @@ button:hover {
     text-decoration: underline;
 }
 
-/* Entry Cards */
+/* Entry Cards Grid Fallback */
 #content {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 1rem;
+    /* IE9 Block/Float fallback framework */
+    display: block;
+    width: 100%;
+}
+
+/* Micro-clearfix utility for structural stability in IE9 */
+#content:after {
+    content: "";
+    display: table;
+    clear: both;
 }
 
 .entry {
-    background: var(--surface-color);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius);
-    padding: 1rem;
-    display: flex;
-    gap: 1rem;
+    background: #161e2e;
+    border: 1px solid #2a374a;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
+    
+    /* Simulating layout structures without Flexbox */
+    display: block;
+    float: left;
+    width: 100%; /* Adjust container rules or change to a precise float percentage if side-by-side elements are needed */
 }
 
 .entry img {
+    float: left;
     width: 64px;
     height: 64px;
     border-radius: 12px;
-    object-fit: cover;
-    background: var(--bg-color);
+    background: #0b0f19;
 }
 
-.info {
-    font-size: 0.85rem;
-    color: var(--text-secondary);
+.entry .info {
+    margin-left: 80px; /* Pushes content cleanly to the side of the floated thumbnail image */
+    font-size: 14px;
+    color: #9ca3af;
 }
 
 .info h4 {
-    color: var(--text-primary);
-    font-size: 1rem;
-    margin-bottom: 0.25rem;
+    color: #f3f4f6;
+    font-size: 16px;
+    margin-bottom: 4px;
 }
