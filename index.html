@@ -7,12 +7,40 @@
     /* Apply to the whole page */
     body {
       font-family: "Comic Sans MS", "Comic Sans", cursive, sans-serif;
+      background-color: #f0f0f0;
+      color: #111111;
+      margin: 30px;
+    }
+
+    header {
+      border-bottom: 2px dashed #707070;
+      padding-bottom: 15px;
+      margin-bottom: 25px;
+    }
+
+    h1 {
+      margin: 0 0 10px 0;
+      font-size: 28px;
     }
 
     /* Apply only to a specific class */
     .heading-accent {
       font-family: "Comic Sans MS", "Comic Sans", cursive, sans-serif;
       font-weight: bold;
+    }
+
+    /* Section containers - IE9 safe styling */
+    .section-box {
+      background: #ffffff;
+      border: 1px solid #b0b0b0;
+      padding: 15px 20px;
+      margin-bottom: 20px;
+    }
+
+    .section-box h2 {
+      margin-top: 0;
+      font-size: 18px;
+      color: #005a9e;
     }
 
     /* IE9-compatible button styling */
@@ -25,20 +53,72 @@
       border: 1px solid #707070;
       font-size: 14px;
       cursor: pointer;
+      margin-right: 8px;
+      margin-bottom: 8px;
     }
     
     .ie9-button:hover {
       background-color: #e5f1fb; /* Light blue hover effect supported by IE9 */
       border-color: #0078d7;
     }
+
+    ul {
+      margin: 0;
+      padding-left: 20px;
+    }
+
+    li {
+      margin-bottom: 6px;
+    }
+
+    footer {
+      font-size: 12px;
+      color: #666666;
+      border-top: 1px solid #d0d0d0;
+      margin-top: 40px;
+      padding-top: 10px;
+      text-align: center;
+    }
   </style>
 </head>
 <body>
 
-  <p>Welcome to modios.online</p>
-  
-  <!-- Safe IE9 Link Button -->
-  <a href="ipa/" class="ie9-button">Open IPA Archive</a>
+  <header>
+    <h1>Welcome to <span class="heading-accent">modios.online</span></h1>
+    <p>Your central hub for archives, tools, and fun mini-projects.</p>
+  </header>
+
+  <!-- Section: Archives & Files -->
+  <div class="section-box">
+    <h2>📁 Archives & Downloads</h2>
+    <p>Explore stored files and application archives:</p>
+    <a href="ipa/" class="ie9-button">Open IPA Archive</a>
+    <a href="roms/" class="ie9-button">Retro ROMs</a>
+    <a href="tools/" class="ie9-button">Old Utilities</a>
+  </div>
+
+  <!-- Section: Fun & Interactive -->
+  <div class="section-box">
+    <h2>🎮 Things to Do</h2>
+    <p>Check out what's running on the server:</p>
+    <a href="guestbook.html" class="ie9-button">Sign the Guestbook</a>
+    <a href="chat/" class="ie9-button">Local Web Chat</a>
+    <a href="counter.html" class="ie9-button">Visitor Stats</a>
+  </div>
+
+  <!-- Section: Quick Links / Status -->
+  <div class="section-box">
+    <h2>📊 Status & Links</h2>
+    <ul>
+      <li>Server Uptime: <strong>99.9%</strong></li>
+      <li>Latest Update: Added retro styling and new section buttons.</li>
+      <li>Contact: <a href="mailto:admin@modios.online">admin@modios.online</a></li>
+    </ul>
+  </div>
+
+  <footer>
+    &copy; 2026 modios.online &bull; Built with vintage web spirit.
+  </footer>
 
 </body>
 </html>
