@@ -110,8 +110,8 @@
   <div class="section-box">
     <h2>📊 Status & Links</h2>
     <ul>
-      <li>Server Uptime: <strong id="live-uptime">Loading...</strong> (99.9% Operational)</li>
-      <li>Update contact link to use Gmail web interface.</li>
+      <li>Server Uptime: <strong>99.9%</strong></li>
+      <li>Time Since Last Update: <strong id="time-since-update" style="color: #005a9e;">Calculating...</strong></li>
       <li>Contact: <a href="https://mail.google.com" style="color: #005a9e;">charlieaallen16@gmail.com</a></li>
     </ul>
   </div>
@@ -120,22 +120,19 @@
     &copy; 2026 modios.online &bull; Built with vintage web spirit.
   </footer>
 
-  <!-- Live Server Uptime Script -->
+  <!-- Time Since Last Update Script -->
   <script>
-    var startTimeKey = 'modios_server_start_time';
-    var serverStartTime = localStorage.getItem(startTimeKey);
-    
-    if (!serverStartTime) {
-      // Sets initial reference start time if not stored yet
-      serverStartTime = new Date().getTime() - (18 * 24 * 60 * 60 * 1000);
-      localStorage.setItem(startTimeKey, serverStartTime);
-    } else {
-      serverStartTime = parseInt(serverStartTime, 10);
-    }
+    // Set your last update date and time here (YYYY-MM-DDTHH:MM:SS format)
+    var lastUpdateDate = new Date("2026-10-12T08:00:00").getTime();
 
-    function updateInlineUptime() {
+    function updateTimeSince() {
       var now = new Date().getTime();
-      var diff = Math.floor((now - serverStartTime) / 1000); // seconds
+      var diff = Math.floor((now - lastUpdateDate) / 1000); // difference in seconds
+
+      if (diff < 0) {
+        document.getElementById('time-since-update').innerText = "Just now";
+        return;
+      }
 
       var days = Math.floor(diff / (3600 * 24));
       diff %= 3600 * 24;
@@ -144,12 +141,16 @@
       var minutes = Math.floor(diff / 60);
       var seconds = diff % 60;
 
-      var uptimeString = days + "d " + hours + "h " + minutes + "m " + seconds + "s";
-      document.getElementById('live-uptime').innerText = uptimeString;
+      var formattedTime = "";
+      if (days > 0) formattedTime += days + "d ";
+      if (hours > 0 || days > 0) formattedTime += hours + "h ";
+      formattedTime += minutes + "m " + seconds + "s ago";
+
+      document.getElementById('time-since-update').innerText = formattedTime;
     }
 
-    updateInlineUptime();
-    setInterval(updateInlineUptime, 1000);
+    updateTimeSince();
+    setInterval(updateTimeSince, 1000);
   </script>
 
 </body>
