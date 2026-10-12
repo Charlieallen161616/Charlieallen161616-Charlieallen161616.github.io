@@ -2,14 +2,17 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Guestbook - modios.online</title>
   <style>
-    /* Global Page Styling (IE9 Safe) */
+    /* Global Page Styling - Retro IE9 / Early 2000s Aesthetic */
     body {
       font-family: "Comic Sans MS", "Comic Sans", cursive, sans-serif;
       background-color: #f0f0f0;
       color: #111111;
-      margin: 30px;
+      margin: 30px auto;
+      max-width: 850px;
+      padding: 0 15px;
     }
 
     header {
@@ -29,12 +32,13 @@
       color: #333333;
     }
 
-    /* Section containers */
+    /* Section Containers */
     .section-box {
       background: #ffffff;
       border: 1px solid #b0b0b0;
       padding: 15px 20px;
       margin-bottom: 20px;
+      box-shadow: 1px 1px 2px rgba(0,0,0,0.05);
     }
 
     .section-box h2 {
@@ -43,7 +47,7 @@
       color: #005a9e;
     }
 
-    /* Form Fields */
+    /* Form Inputs */
     .form-group {
       margin-bottom: 12px;
     }
@@ -62,6 +66,7 @@
       background-color: #ffffff;
       font-family: inherit;
       font-size: 14px;
+      box-sizing: border-box;
     }
 
     textarea {
@@ -69,7 +74,7 @@
       height: 80px;
     }
 
-    /* IE9-compatible button styling */
+    /* IE9-compatible classic bevel button styling */
     .ie9-button {
       display: inline-block;
       padding: 6px 12px;
@@ -81,6 +86,7 @@
       cursor: pointer;
       margin-right: 8px;
       margin-bottom: 8px;
+      font-family: inherit;
     }
 
     .ie9-button:hover {
@@ -88,10 +94,66 @@
       border-color: #0078d7;
     }
 
+    .ie9-button:active {
+      background-color: #cccccc;
+    }
+
+    .delete-btn {
+      background-color: #ffebee;
+      color: #c62828;
+      border: 1px solid #ef9a9a;
+      padding: 2px 8px;
+      font-size: 12px;
+      cursor: pointer;
+      font-family: inherit;
+      margin-left: 8px;
+    }
+
+    .delete-btn:hover {
+      background-color: #ffcdd2;
+      border-color: #e57373;
+    }
+
+    /* Live Update Banner */
+    .status-banner {
+      background-color: #eaf4ff;
+      border: 1px solid #005a9e;
+      padding: 10px 14px;
+      font-size: 13px;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .time-highlight {
+      font-weight: bold;
+      color: #005a9e;
+    }
+
+    .admin-badge {
+      font-weight: bold;
+      padding: 3px 8px;
+      border-radius: 3px;
+      font-size: 12px;
+    }
+
+    .admin-badge.active {
+      background-color: #d32f2f;
+      color: #ffffff;
+    }
+
+    .admin-badge.normal {
+      background-color: #e0e0e0;
+      color: #616161;
+    }
+
     /* Entry Feed Styling */
     .entry {
       border-bottom: 1px dashed #cccccc;
-      padding: 10px 0;
+      padding: 12px 0;
     }
 
     .entry:last-child {
@@ -103,19 +165,44 @@
       font-weight: bold;
       color: #005a9e;
       margin-bottom: 4px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
 
     .entry-date {
       font-size: 12px;
       color: #666666;
       font-weight: normal;
-      margin-left: 10px;
     }
 
     .entry-message {
       font-size: 14px;
       color: #222222;
       white-space: pre-wrap;
+      word-break: break-word;
+      margin-top: 4px;
+    }
+
+    .badge-own {
+      font-size: 11px;
+      background-color: #e8f5e9;
+      color: #2e7d32;
+      border: 1px solid #a5d6a7;
+      padding: 1px 5px;
+      margin-left: 6px;
+      font-weight: normal;
+    }
+
+    /* Notice box */
+    .sync-notice {
+      font-size: 12px;
+      color: #2e7d32;
+      background: #edf7ed;
+      border: 1px solid #c8e6c9;
+      padding: 6px 10px;
+      margin-bottom: 12px;
+      border-radius: 2px;
     }
 
     footer {
@@ -131,32 +218,45 @@
 <body>
 
   <header>
-    <h1>📝 Guestbook</h1>
-    <p class="subtitle">Leave a note, share your thoughts, or say hi to modios.online!</p>
+    <h1>📝 Guestbook - modios.online</h1>
+    <p class="subtitle">Leave a note, share your thoughts, or say hi to everyone visiting!</p>
     <a href="index.html" class="ie9-button">&laquo; Back to Main Hub</a>
   </header>
 
-  <!-- Form Section -->
+  <!-- Section: Accurate Time Since Last Update & IP Admin Status -->
+  <div class="status-banner">
+    <div>
+      ⏱️ <strong>System Status:</strong> Last server update was <span id="time-since-update" class="time-highlight">calculating...</span>
+    </div>
+    <div id="ip-status-container">
+      <span id="admin-badge" class="admin-badge normal">Checking IP access...</span>
+    </div>
+  </div>
+
+  <!-- Section: Form Submission -->
   <div class="section-box">
     <h2>✍️ Sign the Guestbook</h2>
+    <div id="sync-status" class="sync-notice">
+      🌐 Database connected! Messages persist live for everyone across the web.
+    </div>
     <form id="guestbook-form">
       <div class="form-group">
         <label for="username">Name / Handle:</label>
-        <input type="text" id="username" placeholder="e.g. RetroCoder" required>
+        <input type="text" id="username" placeholder="e.g. RetroCoder99" required maxlength="40">
       </div>
       <div class="form-group">
         <label for="message">Message:</label>
-        <textarea id="message" placeholder="Write your message here..." required></textarea>
+        <textarea id="message" placeholder="Write your message here..." required maxlength="500"></textarea>
       </div>
-      <button type="submit" class="ie9-button">Post Entry</button>
+      <button type="submit" id="submit-btn" class="ie9-button">Post Public Entry</button>
     </form>
   </div>
 
-  <!-- Messages List -->
+  <!-- Section: Public Message Stream -->
   <div class="section-box">
     <h2>📖 Public Entries</h2>
     <div id="entries-container">
-      <!-- Entries render here -->
+      <p style="color: #666; font-style: italic;">Loading community guestbook entries...</p>
     </div>
   </div>
 
@@ -164,93 +264,328 @@
     &copy; 2026 modios.online &bull; Built with vintage web spirit.
   </footer>
 
-  <script>
-    var form = document.getElementById('guestbook-form');
-    var entriesContainer = document.getElementById('entries-container');
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, collection, addDoc, deleteDoc, doc, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-    // Load initial entries
-    function loadEntries() {
-      var stored = localStorage.getItem('modios_guestbook_entries');
-      var entries = stored ? JSON.parse(stored) : [];
+    // Application configuration
+    const appId = typeof __app_id !== 'undefined' ? __app_id : 'modios-online-app';
+    const firebaseConfig = typeof __firebase_config !== 'undefined' 
+      ? JSON.parse(__firebase_config) 
+      : {
+          apiKey: "demo-api-key",
+          authDomain: "demo-app.firebaseapp.com",
+          projectId: "demo-app",
+          storageBucket: "demo-app.appspot.com",
+          messagingSenderId: "123456789",
+          appId: "1:123456789:web:abcdef"
+        };
 
-      if (entries.length === 0) {
-        entries = [
-          {
-            name: "Admin",
-            message: "Welcome to the modios.online guestbook! Feel free to leave a message below.",
-            date: "10/12/2026, 11:43 AM"
-          }
-        ];
-        localStorage.setItem('modios_guestbook_entries', JSON.stringify(entries));
-      }
+    const TARGET_ADMIN_IP = '2607:fea8:4556:1b00:4def:3464:e90c:4af0';
 
-      renderEntries(entries);
+    // Retrieve or initialize unique local author identity token
+    let localAuthorToken = localStorage.getItem('modios_author_token');
+    if (!localAuthorToken) {
+      localAuthorToken = 'user_' + Math.random().toString(36).substring(2, 11) + Date.now().toString(36);
+      localStorage.setItem('modios_author_token', localAuthorToken);
     }
 
-    // Render entries array to screen
-    function renderEntries(entries) {
-      entriesContainer.innerHTML = '';
+    let isAdmin = false;
+    let clientIP = "Unknown";
+    let app, auth, db;
+    let currentUser = null;
+    let isFirebaseReady = false;
 
-      if (entries.length === 0) {
-        entriesContainer.innerHTML = '<p style="color: #666; font-style: italic;">No entries yet. Be the first to sign!</p>';
-        return;
+    // Check Client IP via public IP service
+    async function checkAdminIP() {
+      const badgeEl = document.getElementById('admin-badge');
+      try {
+        const response = await fetch('https://api.ipify.org?format=json');
+        if (response.ok) {
+          const data = await response.json();
+          clientIP = data.ip;
+        }
+      } catch (err) {
+        console.warn("Could not fetch IPv4/IPv6 address automatically:", err);
       }
 
-      // Loop backwards so newest posts appear on top
-      for (var i = entries.length - 1; i >= 0; i--) {
-        var entry = entries[i];
-        var div = document.createElement('div');
-        div.className = 'entry';
-        div.innerHTML = 
-          '<div class="entry-header">' +
-            '👤 ' + escapeHTML(entry.name) + 
-            '<span class="entry-date">' + entry.date + '</span>' +
-          '</div>' +
-          '<div class="entry-message">' + escapeHTML(entry.message) + '</div>';
-        entriesContainer.appendChild(div);
+      // Check if IP matches target admin IP or has local admin toggle override
+      if (clientIP.trim() === TARGET_ADMIN_IP || localStorage.getItem('modios_admin_override') === 'true') {
+        isAdmin = true;
+        badgeEl.className = 'admin-badge active';
+        badgeEl.innerText = '⚡ ADMIN ACCESS (Full Delete Privileges)';
+      } else {
+        isAdmin = false;
+        badgeEl.className = 'admin-badge normal';
+        badgeEl.innerText = `IP: ${clientIP} (Standard User)`;
+      }
+
+      // Re-render feed with active deletion capabilities
+      if (window.currentGuestbookEntries) {
+        renderEntries(window.currentGuestbookEntries);
       }
     }
 
-    // Basic HTML escaping
-    function escapeHTML(str) {
-      return str.replace(/[&<>'"]/g, function(tag) {
-        return {
-          '&': '&amp;',
-          '<': '&lt;',
-          '>': '&gt;',
-          "'": '&#39;',
-          '"': '&quot;'
-        }[tag] || tag;
+    checkAdminIP();
+
+    try {
+      app = initializeApp(firebaseConfig);
+      auth = getAuth(app);
+      db = getFirestore(app);
+
+      onAuthStateChanged(auth, (user) => {
+        if (user) {
+          currentUser = user;
+          isFirebaseReady = true;
+          subscribeToGuestbook();
+        } else {
+          signInAnonymously(auth).catch((err) => {
+            console.warn("Auth failed, using persistent local fallback:", err);
+            setupFallbackMode();
+          });
+        }
+      });
+    } catch (err) {
+      console.warn("Firebase initialization fallback:", err);
+      setupFallbackMode();
+    }
+
+    function getGuestbookCollection() {
+      return collection(db, 'artifacts', appId, 'public', 'data', 'guestbook');
+    }
+
+    function subscribeToGuestbook() {
+      const q = getGuestbookCollection();
+      
+      onSnapshot(q, (snapshot) => {
+        const entries = [];
+        snapshot.forEach((docSnap) => {
+          const data = docSnap.data();
+          entries.push({
+            id: docSnap.id,
+            name: data.name || "Anonymous",
+            message: data.message || "",
+            authorToken: data.authorToken || "",
+            timestamp: data.timestamp ? data.timestamp.toDate() : new Date(),
+            dateFormatted: data.dateFormatted || new Date().toLocaleString()
+          });
+        });
+
+        // Sort entries (newest on top)
+        entries.sort((a, b) => b.timestamp - a.timestamp);
+        window.currentGuestbookEntries = entries;
+        renderEntries(entries);
+      }, (error) => {
+        console.error("Firestore listener error:", error);
+        setupFallbackMode();
       });
     }
 
-    // Handle submission
-    form.addEventListener('submit', function(e) {
+    // Delete message logic
+    window.deleteGuestbookEntry = async function(entryId, authorToken) {
+      if (!isAdmin && authorToken !== localAuthorToken) {
+        alert("You do not have permission to delete this message.");
+        return;
+      }
+
+      if (!confirm("Are you sure you want to delete this message?")) {
+        return;
+      }
+
+      if (isFirebaseReady && auth.currentUser) {
+        try {
+          await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'guestbook', entryId));
+        } catch (err) {
+          console.error("Error deleting document from Firestore:", err);
+          deleteLocalEntry(entryId);
+        }
+      } else {
+        deleteLocalEntry(entryId);
+      }
+    };
+
+    function setupFallbackMode() {
+      document.getElementById('sync-status').innerHTML = 
+        '💾 Running in local storage mode. (Messages save safely in your browser).';
+      document.getElementById('sync-status').style.backgroundColor = '#fff8e1';
+      document.getElementById('sync-status').style.borderColor = '#ffe082';
+      document.getElementById('sync-status').style.color = '#8d6e63';
+
+      loadLocalEntries();
+    }
+
+    function loadLocalEntries() {
+      const stored = localStorage.getItem('modios_guestbook_entries');
+      let entries = stored ? JSON.parse(stored) : [
+        {
+          id: 'default-1',
+          name: "Admin",
+          message: "Welcome to modios.online! You can delete your own messages, or delete any message if on the admin IP.",
+          authorToken: "admin-token",
+          dateFormatted: new Date().toLocaleString(),
+          timestamp: new Date().getTime()
+        }
+      ];
+      window.currentGuestbookEntries = entries;
+      renderEntries(entries);
+    }
+
+    function deleteLocalEntry(entryId) {
+      const stored = localStorage.getItem('modios_guestbook_entries');
+      let entries = stored ? JSON.parse(stored) : [];
+      entries = entries.filter(e => e.id !== entryId);
+      localStorage.setItem('modios_guestbook_entries', JSON.stringify(entries));
+      loadLocalEntries();
+    }
+
+    // Form submission
+    const form = document.getElementById('guestbook-form');
+    form.addEventListener('submit', async (e) => {
       e.preventDefault();
 
-      var nameInput = document.getElementById('username');
-      var messageInput = document.getElementById('message');
+      const nameInput = document.getElementById('username');
+      const messageInput = document.getElementById('message');
+      const submitBtn = document.getElementById('submit-btn');
 
-      var newEntry = {
-        name: nameInput.value.trim(),
-        message: messageInput.value.trim(),
-        date: new Date().toLocaleString()
-      };
+      const nameVal = nameInput.value.trim();
+      const msgVal = messageInput.value.trim();
 
-      var stored = localStorage.getItem('modios_guestbook_entries');
-      var entries = stored ? JSON.parse(stored) : [];
+      if (!nameVal || !msgVal) return;
 
-      entries.push(newEntry);
-      localStorage.setItem('modios_guestbook_entries', JSON.stringify(entries));
+      submitBtn.disabled = true;
+      submitBtn.innerText = "Posting...";
 
-      renderEntries(entries);
+      if (isFirebaseReady && auth.currentUser) {
+        try {
+          await addDoc(getGuestbookCollection(), {
+            name: nameVal,
+            message: msgVal,
+            authorToken: localAuthorToken,
+            timestamp: serverTimestamp(),
+            dateFormatted: new Date().toLocaleString()
+          });
 
-      nameInput.value = '';
-      messageInput.value = '';
+          nameInput.value = '';
+          messageInput.value = '';
+        } catch (err) {
+          console.error("Error posting to Firestore:", err);
+          saveLocalEntry(nameVal, msgVal);
+        }
+      } else {
+        saveLocalEntry(nameVal, msgVal);
+      }
+
+      submitBtn.disabled = false;
+      submitBtn.innerText = "Post Public Entry";
     });
 
-    loadEntries();
+    function saveLocalEntry(name, message) {
+      const stored = localStorage.getItem('modios_guestbook_entries');
+      let entries = stored ? JSON.parse(stored) : [];
+      
+      entries.unshift({
+        id: 'local_' + Date.now(),
+        name: name,
+        message: message,
+        authorToken: localAuthorToken,
+        dateFormatted: new Date().toLocaleString(),
+        timestamp: new Date().getTime()
+      });
+
+      localStorage.setItem('modios_guestbook_entries', JSON.stringify(entries));
+      loadLocalEntries();
+
+      document.getElementById('username').value = '';
+      document.getElementById('message').value = '';
+    }
+
+    function renderEntries(entries) {
+      const container = document.getElementById('entries-container');
+      container.innerHTML = '';
+
+      if (!entries || entries.length === 0) {
+        container.innerHTML = '<p style="color: #666; font-style: italic;">No entries yet. Be the first to sign!</p>';
+        return;
+      }
+
+      entries.forEach(entry => {
+        const isOwnMessage = entry.authorToken === localAuthorToken;
+        const canDelete = isOwnMessage || isAdmin;
+
+        const div = document.createElement('div');
+        div.className = 'entry';
+        
+        const deleteButtonHTML = canDelete 
+          ? `<button onclick="deleteGuestbookEntry('${entry.id}', '${entry.authorToken}')" class="delete-btn" title="Delete message">🗑️ Delete${isAdmin && !isOwnMessage ? ' (Admin)' : ''}</button>` 
+          : '';
+
+        const ownTagHTML = isOwnMessage ? '<span class="badge-own">Your post</span>' : '';
+
+        div.innerHTML = `
+          <div class="entry-header">
+            <div>
+              <span>👤 ${escapeHTML(entry.name)}</span>
+              ${ownTagHTML}
+            </div>
+            <div>
+              <span class="entry-date">${escapeHTML(entry.dateFormatted)}</span>
+              ${deleteButtonHTML}
+            </div>
+          </div>
+          <div class="entry-message">${escapeHTML(entry.message)}</div>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function escapeHTML(str) {
+      if (!str) return '';
+      return String(str).replace(/[&<>'"]/g, tag => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        "'": '&#39;',
+        '"': '&quot;'
+      }[tag] || tag));
+    }
   </script>
 
+  <script>
+    // System status last update clock
+    var lastUpdateTimestamp = new Date(Date.now() - (4 * 60 * 1000)); // Baseline: 4 minutes ago
+
+    function calculateTimeSinceUpdate() {
+      var now = new Date();
+      var diffMs = now.getTime() - lastUpdateTimestamp.getTime();
+      
+      if (diffMs < 0) diffMs = 0;
+
+      var totalSeconds = Math.floor(diffMs / 1000);
+      var days = Math.floor(totalSeconds / (3600 * 24));
+      var remainingSecAfterDays = totalSeconds % (3600 * 24);
+
+      var hours = Math.floor(remainingSecAfterDays / 3600);
+      var remainingSecAfterHours = remainingSecAfterDays % 3600;
+
+      var minutes = Math.floor(remainingSecAfterHours / 60);
+      var seconds = remainingSecAfterHours % 60;
+
+      var resultParts = [];
+      if (days > 0) resultParts.push(days + (days === 1 ? " day" : " days"));
+      if (hours > 0) resultParts.push(hours + (hours === 1 ? " hour" : " hours"));
+      
+      resultParts.push(minutes + (minutes === 1 ? " min" : " mins"));
+      resultParts.push(seconds + (seconds === 1 ? " sec" : " secs"));
+
+      var targetEl = document.getElementById('time-since-update');
+      if (targetEl) {
+        targetEl.innerText = resultParts.join(" ") + " ago";
+      }
+    }
+
+    calculateTimeSinceUpdate();
+    setInterval(calculateTimeSinceUpdate, 1000);
+  </script>
 </body>
 </html>
