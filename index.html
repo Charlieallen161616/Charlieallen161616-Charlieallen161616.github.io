@@ -110,9 +110,9 @@
   <div class="section-box">
     <h2>📊 Status & Links</h2>
     <ul>
-      <li>Server Uptime: <strong>99.9%</strong></li>
+      <li>Server Uptime: <strong id="live-uptime">Loading...</strong> (99.9% Operational)</li>
       <li>Update contact link to use Gmail web interface.</li>
-      <li>Contact: <a href="https://mail.google.com">charlieaallen16@gmail.com</a></li>
+      <li>Contact: <a href="https://mail.google.com" style="color: #005a9e;">charlieaallen16@gmail.com</a></li>
     </ul>
   </div>
 
@@ -120,5 +120,10 @@
     &copy; 2026 modios.online &bull; Built with vintage web spirit.
   </footer>
 
-</body>
-</html>
+  <!-- Live Server Uptime Script -->
+  <script>
+    var startTimeKey = 'modios_server_start_time';
+    var serverStartTime = localStorage.getItem(startTimeKey);
+    
+    if (!serverStartTime) {
+      // Sets initial
