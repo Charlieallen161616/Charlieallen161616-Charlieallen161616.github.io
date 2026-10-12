@@ -2,60 +2,48 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Guestbook - modios.online</title>
   <style>
-    /* Global Styles matching modios.online retro theme */
+    /* Global Page Styling (IE9 Safe) */
     body {
-      font-family: 'Comic Sans MS', 'Chalkboard SE', 'Comic Neue', sans-serif;
+      font-family: "Comic Sans MS", "Comic Sans", cursive, sans-serif;
       background-color: #f0f0f0;
-      color: #111;
-      margin: 20px;
-      padding: 0;
+      color: #111111;
+      margin: 30px;
     }
 
-    .container {
-      max-width: 900px;
-      margin: 0 auto;
+    header {
+      border-bottom: 2px dashed #707070;
+      padding-bottom: 15px;
+      margin-bottom: 25px;
     }
 
     h1 {
+      margin: 0 0 10px 0;
       font-size: 28px;
-      margin-bottom: 4px;
     }
 
     p.subtitle {
       margin-top: 0;
       margin-bottom: 15px;
-      color: #333;
+      color: #333333;
     }
 
-    hr.divider {
-      border: none;
-      border-top: 1px dashed #666;
-      margin-bottom: 20px;
-    }
-
-    /* Content Cards */
-    .card {
-      background-color: #ffffff;
-      border: 1px solid #ccc;
+    /* Section containers */
+    .section-box {
+      background: #ffffff;
+      border: 1px solid #b0b0b0;
       padding: 15px 20px;
       margin-bottom: 20px;
-      box-shadow: 1px 1px 3px rgba(0,0,0,0.05);
     }
 
-    .card h2 {
-      font-size: 18px;
+    .section-box h2 {
       margin-top: 0;
-      margin-bottom: 12px;
-      color: #0055a5;
-      display: flex;
-      align-items: center;
-      gap: 8px;
+      font-size: 18px;
+      color: #005a9e;
     }
 
-    /* Form Controls */
+    /* Form Fields */
     .form-group {
       margin-bottom: 12px;
     }
@@ -68,35 +56,201 @@
     }
 
     input[type="text"], textarea {
-      width: 100%;
-      padding: 8px;
-      box-sizing: border-box;
-      border: 1px solid #888;
-      background-color: #fafafa;
+      width: 98%;
+      padding: 6px;
+      border: 1px solid #707070;
+      background-color: #ffffff;
       font-family: inherit;
       font-size: 14px;
     }
 
     textarea {
       resize: vertical;
-      height: 90px;
+      height: 80px;
     }
 
-    /* Button Styling */
-    .btn {
+    /* IE9-compatible button styling */
+    .ie9-button {
+      display: inline-block;
+      padding: 6px 12px;
       background-color: #e1e1e1;
-      border: 1px solid #777;
-      padding: 6px 14px;
-      font-family: inherit;
-      font-size: 13px;
+      color: #000000;
+      text-decoration: none;
+      border: 1px solid #707070;
+      font-size: 14px;
       cursor: pointer;
-      box-shadow: 1px 1px 0px #fff inset;
+      margin-right: 8px;
+      margin-bottom: 8px;
     }
 
-    .btn:hover {
-      background-color: #d0d0d0;
+    .ie9-button:hover {
+      background-color: #e5f1fb;
+      border-color: #0078d7;
     }
 
-    .btn:active {
-      background-color: #bbb;
+    /* Entry Feed Styling */
+    .entry {
+      border-bottom: 1px dashed #cccccc;
+      padding: 10px 0;
     }
+
+    .entry:last-child {
+      border-bottom: none;
+    }
+
+    .entry-header {
+      font-size: 14px;
+      font-weight: bold;
+      color: #005a9e;
+      margin-bottom: 4px;
+    }
+
+    .entry-date {
+      font-size: 12px;
+      color: #666666;
+      font-weight: normal;
+      margin-left: 10px;
+    }
+
+    .entry-message {
+      font-size: 14px;
+      color: #222222;
+      white-space: pre-wrap;
+    }
+
+    footer {
+      font-size: 12px;
+      color: #666666;
+      border-top: 1px solid #d0d0d0;
+      margin-top: 40px;
+      padding-top: 10px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>📝 Guestbook</h1>
+    <p class="subtitle">Leave a note, share your thoughts, or say hi to modios.online!</p>
+    <a href="index.html" class="ie9-button">&laquo; Back to Main Hub</a>
+  </header>
+
+  <!-- Form Section -->
+  <div class="section-box">
+    <h2>✍️ Sign the Guestbook</h2>
+    <form id="guestbook-form">
+      <div class="form-group">
+        <label for="username">Name / Handle:</label>
+        <input type="text" id="username" placeholder="e.g. RetroCoder" required>
+      </div>
+      <div class="form-group">
+        <label for="message">Message:</label>
+        <textarea id="message" placeholder="Write your message here..." required></textarea>
+      </div>
+      <button type="submit" class="ie9-button">Post Entry</button>
+    </form>
+  </div>
+
+  <!-- Messages List -->
+  <div class="section-box">
+    <h2>📖 Public Entries</h2>
+    <div id="entries-container">
+      <!-- Entries render here -->
+    </div>
+  </div>
+
+  <footer>
+    &copy; 2026 modios.online &bull; Built with vintage web spirit.
+  </footer>
+
+  <script>
+    var form = document.getElementById('guestbook-form');
+    var entriesContainer = document.getElementById('entries-container');
+
+    // Load initial entries
+    function loadEntries() {
+      var stored = localStorage.getItem('modios_guestbook_entries');
+      var entries = stored ? JSON.parse(stored) : [];
+
+      if (entries.length === 0) {
+        entries = [
+          {
+            name: "Admin",
+            message: "Welcome to the modios.online guestbook! Feel free to leave a message below.",
+            date: "10/12/2026, 11:43 AM"
+          }
+        ];
+        localStorage.setItem('modios_guestbook_entries', JSON.stringify(entries));
+      }
+
+      renderEntries(entries);
+    }
+
+    // Render entries array to screen
+    function renderEntries(entries) {
+      entriesContainer.innerHTML = '';
+
+      if (entries.length === 0) {
+        entriesContainer.innerHTML = '<p style="color: #666; font-style: italic;">No entries yet. Be the first to sign!</p>';
+        return;
+      }
+
+      // Loop backwards so newest posts appear on top
+      for (var i = entries.length - 1; i >= 0; i--) {
+        var entry = entries[i];
+        var div = document.createElement('div');
+        div.className = 'entry';
+        div.innerHTML = 
+          '<div class="entry-header">' +
+            '👤 ' + escapeHTML(entry.name) + 
+            '<span class="entry-date">' + entry.date + '</span>' +
+          '</div>' +
+          '<div class="entry-message">' + escapeHTML(entry.message) + '</div>';
+        entriesContainer.appendChild(div);
+      }
+    }
+
+    // Basic HTML escaping
+    function escapeHTML(str) {
+      return str.replace(/[&<>'"]/g, function(tag) {
+        return {
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          "'": '&#39;',
+          '"': '&quot;'
+        }[tag] || tag;
+      });
+    }
+
+    // Handle submission
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      var nameInput = document.getElementById('username');
+      var messageInput = document.getElementById('message');
+
+      var newEntry = {
+        name: nameInput.value.trim(),
+        message: messageInput.value.trim(),
+        date: new Date().toLocaleString()
+      };
+
+      var stored = localStorage.getItem('modios_guestbook_entries');
+      var entries = stored ? JSON.parse(stored) : [];
+
+      entries.push(newEntry);
+      localStorage.setItem('modios_guestbook_entries', JSON.stringify(entries));
+
+      renderEntries(entries);
+
+      nameInput.value = '';
+      messageInput.value = '';
+    });
+
+    loadEntries();
+  </script>
+
+</body>
+</html>
