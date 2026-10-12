@@ -126,4 +126,31 @@
     var serverStartTime = localStorage.getItem(startTimeKey);
     
     if (!serverStartTime) {
-      // Sets initial
+      // Sets initial reference start time if not stored yet
+      serverStartTime = new Date().getTime() - (18 * 24 * 60 * 60 * 1000);
+      localStorage.setItem(startTimeKey, serverStartTime);
+    } else {
+      serverStartTime = parseInt(serverStartTime, 10);
+    }
+
+    function updateInlineUptime() {
+      var now = new Date().getTime();
+      var diff = Math.floor((now - serverStartTime) / 1000); // seconds
+
+      var days = Math.floor(diff / (3600 * 24));
+      diff %= 3600 * 24;
+      var hours = Math.floor(diff / 3600);
+      diff %= 3600;
+      var minutes = Math.floor(diff / 60);
+      var seconds = diff % 60;
+
+      var uptimeString = days + "d " + hours + "h " + minutes + "m " + seconds + "s";
+      document.getElementById('live-uptime').innerText = uptimeString;
+    }
+
+    updateInlineUptime();
+    setInterval(updateInlineUptime, 1000);
+  </script>
+
+</body>
+</html>
