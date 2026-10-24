@@ -3,24 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Local & Global Web Chat - modios.online</title>
+  <title>Welcome to modios.online // Web Chat</title>
   <style>
-    /* Apply to the whole page */
     body {
       font-family: "Comic Sans MS", "Comic Sans", cursive, sans-serif;
       background-color: #f0f0f0;
       color: #111111;
-      margin: 30px;
+      margin: 20px;
     }
 
     header {
       border-bottom: 2px dashed #707070;
-      padding-bottom: 15px;
-      margin-bottom: 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
+      padding-bottom: 10px;
+      margin-bottom: 15px;
     }
 
     h1 {
@@ -28,328 +23,206 @@
       font-size: 26px;
     }
 
-    .heading-accent {
-      font-family: "Comic Sans MS", "Comic Sans", cursive, sans-serif;
-      font-weight: bold;
+    a {
+      color: #005a9e;
+      text-decoration: underline;
     }
 
-    /* Section containers - IE9 safe styling */
     .section-box {
       background: #ffffff;
       border: 1px solid #b0b0b0;
-      padding: 15px 20px;
-      margin-bottom: 20px;
+      padding: 12px 15px;
+      margin-bottom: 15px;
     }
 
     .section-box h2 {
       margin-top: 0;
-      font-size: 18px;
+      font-size: 16px;
       color: #005a9e;
     }
 
-    /* IE9-compatible button styling */
     .ie9-button {
       display: inline-block;
-      padding: 6px 12px;
+      padding: 5px 10px;
       background-color: #e1e1e1;
       color: #000000;
       text-decoration: none;
       border: 1px solid #707070;
       font-size: 13px;
       cursor: pointer;
-      margin-right: 6px;
-      margin-bottom: 6px;
+      margin-right: 5px;
       font-family: inherit;
     }
-    
+
     .ie9-button:hover {
       background-color: #e5f1fb;
       border-color: #0078d7;
     }
 
-    .ie9-button:active {
-      background-color: #cce4f7;
-    }
-
-    .ie9-input {
-      padding: 6px 8px;
+    .ie9-input, .ie9-select {
+      padding: 4px 6px;
       border: 1px solid #707070;
       font-family: "Comic Sans MS", "Comic Sans", cursive, sans-serif;
       font-size: 13px;
       background: #fff;
-      box-sizing: border-box;
     }
 
-    .status-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 4px 10px;
-      background: #e1e1e1;
-      border: 1px solid #707070;
-      font-size: 12px;
-      font-weight: bold;
-    }
-
-    .status-dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      background-color: #28a745;
-      display: inline-block;
-    }
-
-    /* Chat Layout Grid */
-    .chat-grid {
-      display: grid;
-      grid-template-columns: 240px 1fr;
-      gap: 15px;
-    }
-
-    @media (max-width: 768px) {
-      .chat-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    /* Settings Panel */
-    .settings-panel {
+    .top-bar {
       display: flex;
-      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
       gap: 10px;
     }
 
     .avatar-picker {
-      display: flex;
-      gap: 6px;
-      flex-wrap: wrap;
+      display: inline-flex;
+      gap: 4px;
     }
 
     .avatar-opt {
       cursor: pointer;
-      padding: 4px 8px;
+      padding: 2px 6px;
       border: 1px solid #ccc;
       background: #f9f9f9;
-      font-size: 16px;
     }
 
     .avatar-opt.selected {
       border-color: #0078d7;
       background: #e5f1fb;
-      font-weight: bold;
     }
 
-    /* Message Display Box */
+    .chat-layout {
+      display: grid;
+      grid-template-columns: 1fr 220px;
+      gap: 15px;
+    }
+
+    @media (max-width: 768px) {
+      .chat-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
     .chat-messages {
-      height: 380px;
+      height: 320px;
       border: 1px solid #707070;
-      background: #fafafa;
+      background: #fff;
       overflow-y: auto;
-      padding: 12px;
-      margin-bottom: 12px;
-      box-sizing: border-box;
-    }
-
-    .message-item {
+      padding: 10px;
       margin-bottom: 10px;
-      padding-bottom: 8px;
-      border-bottom: 1px dotted #d0d0d0;
-      word-wrap: break-word;
+      font-size: 13px;
     }
 
-    .message-header {
-      font-size: 12px;
-      color: #555;
-      margin-bottom: 3px;
+    .msg-line {
+      margin-bottom: 6px;
+      line-height: 1.3;
     }
 
-    .message-user {
+    .msg-time {
+      color: #888;
+      font-size: 11px;
+    }
+
+    .msg-user {
       font-weight: bold;
-      color: #005a9e;
+      color: #a00;
     }
 
-    .message-body {
-      font-size: 14px;
-      line-height: 1.4;
-      color: #111;
-    }
-
-    .system-msg {
-      font-style: italic;
+    .sys-msg {
+      text-align: center;
       color: #666;
+      font-style: italic;
       font-size: 12px;
-      background: #f0f0f0;
-      padding: 4px 8px;
-      border-left: 3px solid #005a9e;
-      margin: 6px 0;
+      margin: 8px 0;
     }
 
-    /* Chat Input Form */
-    .chat-input-area {
+    .chat-input-row {
       display: flex;
       gap: 8px;
     }
 
-    .chat-input-area input {
+    .chat-input-row input {
       flex: 1;
     }
 
-    /* User List */
     .user-list {
       list-style: none;
       padding: 0;
       margin: 0;
-      max-height: 150px;
-      overflow-y: auto;
+      font-size: 13px;
     }
 
     .user-list li {
-      padding: 4px 0;
-      font-size: 13px;
-      border-bottom: 1px dashed #e0e0e0;
-      display: flex;
-      align-items: center;
-      gap: 6px;
+      padding: 3px 0;
+      border-bottom: 1px dashed #ddd;
     }
 
-    footer {
-      font-size: 12px;
-      color: #666666;
-      border-top: 1px solid #d0d0d0;
-      margin-top: 30px;
-      padding-top: 10px;
-      text-align: center;
+    .status-online {
+      color: #28a745;
+      font-size: 11px;
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
 
   <header>
-    <div>
-      <h1>💬 Local & Global Web Chat</h1>
-      <p style="margin: 4px 0 0 0; font-size: 13px;">Welcome to the live chatroom for <span class="heading-accent">modios.online</span></p>
-    </div>
-    <div>
-      <!-- Relative link back up to index.html at root -->
-      <a href="../index.html" class="ie9-button">&laquo; Back to Home</a>
-      <div class="status-badge" id="net-status-badge">
-        <span class="status-dot" id="net-status-dot"></span>
-        <span id="net-status-text">Online (Connected)</span>
-      </div>
-    </div>
+    <h1>Welcome to modios.online // Web Chat</h1>
+    <p>Connect with visitors globally in real-time. &bull; <a href="../index.html">&laquo; Back to Home</a></p>
   </header>
 
-  <div class="chat-grid">
-    <!-- Sidebar / Settings -->
-    <div class="settings-panel">
-      <div class="section-box" style="margin-bottom: 10px;">
-        <h2 style="font-size: 15px;">👤 My Profile</h2>
-        
-        <label style="font-size: 12px; display: block; margin-bottom: 4px;">Handle / Username:</label>
-        <input type="text" id="username-input" class="ie9-input" style="width: 100%; margin-bottom: 10px;" value="Visitor_90" maxlength="20">
-
-        <label style="font-size: 12px; display: block; margin-bottom: 4px;">Avatar Icon:</label>
-        <div class="avatar-picker" id="avatar-picker" style="margin-bottom: 10px;">
-          <span class="avatar-opt selected" onclick="selectAvatar('👾', this)">👾</span>
-          <span class="avatar-opt" onclick="selectAvatar('🕹️', this)">🕹️</span>
-          <span class="avatar-opt" onclick="selectAvatar('💾', this)">💾</span>
-          <span class="avatar-opt" onclick="selectAvatar('💻', this)">💻</span>
-          <span class="avatar-opt" onclick="selectAvatar('⚙️', this)">⚙️</span>
-        </div>
-
-        <button class="ie9-button" onclick="saveProfile()" style="width: 100%;">Save Profile</button>
+  <!-- Profile Settings Bar -->
+  <div class="section-box top-bar">
+    <div>
+      <strong>👤 Your Profile Settings</strong> &nbsp;|&nbsp;
+      <label>Handle:</label>
+      <input type="text" id="username" class="ie9-input" style="width: 110px;" value="Guest_100">
+      
+      <label style="margin-left: 8px;">Avatar:</label>
+      <div class="avatar-picker">
+        <span class="avatar-opt selected" id="av-👾" onclick="setAvatar('👾')">👾</span>
+        <span class="avatar-opt" id="av-🕹️" onclick="setAvatar('🕹️')">🕹️</span>
+        <span class="avatar-opt" id="av-💾" onclick="setAvatar('💾')">💾</span>
+        <span class="avatar-opt" id="av-💻" onclick="setAvatar('💻')">💻</span>
       </div>
-
-      <div class="section-box">
-        <h2 style="font-size: 15px;">👥 Active Room Members</h2>
-        <ul class="user-list" id="user-list">
-          <li>👾 <strong>Visitor_90</strong> (You)</li>
-        </ul>
-        <div style="font-size: 11px; color: #666; margin-top: 8px;" id="peer-count">Connected Peers: 1</div>
-      </div>
-
-      <div class="section-box">
-        <h2 style="font-size: 15px;">🛠️ Options</h2>
-        <button class="ie9-button" onclick="toggleSound()" id="sound-btn" style="width: 100%;">🔊 Sound: ON</button>
-        <button class="ie9-button" onclick="exportChatLogs()" style="width: 100%;">💾 Export Chat Log</button>
-        <button class="ie9-button" onclick="clearLocalHistory()" style="width: 100%; color: #a00;">🗑️ Clear Local Log</button>
-      </div>
+      <button class="ie9-button" id="save-profile-btn" style="margin-left: 6px;">Save Profile</button>
     </div>
 
-    <!-- Main Chat Window -->
     <div>
-      <div class="section-box">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-          <h2 style="margin: 0;">💬 #general-chat</h2>
-          <input type="text" id="search-input" class="ie9-input" placeholder="🔍 Filter messages..." onkeyup="filterMessages()" style="width: 180px;">
-        </div>
-
-        <!-- Messages Box -->
-        <div class="chat-messages" id="chat-messages">
-          <!-- Chat messages rendered dynamically -->
-        </div>
-
-        <!-- Chat Input Form -->
-        <form onsubmit="handleSend(event)" class="chat-input-area">
-          <input type="text" id="msg-input" class="ie9-input" placeholder="Type a message to post to room..." autocomplete="off" maxlength="300" required>
-          <button type="submit" class="ie9-button" style="padding: 6px 18px; font-weight: bold;">Send</button>
-        </form>
-      </div>
+      <button class="ie9-button" id="sound-btn">🔊 Sound: ON</button>
     </div>
   </div>
 
-  <footer>
-    &copy; 2026 modios.online &bull; Vintage Retro Web Chat System
-  </footer>
+  <div class="chat-layout">
+    <!-- Main Chat Window -->
+    <div class="section-box">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+        <h2 style="margin: 0;">💬 Global Live Chatroom (#general)</h2>
+        <span id="conn-status" class="status-online">● Live Global Database Connected</span>
+      </div>
 
-  <!-- Retro Web Chat Logic Engine -->
-  <script>
-    // System State
-    var currentUser = {
-      name: "Visitor_" + Math.floor(1000 + Math.random() * 9000),
-      avatar: "👾",
-      id: "usr_" + Math.random().toString(36).substring(2, 9)
-    };
-    
-    var soundEnabled = true;
-    var messages = [];
-    var activePeers = new Set([currentUser.id]);
-    var broadcastChannel = null;
+      <div class="chat-messages" id="chat-box">
+        <div class="sys-msg">*** Connecting to Firebase global chat network... ***</div>
+      </div>
 
-    // Load Saved Profile
-    var savedName = localStorage.getItem('modios_chat_username');
-    var savedAvatar = localStorage.getItem('modios_chat_avatar');
-    if (savedName) currentUser.name = savedName;
-    if (savedAvatar) currentUser.avatar = savedAvatar;
+      <form id="chat-form" class="chat-input-row">
+        <input type="text" id="msg-input" class="ie9-input" placeholder="Type your message here (sent live to everyone globally)..." autocomplete="off" maxlength="250" required>
+        <button type="submit" class="ie9-button" style="font-weight: bold;">Send Message</button>
+      </form>
+    </div>
 
-    document.getElementById('username-input').value = currentUser.name;
+    <!-- Sidebar -->
+    <div>
+      <div class="section-box">
+        <h2>👥 Chat Status</h2>
+        <p style="font-size: 12px; margin: 0;">Logged in as: <strong id="my-name-display">Guest_100</strong></p>
+      </div>
 
-    // Web Audio Synthesizer for 8-bit Sound FX
-    function playBeep(freq, type, duration) {
-      if (!soundEnabled) return;
-      try {
-        var ctx = new (window.AudioContext || window.webkitAudioContext)();
-        var osc = ctx.createOscillator();
-        var gain = ctx.createGain();
-        osc.type = type || 'square';
-        osc.frequency.value = freq || 440;
-        gain.gain.setValueAtTime(0.08, ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + (duration || 0.1));
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.start();
-        osc.stop(ctx.currentTime + (duration || 0.1));
-      } catch (e) {}
-    }
-
-    function toggleSound() {
-      soundEnabled = !soundEnabled;
-      document.getElementById('sound-btn').innerText = soundEnabled ? "🔊 Sound: ON" : "🔇 Sound: OFF";
-      if (soundEnabled) playBeep(800, 'sine', 0.08);
-    }
-
-    function selectAvatar(emoji, el) {
-      currentUser.avatar = emoji;
-      var opts = document.querySelectorAll('.avatar-opt');
-      opts.forEach(function(o) { o.classList.remove('selected'); });
-      el.classList.add('selected');
+      <div class="section-box">
+        <h2>ℹ️ Chatroom Rules</h2>
+        <ul style="padding-left: 15px; margin: 0; font-size: 12px;">
+          <li>Be respectful to fellow archivists.</li>
+          <li>No spamming or flooding.</li>
+          <li>All messages are preserved automatically worldwide.</li>
+        </ul>
