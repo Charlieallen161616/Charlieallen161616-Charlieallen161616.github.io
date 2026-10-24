@@ -59,7 +59,7 @@
       border-color: #0078d7;
     }
 
-    .ie9-input, .ie9-select {
+    .ie9-input {
       padding: 4px 6px;
       border: 1px solid #707070;
       font-family: "Comic Sans MS", "Comic Sans", cursive, sans-serif;
@@ -146,24 +146,16 @@
       flex: 1;
     }
 
-    .user-list {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-      font-size: 13px;
-    }
-
-    .user-list li {
-      padding: 3px 0;
-      border-bottom: 1px dashed #ddd;
-    }
-
     .status-online {
       color: #28a745;
       font-size: 11px;
       font-weight: bold;
     }
   </style>
+
+  <!-- Firebase Compat Scripts (Ultra Stable for Static Hosts) -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 </head>
 <body>
 
@@ -172,7 +164,6 @@
     <p>Connect with visitors globally in real-time. &bull; <a href="../index.html">&laquo; Back to Home</a></p>
   </header>
 
-  <!-- Profile Settings Bar -->
   <div class="section-box top-bar">
     <div>
       <strong>👤 Your Profile Settings</strong> &nbsp;|&nbsp;
@@ -186,33 +177,31 @@
         <span class="avatar-opt" id="av-💾" onclick="setAvatar('💾')">💾</span>
         <span class="avatar-opt" id="av-💻" onclick="setAvatar('💻')">💻</span>
       </div>
-      <button class="ie9-button" id="save-profile-btn" style="margin-left: 6px;">Save Profile</button>
+      <button class="ie9-button" onclick="saveProfile()" style="margin-left: 6px;">Save Profile</button>
     </div>
 
     <div>
-      <button class="ie9-button" id="sound-btn">🔊 Sound: ON</button>
+      <button class="ie9-button" onclick="toggleSound()" id="sound-btn">🔊 Sound: ON</button>
     </div>
   </div>
 
   <div class="chat-layout">
-    <!-- Main Chat Window -->
     <div class="section-box">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
         <h2 style="margin: 0;">💬 Global Live Chatroom (#general)</h2>
-        <span id="conn-status" class="status-online">● Live Global Database Connected</span>
+        <span id="conn-status" class="status-online">● Live Global Sync Connected</span>
       </div>
 
       <div class="chat-messages" id="chat-box">
-        <div class="sys-msg">*** Connecting to Firebase global chat network... ***</div>
+        <div class="sys-msg">*** Connecting to global chat network... ***</div>
       </div>
 
-      <form id="chat-form" class="chat-input-row">
-        <input type="text" id="msg-input" class="ie9-input" placeholder="Type your message here (sent live to everyone globally)..." autocomplete="off" maxlength="250" required>
+      <form onsubmit="sendMessage(event)" class="chat-input-row">
+        <input type="text" id="msg-input" class="ie9-input" placeholder="Type your message here..." autocomplete="off" maxlength="250" required>
         <button type="submit" class="ie9-button" style="font-weight: bold;">Send Message</button>
       </form>
     </div>
 
-    <!-- Sidebar -->
     <div>
       <div class="section-box">
         <h2>👥 Chat Status</h2>
@@ -226,3 +215,118 @@
           <li>No spamming or flooding.</li>
           <li>All messages are preserved automatically worldwide.</li>
         </ul>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Firebase Setup
+    const firebaseConfig = {
+      apiKey: "AIzaSyDGJ_j-2T1u9L_0FSmdZd_y5tuM3IcwLs4",
+      authDomain: "modios-chat.firebaseapp.com",
+      databaseURL: "https://modios-chat-default-rtdb.firebaseio.com",
+      projectId: "modios-chat",
+      storageBucket: "modios-chat.firebasestorage.app",
+      messagingSenderId: "411507355631",
+      appId: "1:411507355631:web:83da4d0fad03a3f3ca901a"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+    const chatRef = db.ref('global_messages');
+
+    let myUser = {
+      name: "Guest_" + Math.floor(1000 + Math.random() * 9000),
+      avatar: "👾"
+    };
+    let soundOn = true;
+
+    if (localStorage.getItem('m_name')) myUser.name = localStorage.getItem('m_name');
+    if (localStorage.getItem('m_avatar')) myUser.avatar = localStorage.getItem('m_avatar');
+    document.getElementById('username').value = myUser.name;
+    document.getElementById('my-name-display').innerText = myUser.name;
+
+    function playBeep() {
+      if (!soundOn) return;
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.frequency.value = 520;
+        gain.gain.setValueAtTime(0.05, ctx.currentTime);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.08);
+      } catch(e){}
+    }
+
+    function setAvatar(emoji) {
+      myUser.avatar = emoji;
+      document.querySelectorAll('.avatar-opt').forEach(el => el.classList.remove('selected'));
+      const activeEl = document.getElementById('av-' + emoji);
+      if (activeEl) activeEl.classList.add('selected');
+    }
+
+    function saveProfile() {
+      const val = document.getElementById('username').value.trim();
+      if (val) {
+        myUser.name = val;
+        localStorage.setItem('m_name', myUser.name);
+        localStorage.setItem('m_avatar', myUser.avatar);
+        document.getElementById('my-name-display').innerText = myUser.name;
+        alert("Profile saved!");
+      }
+    }
+
+    function toggleSound() {
+      soundOn = !soundOn;
+      document.getElementById('sound-btn').innerText = soundOn ? "🔊 Sound: ON" : "🔇 Sound: OFF";
+    }
+
+    function sendMessage(e) {
+      e.preventDefault();
+      const input = document.getElementById('msg-input');
+      const text = input.value.trim();
+      if (!text) return;
+
+      chatRef.push({
+        user: myUser.name,
+        avatar: myUser.avatar,
+        text: text,
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        timestamp: firebase.database.ServerValue.TIMESTAMP
+      });
+
+      input.value = '';
+    }
+
+    function escapeHtml(str) {
+      return (str || '').replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    // Real-time listener across all devices globally
+    chatRef.limitToLast(50).on('value', (snapshot) => {
+      const box = document.getElementById('chat-box');
+      box.innerHTML = '';
+
+      const data = snapshot.val();
+      if (data) {
+        Object.values(data).forEach((m) => {
+          const div = document.createElement('div');
+          div.className = 'msg-line';
+          div.innerHTML = `<span class="msg-time">[${m.time || ''}]</span> ` +
+                          `<span>${m.avatar || '👤'}</span> ` +
+                          `<span class="msg-user">${escapeHtml(m.user)}:</span> ` +
+                          `<span>${escapeHtml(m.text)}</span>`;
+          box.appendChild(div);
+        });
+        box.scrollTop = box.scrollHeight;
+        playBeep();
+      } else {
+        box.innerHTML = '<div class="sys-msg">*** Connected! Be the first to type a message... ***</div>';
+      }
+    });
+  </script>
+</body>
+</html>
