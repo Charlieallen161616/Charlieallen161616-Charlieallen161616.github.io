@@ -1,3 +1,585 @@
-<p>Not created yet</p>
-</div>
-<a href="../" class="ie9-button">&larr; Back to Home</a>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>modios.online // Web Chat</title>
+  <style>
+    /* Apply to the whole page - Matching original modios.online theme */
+    body {
+      font-family: "Comic Sans MS", "Comic Sans", cursive, sans-serif;
+      background-color: #f0f0f0;
+      color: #111111;
+      margin: 30px;
+    }
+
+    header {
+      border-bottom: 2px dashed #707070;
+      padding-bottom: 15px;
+      margin-bottom: 25px;
+    }
+
+    h1 {
+      margin: 0 0 10px 0;
+      font-size: 28px;
+    }
+
+    .heading-accent {
+      font-family: "Comic Sans MS", "Comic Sans", cursive, sans-serif;
+      font-weight: bold;
+    }
+
+    /* Section containers - IE9 safe styling */
+    .section-box {
+      background: #ffffff;
+      border: 1px solid #b0b0b0;
+      padding: 15px 20px;
+      margin-bottom: 20px;
+    }
+
+    .section-box h2 {
+      margin-top: 0;
+      font-size: 18px;
+      color: #005a9e;
+    }
+
+    /* IE9-compatible button styling */
+    .ie9-button {
+      display: inline-block;
+      padding: 6px 12px;
+      background-color: #e1e1e1; /* Classic grey button color */
+      color: #000000;
+      text-decoration: none;
+      border: 1px solid #707070;
+      font-size: 14px;
+      cursor: pointer;
+      margin-right: 6px;
+      margin-bottom: 6px;
+      font-family: "Comic Sans MS", "Comic Sans", cursive, sans-serif;
+    }
+    
+    .ie9-button:hover {
+      background-color: #e5f1fb; /* Light blue hover effect supported by IE9 */
+      border-color: #0078d7;
+    }
+
+    .ie9-button:active {
+      background-color: #cce4f7;
+    }
+
+    /* Layout Grid using standard display box model */
+    .chat-layout {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .main-chat-col {
+      flex: 1 1 600px;
+    }
+
+    .side-col {
+      flex: 0 0 280px;
+      min-width: 260px;
+    }
+
+    @media (max-width: 850px) {
+      .chat-layout {
+        flex-direction: column;
+      }
+      .side-col {
+        flex: 1 1 100%;
+      }
+    }
+
+    /* Profile controls */
+    .profile-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      align-items: center;
+    }
+
+    .profile-field {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .retro-input, .retro-select {
+      font-family: "Comic Sans MS", "Comic Sans", cursive, sans-serif;
+      padding: 5px 8px;
+      border: 1px solid #707070;
+      background: #fff;
+      font-size: 14px;
+    }
+
+    .avatar-picker {
+      display: flex;
+      gap: 6px;
+    }
+
+    .avatar-btn {
+      cursor: pointer;
+      padding: 3px 6px;
+      border: 1px solid #b0b0b0;
+      background: #f5f5f5;
+      font-size: 16px;
+    }
+
+    .avatar-btn.selected {
+      border: 2px solid #005a9e;
+      background: #e5f1fb;
+    }
+
+    /* Chat Log Window */
+    .chat-log {
+      height: 380px;
+      border: 1px solid #707070;
+      background: #fafafa;
+      padding: 12px;
+      overflow-y: scroll;
+      margin-bottom: 12px;
+      box-sizing: border-box;
+    }
+
+    .chat-msg {
+      margin-bottom: 10px;
+      line-height: 1.4;
+      font-size: 14px;
+      word-wrap: break-word;
+    }
+
+    .msg-timestamp {
+      color: #888888;
+      font-size: 11px;
+      margin-right: 4px;
+    }
+
+    .msg-username {
+      font-weight: bold;
+      color: #005a9e;
+    }
+
+    .msg-username.admin {
+      color: #d11a1a;
+    }
+
+    .msg-username.me {
+      color: #008000;
+    }
+
+    .system-msg {
+      color: #666;
+      font-style: italic;
+      font-size: 12px;
+      margin: 6px 0;
+      text-align: center;
+      background: #eee;
+      padding: 3px 6px;
+      border: 1px dashed #ccc;
+    }
+
+    /* Quick Reaction Tag */
+    .badge-reaction {
+      display: inline-block;
+      background: #fff8c4;
+      border: 1px solid #d8c038;
+      padding: 1px 5px;
+      font-size: 12px;
+      border-radius: 3px;
+      margin-left: 4px;
+    }
+
+    /* Chat Input Controls */
+    .input-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .chat-text-input {
+      flex: 1;
+      padding: 8px;
+      font-family: "Comic Sans MS", "Comic Sans", cursive, sans-serif;
+      border: 1px solid #707070;
+      font-size: 14px;
+    }
+
+    .quick-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 5px;
+      font-size: 13px;
+    }
+
+    /* Online Users List */
+    .user-list {
+      list-style: none;
+      padding-left: 0;
+      margin: 0;
+    }
+
+    .user-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 0;
+      border-bottom: 1px solid #eeeeee;
+      font-size: 14px;
+    }
+
+    .user-item:last-child {
+      border-bottom: none;
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .status-badge {
+      font-size: 11px;
+      padding: 2px 6px;
+      border: 1px solid #999;
+      background: #eee;
+    }
+
+    .status-online { background: #e2f7e2; border-color: #4caf50; color: #1b5e20; }
+    .status-away { background: #fff3cd; border-color: #ffc107; color: #856404; }
+    .status-busy { background: #f8d7da; border-color: #dc3545; color: #721c24; }
+    .status-gaming { background: #e0f2fe; border-color: #0284c7; color: #0369a1; }
+
+    footer {
+      font-size: 12px;
+      color: #666666;
+      border-top: 1px solid #d0d0d0;
+      margin-top: 40px;
+      padding-top: 10px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Welcome to <span class="heading-accent">modios.online // Web Chat</span></h1>
+    <p>Connect with local visitors in real-time. &bull; <a href="index.html" style="color: #005a9e; font-weight: bold;">&laquo; Back to Home</a></p>
+  </header>
+
+  <!-- User Profile Config Section -->
+  <div class="section-box">
+    <h2>👤 Your Profile Settings</h2>
+    <div class="profile-controls">
+      <div class="profile-field">
+        <label for="username-input"><strong>Handle:</strong></label>
+        <input type="text" id="username-input" class="retro-input" value="Guest_4082" maxlength="18">
+      </div>
+
+      <div class="profile-field">
+        <label for="status-select"><strong>Status:</strong></label>
+        <select id="status-select" class="retro-select">
+          <option value="Online">Online</option>
+          <option value="Away">Away</option>
+          <option value="Busy">Busy</option>
+          <option value="Looking to Play ROMs">Looking to Play ROMs</option>
+        </select>
+      </div>
+
+      <div class="profile-field">
+        <label><strong>Avatar:</strong></label>
+        <div class="avatar-picker" id="avatar-picker">
+          <button type="button" class="avatar-btn selected" data-avatar="👾">👾</button>
+          <button type="button" class="avatar-btn" data-avatar="🕹️">🕹️</button>
+          <button type="button" class="avatar-btn" data-avatar="💾">💾</button>
+          <button type="button" class="avatar-btn" data-avatar="💻">💻</button>
+          <button type="button" class="avatar-btn" data-avatar="⚙️">⚙️</button>
+          <button type="button" class="avatar-btn" data-avatar="⚡">⚡</button>
+        </div>
+      </div>
+      
+      <button id="update-profile-btn" class="ie9-button" style="margin-bottom: 0;">Save Profile</button>
+    </div>
+  </div>
+
+  <div class="chat-layout">
+    <!-- Main Chat Window Area -->
+    <div class="main-chat-col">
+      <div class="section-box">
+        <h2>💬 Local Chatroom (#general)</h2>
+        
+        <!-- Messages View Container -->
+        <div class="chat-log" id="chat-log">
+          <!-- Initial pre-populated messages -->
+          <div class="chat-msg">
+            <span class="msg-timestamp">[12:15:02]</span>
+            <span class="msg-username admin">👾 ModiosAdmin</span>: 
+            Welcome to the updated web chat! Check out the new IPA and ROM updates in the archive section.
+          </div>
+          <div class="chat-msg">
+            <span class="msg-timestamp">[12:18:44]</span>
+            <span class="msg-username">🕹️ RetroGamer99</span>: 
+            Anyone managed to run the Game Boy Advance ROMs on the browser emulator yet?
+          </div>
+          <div class="chat-msg">
+            <span class="msg-timestamp">[12:20:10]</span>
+            <span class="msg-username">💾 ArchiveBot</span>: 
+            <span class="badge-reaction">NOTICE</span> Daily backup complete. Server uptime remains at 99.9%.
+          </div>
+          <div class="chat-msg">
+            <span class="msg-timestamp">[12:22:35]</span>
+            <span class="msg-username">💻 NetSurfer01</span>: 
+            Classic Comic Sans style! Brings back 2000s web surfing nostalgia haha.
+          </div>
+        </div>
+
+        <!-- Chat Input Form -->
+        <form id="chat-form" onsubmit="event.preventDefault(); sendMessage();">
+          <div class="input-row">
+            <input type="text" id="chat-message-input" class="chat-text-input" placeholder="Type your message here..." autocomplete="off">
+            <button type="submit" class="ie9-button" style="margin-right:0; margin-bottom:0; padding: 8px 16px;">Send Message</button>
+          </div>
+        </form>
+
+        <!-- Quick Reaction Stickers -->
+        <div class="quick-actions">
+          <strong>Quick Reactions:</strong>
+          <button type="button" class="ie9-button" onclick="sendQuickText('[BRB]')">[BRB]</button>
+          <button type="button" class="ie9-button" onclick="sendQuickText('[LOL]')">[LOL]</button>
+          <button type="button" class="ie9-button" onclick="sendQuickText('[GG]')">[GG]</button>
+          <button type="button" class="ie9-button" onclick="sendQuickText('[AFK]')">[AFK]</button>
+          <button type="button" class="ie9-button" onclick="sendQuickText('Anyone up for a ROM challenge?')">🕹️ Challenge</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sidebar: Online Users -->
+    <div class="side-col">
+      <div class="section-box">
+        <h2>👥 Online Users (<span id="user-count">4</span>)</h2>
+        <ul class="user-list" id="user-list">
+          <li class="user-item" id="user-item-me">
+            <div class="user-info">
+              <span id="me-avatar">👾</span>
+              <strong id="me-name" style="color: #008000;">Guest_4082 (You)</strong>
+            </div>
+            <span class="status-badge status-online" id="me-status">Online</span>
+          </li>
+          <li class="user-item">
+            <div class="user-info">
+              <span>👾</span>
+              <span style="color: #d11a1a; font-weight: bold;">ModiosAdmin</span>
+            </div>
+            <span class="status-badge status-online">Online</span>
+          </li>
+          <li class="user-item">
+            <div class="user-info">
+              <span>🕹️</span>
+              <span>RetroGamer99</span>
+            </div>
+            <span class="status-badge status-gaming">Playing ROMs</span>
+          </li>
+          <li class="user-item">
+            <div class="user-info">
+              <span>💻</span>
+              <span>NetSurfer01</span>
+            </div>
+            <span class="status-badge status-away">Away</span>
+          </li>
+          <li class="user-item">
+            <div class="user-info">
+              <span>💾</span>
+              <span>ArchiveBot</span>
+            </div>
+            <span class="status-badge status-online">Bot</span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Quick Server Info Box -->
+      <div class="section-box">
+        <h2>ℹ️ Chatroom Rules</h2>
+        <ul style="padding-left: 15px; font-size: 13px;">
+          <li>Be respectful to fellow archivists.</li>
+          <li>No spamming or flooding.</li>
+          <li>Share retro tools & IPA findings freely!</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    &copy; 2026 modios.online &bull; Built with vintage web spirit.
+  </footer>
+
+  <!-- Web Chat Logic Script -->
+  <script>
+    // State variables
+    var currentAvatar = "👾";
+    var currentUsername = "Guest_4082";
+    var currentStatus = "Online";
+
+    // Dynamic simulated replies bank
+    var botReplies = [
+      "That's super cool! Have you checked the tools section recently?",
+      "Nice! I agree with that.",
+      "Awesome! Modios.online archives are getting updated every week.",
+      "Haha [LOL], totally!",
+      "Does anyone have old iOS 6 IPAs downloaded?",
+      "Server ping looks super fast today!",
+      "Brilliant! Let me grab a quick coffee [BRB].",
+      "I'm testing out some retro utilities right now on my setup."
+    ];
+
+    var botUsernames = [
+      { name: "RetroGamer99", avatar: "🕹️", class: "" },
+      { name: "ModiosAdmin", avatar: "👾", class: "admin" },
+      { name: "NetSurfer01", avatar: "💻", class: "" },
+      { name: "ArchiveBot", avatar: "💾", class: "" }
+    ];
+
+    // Avatar Selection Setup
+    var avatarBtns = document.querySelectorAll('.avatar-btn');
+    avatarBtns.forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        avatarBtns.forEach(function(b) { b.classList.remove('selected'); });
+        this.classList.add('selected');
+        currentAvatar = this.getAttribute('data-avatar');
+      });
+    });
+
+    // Save Profile Settings
+    document.getElementById('update-profile-btn').addEventListener('click', function() {
+      var nameInput = document.getElementById('username-input').value.trim();
+      var statusSelect = document.getElementById('status-select').value;
+
+      if (nameInput === "") {
+        nameInput = "Guest_" + Math.floor(1000 + Math.random() * 9000);
+        document.getElementById('username-input').value = nameInput;
+      }
+
+      currentUsername = nameInput;
+      currentStatus = statusSelect;
+
+      // Update Sidebar UI
+      document.getElementById('me-avatar').innerText = currentAvatar;
+      document.getElementById('me-name').innerText = currentUsername + " (You)";
+      
+      var meStatusBadge = document.getElementById('me-status');
+      meStatusBadge.innerText = currentStatus;
+      
+      // Update badge class
+      meStatusBadge.className = "status-badge ";
+      if (currentStatus === "Online") meStatusBadge.classList.add("status-online");
+      else if (currentStatus === "Away") meStatusBadge.classList.add("status-away");
+      else if (currentStatus === "Busy") meStatusBadge.classList.add("status-busy");
+      else meStatusBadge.classList.add("status-gaming");
+
+      // Post system announcement
+      appendSystemMessage("You updated your profile to: " + currentAvatar + " " + currentUsername + " [" + currentStatus + "]");
+    });
+
+    // Get formatted current time HH:MM:SS
+    function getFormattedTime() {
+      var d = new Date();
+      var h = String(d.getHours()).padStart(2, '0');
+      var m = String(d.getMinutes()).padStart(2, '0');
+      var s = String(d.getSeconds()).padStart(2, '0');
+      return "[" + h + ":" + m + ":" + s + "]";
+    }
+
+    // Append standard user message
+    function appendMessage(avatar, username, text, isMe, isAdmin) {
+      var log = document.getElementById('chat-log');
+      var msgDiv = document.createElement('div');
+      msgDiv.className = 'chat-msg';
+
+      var timeSpan = document.createElement('span');
+      timeSpan.className = 'msg-timestamp';
+      timeSpan.innerText = getFormattedTime() + " ";
+
+      var userSpan = document.createElement('span');
+      userSpan.className = 'msg-username' + (isMe ? ' me' : '') + (isAdmin ? ' admin' : '');
+      userSpan.innerText = avatar + " " + username;
+
+      var textNode = document.createTextNode(": " + text);
+
+      msgDiv.appendChild(timeSpan);
+      msgDiv.appendChild(userSpan);
+      msgDiv.appendChild(textNode);
+
+      log.appendChild(msgDiv);
+      log.scrollTop = log.scrollHeight; // Auto-scroll to bottom
+    }
+
+    // Append system alert message
+    function appendSystemMessage(text) {
+      var log = document.getElementById('chat-log');
+      var sysDiv = document.createElement('div');
+      sysDiv.className = 'system-msg';
+      sysDiv.innerText = "*** " + text + " ***";
+      log.appendChild(sysDiv);
+      log.scrollTop = log.scrollHeight;
+    }
+
+    // Send Message Trigger
+    function sendMessage() {
+      var input = document.getElementById('chat-message-input');
+      var text = input.value.trim();
+
+      if (text === "") return;
+
+      // Append user's message
+      appendMessage(currentAvatar, currentUsername, text, true, false);
+      input.value = "";
+
+      // Trigger bot response after delay
+      scheduleBotReply(text);
+    }
+
+    // Quick text sticker helper
+    function sendQuickText(text) {
+      var input = document.getElementById('chat-message-input');
+      input.value = text;
+      sendMessage();
+    }
+
+    // Automated Bot Reply logic
+    function scheduleBotReply(userMsg) {
+      var delay = Math.floor(Math.random() * 1500) + 1500; // 1.5s - 3s delay
+
+      setTimeout(function() {
+        var randomBot = botUsernames[Math.floor(Math.random() * botUsernames.length)];
+        var replyText = "";
+
+        // Contextual bot responses
+        var lowerMsg = userMsg.toLowerCase();
+        if (lowerMsg.includes("hello") || lowerMsg.includes("hi") || lowerMsg.includes("hey")) {
+          replyText = "Hey there " + currentUsername + "! Welcome to modios chat!";
+        } else if (lowerMsg.includes("rom") || lowerMsg.includes("game")) {
+          replyText = "Check out the retro ROM archive on the homepage! Lots of classical games saved there.";
+        } else if (lowerMsg.includes("ipa") || lowerMsg.includes("ios") || lowerMsg.includes("app")) {
+          replyText = "The IPA archive was updated recently. Make sure to archive your favorites!";
+        } else {
+          replyText = botReplies[Math.floor(Math.random() * botReplies.length)];
+        }
+
+        appendMessage(randomBot.avatar, randomBot.name, replyText, false, randomBot.class === 'admin');
+      }, delay);
+    }
+
+    // Occasional simulated activity (Status changes / user joining)
+    setInterval(function() {
+      var rand = Math.random();
+      if (rand < 0.3) {
+        var statuses = ["Away", "Playing ROMs", "Online", "Busy"];
+        var newStat = statuses[Math.floor(Math.random() * statuses.length)];
+        appendSystemMessage("NetSurfer01 changed status to " + newStat);
+      }
+    }, 45000); // Every 45 seconds
+  </script>
+
+</body>
+</html>
