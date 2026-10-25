@@ -232,9 +232,9 @@
       });
     }
 
-    // Fetch live files from GitHub API
+    // Fetch live files from GitHub API (Corrected URL construction)
     async function fetchGitHubFiles() {
-      const apiUrl = `https://api.github.com/repos/${Charlieallen161616}/${Charlieallen161616.github.io}/contents/${/linux}`;
+      const apiUrl = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${folderPath}`;
       
       try {
         const response = await fetch(apiUrl);
