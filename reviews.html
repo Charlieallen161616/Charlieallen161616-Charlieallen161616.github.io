@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Visitor Reviews - modios.online</title>
+  <style>
+    body {
+      font-family: "Comic Sans MS", "Comic Sans", cursive, sans-serif;
+      background-color: #f0f0f0;
+      color: #111111;
+      margin: 30px;
+    }
+
+    header {
+      border-bottom: 2px dashed #707070;
+      padding-bottom: 15px;
+      margin-bottom: 25px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    h1 {
+      margin: 0 0 5px 0;
+      font-size: 28px;
+    }
+
+    .heading-accent {
+      font-family: "Comic Sans MS", "Comic Sans", cursive, sans-serif;
+      font-weight: bold;
+    }
+
+    /* Section containers - IE9 safe styling */
+    .section-box {
+      background: #ffffff;
+      border: 1px solid #b0b0b0;
+      padding: 15px 20px;
+      margin-bottom: 20px;
+    }
+
+    .section-box h2 {
+      margin-top: 0;
+      font-size: 18px;
+      color: #005a9e;
+    }
+
+    /* IE9-compatible button styling */
+    .ie9-button {
+      display: inline-block;
+      padding: 6px 12px;
+      background-color: #e1e1e1;
+      color: #000000;
+      text-decoration: none;
+      border: 1px solid #707070;
+      font-size: 14px;
+      cursor: pointer;
+      margin-right: 8px;
+      margin-bottom: 8px;
+      font-family: inherit;
+    }
+    
+    .ie9-button:hover {
+      background-color: #e5f1fb;
+      border-color: #0078d7;
+    }
+
+    .ie9-input, .ie9-select, .ie9-textarea {
+      padding: 6px 8px;
+      border: 1px solid #707070;
+      font-family: "Comic Sans MS", "Comic Sans", cursive, sans-serif;
+      font-size: 13px;
+      background: #fff;
+      box-sizing: border-box;
+      width: 100%;
+      margin-bottom: 10px;
+    }
+
+    .review-card {
+      background: #fafafa;
+      border: 1px dotted #b0b0b0;
+      padding: 12px;
+      margin-bottom: 12px;
+    }
+
+    .review-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      color: #555;
+      margin-bottom: 5px;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 4px;
+    }
+
+    .review-stars {
+      color: #f39c12;
+      font-weight: bold;
+    }
+
+    .review-author {
+      font-weight: bold;
+      color: #005a9e;
+    }
+
+    .review-text {
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    footer {
+      font-size: 12px;
+      color: #666666;
+      border-top: 1px solid #d0d0d0;
+      margin-top: 40px;
+      padding-top: 10px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div>
+      <h1>⭐ Visitor <span class="heading-accent">Reviews</span></h1>
+      <p style="margin: 0; font-size: 14px;">See what people are saying about <span class="heading-accent">modios.online</span></p>
+    </div>
+    <div>
+      <a href="index.html" class="ie9-button">&laquo; Back to Home</a>
+      <a href="chat/" class="ie9-button">Open Web Chat</a>
+    </div>
+  </header>
+
+  <div style="display: grid; grid-template-columns: 1fr 320px; gap: 20px;">
+    
+    <!-- Left Column: Display Reviews -->
+    <div>
+      <div class="section-box">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+          <h2 style="margin: 0;">📋 Community Feedback</h2>
+          <button class="ie9-button" onclick="clearReviews()" style="font-size: 12px; padding: 3px 8px; color: #a00;">Clear Local Reviews</button>
+        </div>
+        <div id="reviews-container">
+          <!-- Reviews injected dynamically -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column: Leave a Review Form -->
+    <div>
+      <div class="section-box">
+        <h2>✍️ Leave a Review</h2>
+        <form onsubmit="handleReviewSubmit(event)">
+          <label style="font-size: 12px; display: block; margin-bottom: 3px;">Your Name / Handle:</label>
+          <input type="text" id="rev-name" class="ie9-input" placeholder="e.g. RetroCoder99" maxlength="25" required>
+
+          <label style="font-size: 12px; display: block; margin-bottom: 3px;">Rating:</label>
+          <select id="rev-rating" class="ie9-select">
+            <option value="5">⭐⭐⭐⭐⭐ (5/5 - Awesome!)</option>
+            <option value="4">⭐⭐⭐⭐ (4/5 - Pretty Good)</option>
+            <option value="3">⭐⭐⭐ (3/5 - It's Okay)</option>
+            <option value="2">⭐⭐ (2/5 - Needs Work)</option>
+            <option value="1">⭐ (1/5 - Bad)</option>
+          </select>
+
+          <label style="font-size: 12px; display: block; margin-bottom: 3px;">Your Review:</label>
+          <textarea id="rev-text" class="ie9-textarea" rows="4" placeholder="Write your thoughts about the site, ROMs, or chat..." maxlength="250" required></textarea>
+
+          <button type="submit" class="ie9-button" style="width: 100%; font-weight: bold; background: #e1e1e1;">Submit Review</button>
+        </form>
+      </div>
+    </div>
+
+  </div>
+
+  <footer>
+    &copy; 2026 modios.online &bull; Built with vintage web spirit.
+  </footer>
+
+  <script>
+    // Default initial reviews if none saved yet
+    var defaultReviews = [
+      {
+        name: "Admin_Modios",
+        rating: 5,
+        text: "Welcome to reviews.online! Leave your feedback on our retro utilities and archives here.",
+        date: "2026-10-01"
+      },
+      {
+        name: "LinuxFanatic",
+        rating: 5,
+        text: "Awesome retro site design! Reminds me of the classic 2000s web era.",
+        date: "2026-10-15"
+      }
+    ];
+
+    function getReviews() {
+      try {
+        var raw = localStorage.getItem('modios_reviews');
+        if (raw) {
+          return JSON.parse(raw);
+        }
+      } catch(e) {}
+      return defaultReviews;
+    }
+
+    function saveReviews(reviews) {
+      try {
+        localStorage.setItem('modios_reviews', JSON.stringify(reviews));
+      } catch(e) {}
+    }
+
+    function renderReviews() {
+      var container = document.getElementById('reviews-container');
+      container.innerHTML = '';
+      var reviews = getReviews();
+
+      if (reviews.length === 0) {
+        container.innerHTML = '<p style="font-style: italic; color: #666;">No reviews yet. Be the first to leave one!</p>';
+        return;
+      }
+
+      reviews.slice().reverse().forEach(function(rev) {
+        var starsStr = "⭐".repeat(Number(rev.rating) || 5);
+        var card = document.createElement('div');
+        card.className = 'review-card';
+        card.innerHTML = '<div class="review-header">' +
+                           '<span class="review-author">' + escapeHtml(rev.name) + '</span>' +
+                           '<span class="review-stars">' + starsStr + '</span>' +
+                         '</div>' +
+                         '<div class="review-text">' + escapeHtml(rev.text) + '</div>' +
+                         '<div style="font-size: 10px; color: #888; margin-top: 4px; text-align: right;">' + (rev.date || '') + '</div>';
+        container.appendChild(card);
+      });
+    }
+
+    function handleReviewSubmit(e) {
+      e.preventDefault();
+      var name = document.getElementById('rev-name').value.trim();
+      var rating = document.getElementById('rev-rating').value;
+      var text = document.getElementById('rev-text').value.trim();
+
+      if (!name || !text) return;
+
+      var newRev = {
+        name: name,
+        rating: rating,
+        text: text,
+        date: new Date().toLocaleDateString()
+      };
+
+      var reviews = getReviews();
+      reviews.push(newRev);
+      saveReviews(reviews);
+
+      document.getElementById('rev-text').value = '';
+      renderReviews();
+      alert("Thank you for your review!");
+    }
+
+    function clearReviews() {
+      if (confirm("Reset reviews to default?")) {
+        localStorage.removeItem('modios_reviews');
+        renderReviews();
+      }
+    }
+
+    function escapeHtml(str) {
+      return (str || '').replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    window.onload = function() {
+      renderReviews();
+    };
+  </script>
+
+</body>
+</html>
