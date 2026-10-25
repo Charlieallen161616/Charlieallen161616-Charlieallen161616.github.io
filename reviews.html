@@ -109,6 +109,13 @@
       line-height: 1.4;
     }
 
+    .status-online {
+      color: #28a745;
+      font-size: 12px;
+      font-weight: bold;
+      float: right;
+    }
+
     footer {
       font-size: 12px;
       color: #666666;
@@ -118,13 +125,17 @@
       text-align: center;
     }
   </style>
+
+  <!-- Firebase Compat Scripts -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 </head>
 <body>
 
   <header>
     <div>
       <h1>⭐ Visitor <span class="heading-accent">Reviews</span></h1>
-      <p style="margin: 0; font-size: 14px;">See what people are saying about <span class="heading-accent">modios.online</span></p>
+      <p style="margin: 0; font-size: 14px;">Global feedback for <span class="heading-accent">modios.online</span></p>
     </div>
     <div>
       <a href="index.html" class="ie9-button">&laquo; Back to Home</a>
@@ -134,15 +145,15 @@
 
   <div style="display: grid; grid-template-columns: 1fr 320px; gap: 20px;">
     
-    <!-- Left Column: Display Reviews -->
+    <!-- Left Column: Display Global Reviews -->
     <div>
       <div class="section-box">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
           <h2 style="margin: 0;">📋 Community Feedback</h2>
-          <button class="ie9-button" onclick="clearReviews()" style="font-size: 12px; padding: 3px 8px; color: #a00;">Clear Local Reviews</button>
+          <span class="status-online">● Live Database Connected</span>
         </div>
         <div id="reviews-container">
-          <!-- Reviews injected dynamically -->
+          <p style="font-style: italic; color: #666;">Connecting to global reviews database...</p>
         </div>
       </div>
     </div>
@@ -165,9 +176,9 @@
           </select>
 
           <label style="font-size: 12px; display: block; margin-bottom: 3px;">Your Review:</label>
-          <textarea id="rev-text" class="ie9-textarea" rows="4" placeholder="Write your thoughts about the site, ROMs, or chat..." maxlength="250" required></textarea>
+          <textarea id="rev-text" class="ie9-textarea" rows="4" placeholder="Write your thoughts about the site..." maxlength="250" required></textarea>
 
-          <button type="submit" class="ie9-button" style="width: 100%; font-weight: bold; background: #e1e1e1;">Submit Review</button>
+          <button type="submit" class="ie9-button" style="width: 100%; font-weight: bold; background: #e1e1e1;">Submit Global Review</button>
         </form>
       </div>
     </div>
@@ -179,60 +190,24 @@
   </footer>
 
   <script>
-    // Default initial reviews if none saved yet
-    var defaultReviews = [
-      {
-        name: "Admin_Modios",
-        rating: 5,
-        text: "Welcome to reviews.online! Leave your feedback on our retro utilities and archives here.",
-        date: "2026-10-01"
-      },
-      {
-        name: "LinuxFanatic",
-        rating: 5,
-        text: "Awesome retro site design! Reminds me of the classic 2000s web era.",
-        date: "2026-10-15"
-      }
-    ];
+    // Firebase Setup
+    const firebaseConfig = {
+      apiKey: "AIzaSyDGJ_j-2T1u9L_0FSmdZd_y5tuM3IcwLs4",
+      authDomain: "modios-chat.firebaseapp.com",
+      databaseURL: "https://modios-chat-default-rtdb.firebaseio.com",
+      projectId: "modios-chat",
+      storageBucket: "modios-chat.firebasestorage.app",
+      messagingSenderId: "411507355631",
+      appId: "1:411507355631:web:83da4d0fad03a3f3ca901a"
+    };
 
-    function getReviews() {
-      try {
-        var raw = localStorage.getItem('modios_reviews');
-        if (raw) {
-          return JSON.parse(raw);
-        }
-      } catch(e) {}
-      return defaultReviews;
-    }
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+    const reviewsRef = db.ref('global_reviews');
 
-    function saveReviews(reviews) {
-      try {
-        localStorage.setItem('modios_reviews', JSON.stringify(reviews));
-      } catch(e) {}
-    }
-
-    function renderReviews() {
-      var container = document.getElementById('reviews-container');
-      container.innerHTML = '';
-      var reviews = getReviews();
-
-      if (reviews.length === 0) {
-        container.innerHTML = '<p style="font-style: italic; color: #666;">No reviews yet. Be the first to leave one!</p>';
-        return;
-      }
-
-      reviews.slice().reverse().forEach(function(rev) {
-        var starsStr = "⭐".repeat(Number(rev.rating) || 5);
-        var card = document.createElement('div');
-        card.className = 'review-card';
-        card.innerHTML = '<div class="review-header">' +
-                           '<span class="review-author">' + escapeHtml(rev.name) + '</span>' +
-                           '<span class="review-stars">' + starsStr + '</span>' +
-                         '</div>' +
-                         '<div class="review-text">' + escapeHtml(rev.text) + '</div>' +
-                         '<div style="font-size: 10px; color: #888; margin-top: 4px; text-align: right;">' + (rev.date || '') + '</div>';
-        container.appendChild(card);
-      });
+    // Load saved name if user set one in chat
+    if (localStorage.getItem('m_name')) {
+      document.getElementById('rev-name').value = localStorage.getItem('m_name');
     }
 
     function handleReviewSubmit(e) {
@@ -243,36 +218,47 @@
 
       if (!name || !text) return;
 
-      var newRev = {
+      // Push to Firebase Realtime Database
+      reviewsRef.push({
         name: name,
         rating: rating,
         text: text,
-        date: new Date().toLocaleDateString()
-      };
-
-      var reviews = getReviews();
-      reviews.push(newRev);
-      saveReviews(reviews);
+        date: new Date().toLocaleDateString(),
+        timestamp: firebase.database.ServerValue.TIMESTAMP
+      });
 
       document.getElementById('rev-text').value = '';
-      renderReviews();
-      alert("Thank you for your review!");
-    }
-
-    function clearReviews() {
-      if (confirm("Reset reviews to default?")) {
-        localStorage.removeItem('modios_reviews');
-        renderReviews();
-      }
+      alert("Review posted globally!");
     }
 
     function escapeHtml(str) {
       return (str || '').replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
     }
 
-    window.onload = function() {
-      renderReviews();
-    };
+    // Listen live to global reviews from Firebase
+    reviewsRef.limitToLast(50).on('value', (snapshot) => {
+      var container = document.getElementById('reviews-container');
+      container.innerHTML = '';
+      var data = snapshot.val();
+
+      if (data) {
+        var revs = Object.values(data);
+        revs.reverse().forEach(function(rev) {
+          var starsStr = "⭐".repeat(Number(rev.rating) || 5);
+          var card = document.createElement('div');
+          card.className = 'review-card';
+          card.innerHTML = '<div class="review-header">' +
+                             '<span class="review-author">' + escapeHtml(rev.name) + '</span>' +
+                             '<span class="review-stars">' + starsStr + '</span>' +
+                           '</div>' +
+                           '<div class="review-text">' + escapeHtml(rev.text) + '</div>' +
+                           '<div style="font-size: 10px; color: #888; margin-top: 4px; text-align: right;">' + (rev.date || '') + '</div>';
+          container.appendChild(card);
+        });
+      } else {
+        container.innerHTML = '<p style="font-style: italic; color: #666;">No reviews yet. Be the first to leave one!</p>';
+      }
+    });
   </script>
 
 </body>
