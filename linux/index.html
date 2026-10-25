@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Linux ISO Archives - modios.online</title>
+  <style>
+    body {
+      font-family: "Comic Sans MS", "Comic Sans", cursive, sans-serif;
+      background-color: #f0f0f0;
+      color: #111111;
+      margin: 20px;
+    }
+
+    header {
+      border-bottom: 2px dashed #707070;
+      padding-bottom: 10px;
+      margin-bottom: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    h1 {
+      margin: 0 0 5px 0;
+      font-size: 24px;
+    }
+
+    /* Retro Explorer Window Frame */
+    .explorer-window {
+      background: #ece9d8;
+      border: 2px solid #0055ea;
+      padding: 4px;
+      margin-bottom: 20px;
+      box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+    }
+
+    .explorer-titlebar {
+      background: linear-gradient(to right, #0055ea, #6385ed);
+      color: white;
+      padding: 4px 8px;
+      font-weight: bold;
+      font-size: 13px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .explorer-toolbar {
+      background: #f0f0f0;
+      border-bottom: 1px solid #aca899;
+      padding: 4px 8px;
+      font-size: 12px;
+      display: flex;
+      gap: 15px;
+      align-items: center;
+    }
+
+    .address-bar {
+      background: #fff;
+      border: 1px solid #7f9db9;
+      padding: 2px 6px;
+      font-size: 12px;
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .section-box {
+      background: #ffffff;
+      border: 1px solid #b0b0b0;
+      padding: 15px;
+      margin-bottom: 15px;
+    }
+
+    /* IE9-compatible button styling */
+    .ie9-button {
+      display: inline-block;
+      padding: 5px 10px;
+      background-color: #e1e1e1;
+      color: #000000;
+      text-decoration: none;
+      border: 1px solid #707070;
+      font-size: 13px;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    
+    .ie9-button:hover {
+      background-color: #e5f1fb;
+      border-color: #0078d7;
+    }
+
+    /* File Table Style */
+    .file-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      background: #fff;
+    }
+
+    .file-table th {
+      background: #f1f1f1;
+      border-bottom: 1px solid #aca899;
+      border-right: 1px solid #d0d0d0;
+      text-align: left;
+      padding: 6px 8px;
+      font-weight: bold;
+    }
+
+    .file-table td {
+      padding: 6px 8px;
+      border-bottom: 1px solid #eee;
+      border-right: 1px solid #f0f0f0;
+    }
+
+    .file-table tr:hover {
+      background: #e5f1fb;
+    }
+
+    .file-icon {
+      margin-right: 6px;
+    }
+
+    footer {
+      font-size: 12px;
+      color: #666;
+      border-top: 1px solid #d0d0d0;
+      margin-top: 30px;
+      padding-top: 10px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div>
+      <h1>🐧 Linux ISO & Utilities Mirror</h1>
+      <p style="margin: 0; font-size: 13px;">Archived operating system images and installation media.</p>
+    </div>
+    <div>
+      <a href="../index.html" class="ie9-button">&laquo; Back to Home</a>
+      <a href="../chat/" class="ie9-button">Web Chat</a>
+    </div>
+  </header>
+
+  <!-- Virtual Windows Explorer Frame -->
+  <div class="explorer-window">
+    <div class="explorer-titlebar">
+      <span>📁 File Explorer - /modios.online/linux/</span>
+      <span>[_] [O] [X]</span>
+    </div>
+    <div class="explorer-toolbar">
+      <span><strong>File</strong></span>
+      <span><strong>Edit</strong></span>
+      <span><strong>View</strong></span>
+      <span><strong>Favorites</strong></span>
+      <div class="address-bar">
+        <span>Address:</span>
+        <span style="color: #005a9e; font-family: monospace;">C:\modios.online\linux\</span>
+      </div>
+    </div>
+
+    <div style="background: #ffffff; padding: 10px; min-height: 250px;">
+      <div style="margin-bottom: 10px; font-size: 12px; color: #555; display: flex; justify-content: space-between;">
+        <span id="item-count">Scanning directory mirror...</span>
+        <span id="api-status" style="color: #28a745; font-weight: bold;">● GitHub API Mirror Active</span>
+      </div>
+
+      <table class="file-table">
+        <thead>
+          <tr>
+            <th style="width: 45%;">Name</th>
+            <th style="width: 20%;">Size</th>
+            <th style="width: 20%;">Type</th>
+            <th style="width: 15%;">Action</th>
+          </tr>
+        </thead>
+        <tbody id="file-list-body">
+          <!-- Dynamically populated via GitHub API -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <footer>
+    &copy; 2026 modios.online &bull; Mirror synchronized with GitHub repository.
+  </footer>
+
+  <script>
+    // GitHub Repository details for dynamic directory mirroring
+    const repoOwner = "Charlieallen161616";
+    const repoName = "Charlieallen161616.github.io";
+    const folderPath = "linux";
+
+    // Fallback sample ISOs if API rate limit or empty folder occurs
+    const fallbackFiles = [
+      { name: ".. (Parent Directory)", size: "--", type: "Folder", download_url: "../index.html", isParent: true },
+      { name: "void-live-x86_64-20240314.iso", size: "412 MB", type: "Disk Image (.iso)", download_url: "#" },
+      { name: "debian-9.13.0-amd64-netinst.iso", size: "325 MB", type: "Disk Image (.iso)", download_url: "#" },
+      { name: "linuxmint-21.3-xfce-64bit.iso", size: "2.4 GB", type: "Disk Image (.iso)", download_url: "#" }
+    ];
+
+    function renderFiles(files) {
+      const tbody = document.getElementById('file-list-body');
+      tbody.innerHTML = '';
+      
+      let count = files.length;
+      document.getElementById('item-count').innerText = count + " item(s) found";
+
+      files.forEach(file => {
+        const tr = document.createElement('tr');
+        
+        let icon = "📄";
+        if (file.type === "dir" || file.isParent) icon = "📁";
+        else if (file.name.endsWith('.iso')) icon = "💿";
+        else if (file.name.endsWith('.zip') || file.name.endsWith('.tar.gz')) icon = "📦";
+
+        let sizeStr = file.size ? (file.size > 1024 * 1024 ? (file.size / (1024*1024)).toFixed(1) + " MB" : file.size + " KB") : file.size || "--";
+        let typeStr = file.isParent ? "Folder" : (file.name.endsWith('.iso') ? "Disk Image (.iso)" : "File");
+
+        tr.innerHTML = `
+          <td><span class="file-icon">${icon}</span><strong>${file.name}</strong></td>
+          <td>${sizeStr}</td>
+          <td>${typeStr}</td>
+          <td><a href="${file.download_url || file.html_url}" class="ie9-button" style="padding: 2px 6px; font-size: 11px;" target="_blank">${file.isParent ? 'Open' : 'Download'}</a></td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // Fetch live files from GitHub API
+    async function fetchGitHubFiles() {
+      const apiUrl = `https://api.github.com/repos/${Charlieallen161616}/${Charlieallen161616.github.io}/contents/${/linux}`;
+      
+      try {
+        const response = await fetch(apiUrl);
+        if (!response.ok) throw new Error("API limit or folder not found");
+        const data = await response.json();
+
+        // Format GitHub contents into file explorer list
+        let fileList = [{ name: ".. (Parent Directory)", size: "--", type: "dir", download_url: "../index.html", isParent: true }];
+        
+        data.forEach(item => {
+          fileList.push({
+            name: item.name,
+            size: item.size,
+            type: item.type,
+            download_url: item.download_url || item.html_url
+          });
+        });
+
+        renderFiles(fileList);
+      } catch (err) {
+        // Fallback gracefully if rate-limited or offline
+        document.getElementById('api-status').innerText = "● Using Local Archive Manifest";
+        document.getElementById('api-status').style.color = "#d9534f";
+        renderFiles(fallbackFiles);
+      }
+    }
+
+    window.onload = function() {
+      fetchGitHubFiles();
+    };
+  </script>
+</body>
+</html>
