@@ -32,7 +32,6 @@
       font-weight: bold;
     }
 
-    /* Section containers - IE9 safe styling */
     .section-box {
       background: #ffffff;
       border: 1px solid #b0b0b0;
@@ -46,7 +45,6 @@
       color: #005a9e;
     }
 
-    /* IE9-compatible button styling */
     .ie9-button {
       display: inline-block;
       padding: 6px 12px;
@@ -145,20 +143,18 @@
 
   <div style="display: grid; grid-template-columns: 1fr 320px; gap: 20px;">
     
-    <!-- Left Column: Display Global Reviews -->
     <div>
       <div class="section-box">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
           <h2 style="margin: 0;">📋 Community Feedback</h2>
-          <span class="status-online">● Live Database Connected</span>
+          <span class="status-online" id="db-status">● Connecting...</span>
         </div>
         <div id="reviews-container">
-          <p style="font-style: italic; color: #666;">Connecting to global reviews database...</p>
+          <p style="font-style: italic; color: #666;" id="loading-text">Connecting to global reviews database...</p>
         </div>
       </div>
     </div>
 
-    <!-- Right Column: Leave a Review Form -->
     <div>
       <div class="section-box">
         <h2>✍️ Leave a Review</h2>
@@ -190,7 +186,6 @@
   </footer>
 
   <script>
-    // Firebase Setup
     const firebaseConfig = {
       apiKey: "AIzaSyDGJ_j-2T1u9L_0FSmdZd_y5tuM3IcwLs4",
       authDomain: "modios-chat.firebaseapp.com",
@@ -205,7 +200,6 @@
     const db = firebase.database();
     const reviewsRef = db.ref('global_reviews');
 
-    // Load saved name if user set one in chat
     if (localStorage.getItem('m_name')) {
       document.getElementById('rev-name').value = localStorage.getItem('m_name');
     }
@@ -218,25 +212,29 @@
 
       if (!name || !text) return;
 
-      // Push to Firebase Realtime Database
       reviewsRef.push({
         name: name,
         rating: rating,
         text: text,
         date: new Date().toLocaleDateString(),
         timestamp: firebase.database.ServerValue.TIMESTAMP
+      }).then(() => {
+        document.getElementById('rev-text').value = '';
+        alert("Review posted globally!");
+      }).catch((err) => {
+        alert("Error posting review: " + err.message);
       });
-
-      document.getElementById('rev-text').value = '';
-      alert("Review posted globally!");
     }
 
     function escapeHtml(str) {
       return (str || '').replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
     }
 
-    // Listen live to global reviews from Firebase
+    // Listen with error catching
     reviewsRef.limitToLast(50).on('value', (snapshot) => {
+      document.getElementById('db-status').innerText = "● Live Database Connected";
+      document.getElementById('db-status').style.color = "#28a745";
+
       var container = document.getElementById('reviews-container');
       container.innerHTML = '';
       var data = snapshot.val();
@@ -258,6 +256,10 @@
       } else {
         container.innerHTML = '<p style="font-style: italic; color: #666;">No reviews yet. Be the first to leave one!</p>';
       }
+    }, (error) => {
+      document.getElementById('db-status').innerText = "● Connection Failed";
+      document.getElementById('db-status').style.color = "#a00";
+      document.getElementById('reviews-container').innerHTML = '<p style="color: #a00;">Firebase Error: ' + escapeHtml(error.message) + '<br><small>Check your Firebase Realtime Database Rules.</small></p>';
     });
   </script>
 
