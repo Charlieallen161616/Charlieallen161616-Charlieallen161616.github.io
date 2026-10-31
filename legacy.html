@@ -2,223 +2,208 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Retro Web Arcade - IE7 Compatible Edition</title>
+    <title>Retro Web Arcade - Windows XP / IE7 Edition</title>
     <style type="text/css">
-        /* Standard CSS 2.1 Styling for Strict IE7 / Legacy & Modern Compatibility */
+        /* Standard CSS 2.1 - Strict IE7 Compatibility (No Flexbox, Grid, rounded corners, or modern selectors) */
         body {
             margin: 0;
             padding: 0;
-            background-color: #008080; /* Classic Win95 Teal */
+            background-color: #008080; /* Windows 95/98 Classic Teal */
             font-family: "Tahoma", "Verdana", "Arial", sans-serif;
-            font-size: 12px;
+            font-size: 11px;
             color: #000000;
         }
 
-        #wrapper {
-            width: 780px;
-            margin: 15px auto;
-            background-color: #c0c0c0; /* Standard retro gray */
+        #outer-container {
+            width: 760px;
+            margin: 12px auto;
+            background-color: #c0c0c0; /* Standard Win95 Bevel Gray */
             border: 2px solid #ffffff;
             border-right-color: #404040;
             border-bottom-color: #404040;
             padding: 4px;
         }
 
-        /* Header Styling */
-        #header {
+        /* Windows Title Bar */
+        #window-titlebar {
             background-color: #000080; /* Classic Navy */
             color: #ffffff;
-            padding: 8px 12px;
-            border: 2px solid #000040;
-        }
-
-        #header h1 {
-            margin: 0;
-            font-size: 20px;
+            padding: 4px 6px;
             font-weight: bold;
+            font-size: 12px;
             letter-spacing: 1px;
-            font-family: "Courier New", monospace;
         }
 
-        #header .tagline {
-            font-size: 11px;
-            color: #ffff00;
-            margin-top: 3px;
-        }
-
-        /* Marquee / Status Bar */
-        #ticker {
-            background-color: #ffffcc;
-            border: 1px inset #808080;
-            padding: 3px 6px;
-            margin: 6px 0;
-            font-size: 11px;
-            color: #333333;
-            font-weight: bold;
-        }
-
-        /* Main Table Layout (IE7 Standard Layout technique) */
-        #main-table {
+        #window-titlebar table {
             width: 100%;
             border-collapse: collapse;
         }
 
-        #sidebar-cell {
-            width: 180px;
-            vertical-align: top;
-            padding-right: 6px;
+        /* Top Menu Bar Navigation */
+        #menu-bar {
+            background-color: #c0c0c0;
+            border-bottom: 1px solid #808080;
+            padding: 4px;
+            margin-top: 2px;
         }
 
-        #content-cell {
+        .tab-button {
+            display: inline;
+            float: left;
+            background-color: #c0c0c0;
+            border: 2px outset #ffffff;
+            padding: 4px 12px;
+            margin-right: 4px;
+            font-family: "Tahoma", sans-serif;
+            font-size: 11px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #000000;
+        }
+
+        .tab-button-active {
+            border: 2px inset #ffffff;
+            background-color: #e0e0e0;
+            color: #000080;
+        }
+
+        /* Content Layout using HTML Tables for IE7 layout safety */
+        #main-layout-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 6px;
+        }
+
+        #content-area {
             vertical-align: top;
             background-color: #ffffff;
             border: 2px inset #ffffff;
-            padding: 12px;
-            height: 420px;
+            padding: 10px;
+            height: 410px;
         }
 
-        /* Windows 95 Style Panel Boxes */
-        .panel {
+        #sidebar-area {
+            width: 180px;
+            vertical-align: top;
+            padding-left: 6px;
+        }
+
+        /* Panel Boxes */
+        .panel-box {
             border: 2px outset #ffffff;
             background-color: #c0c0c0;
-            padding: 6px;
+            padding: 5px;
             margin-bottom: 8px;
         }
 
-        .panel-title {
-            font-weight: bold;
-            font-size: 11px;
+        .panel-header {
             background-color: #000080;
             color: #ffffff;
-            padding: 3px 6px;
-            margin-bottom: 6px;
+            font-weight: bold;
+            padding: 2px 5px;
+            margin-bottom: 5px;
+            font-size: 11px;
         }
 
-        /* Navigation Buttons */
-        .nav-btn {
-            display: block;
+        .action-button {
             width: 100%;
-            text-align: left;
+            padding: 4px;
+            background-color: #c0c0c0;
+            border: 2px outset #ffffff;
+            font-family: "Tahoma", sans-serif;
+            font-size: 11px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #000000;
             margin-bottom: 4px;
-            padding: 5px;
-            background-color: #c0c0c0;
-            border: 2px outset #ffffff;
-            font-family: "Tahoma", sans-serif;
+        }
+
+        /* Status Ticker */
+        #status-ticker {
+            background-color: #ffffcc;
+            border: 1px inset #808080;
+            padding: 3px 6px;
             font-size: 11px;
-            font-weight: bold;
-            cursor: pointer;
             color: #000000;
-        }
-
-        .nav-btn:hover {
-            background-color: #d4d4d4;
-        }
-
-        .nav-btn-active {
-            border: 2px inset #ffffff;
-            background-color: #e0e0e0;
             font-weight: bold;
-            color: #000080;
+            margin-top: 4px;
         }
 
-        /* Controls / Theme Toggle Box */
-        .btn-action {
-            padding: 4px 10px;
-            background-color: #c0c0c0;
-            border: 2px outset #ffffff;
-            font-family: "Tahoma", sans-serif;
-            font-size: 11px;
-            font-weight: bold;
-            cursor: pointer;
-            color: #000000;
-            margin-right: 4px;
-        }
-
-        .btn-action:active {
-            border: 2px inset #ffffff;
-        }
-
-        /* Game Sections Container */
-        .game-title {
-            font-size: 16px;
-            color: #000080;
-            border-bottom: 2px solid #000080;
-            padding-bottom: 4px;
-            margin-top: 0;
-            margin-bottom: 10px;
-        }
-
-        /* Score Tracker */
-        .score-board {
+        /* Score Display Board */
+        .score-box {
             background-color: #000000;
             color: #00ff00;
             font-family: "Courier New", monospace;
-            font-size: 14px;
-            padding: 6px;
+            font-size: 13px;
+            font-weight: bold;
+            padding: 5px;
             border: 2px inset #808080;
-            margin-bottom: 10px;
             text-align: center;
+            margin-bottom: 10px;
         }
 
-        /* Game 1: Tic-Tac-Toe Table Styling */
-        #ttt-board {
-            margin: 15px auto;
+        /* Game Headings */
+        .game-title {
+            font-size: 14px;
+            font-weight: bold;
+            color: #000080;
+            border-bottom: 2px solid #000080;
+            padding-bottom: 2px;
+            margin-top: 0;
+            margin-bottom: 8px;
+        }
+
+        /* Game 1: Tic-Tac-Toe Styling */
+        #ttt-table {
+            margin: 10px auto;
             border-collapse: collapse;
         }
 
-        .ttt-cell {
-            width: 80px;
-            height: 80px;
-            border: 3px solid #000080;
-            text-align: center;
-            vertical-align: middle;
-            font-family: "Courier New", monospace;
-            font-size: 36px;
+        .ttt-btn {
+            width: 75px;
+            height: 75px;
+            border: 2px outset #ffffff;
+            background-color: #c0c0c0;
+            font-family: "Trebuchet MS", "Arial", sans-serif;
+            font-size: 32px;
             font-weight: bold;
             cursor: pointer;
-            background-color: #f0f0f0;
+            text-align: center;
+            vertical-align: middle;
         }
 
-        .ttt-cell:hover {
-            background-color: #e0e0e0;
-        }
-
-        /* Game 2: DOM-based Snake Grid (15x15 pixel array) */
-        #snake-container {
-            width: 300px;
-            height: 300px;
-            margin: 10px auto;
-            position: relative;
-            background-color: #000000;
-            border: 3px inset #808080;
-        }
-
-        .snake-dot {
-            position: absolute;
-            width: 18px;
-            height: 18px;
-            background-color: #00ff00;
-            border: 1px solid #003300;
-        }
-
-        .snake-food {
-            position: absolute;
-            width: 18px;
-            height: 18px;
-            background-color: #ff0000;
-            border: 1px solid #800000;
-        }
-
-        /* D-Pad Controls for Touch/Mouse on Snake */
-        .dpad-table {
-            margin: 10px auto 0 auto;
+        /* Game 2: DOM Grid Snake Styling */
+        #snake-board {
+            margin: 5px auto;
             border-collapse: collapse;
+            background-color: #000000;
+            border: 2px inset #808080;
+        }
+
+        .snake-cell {
+            width: 14px;
+            height: 14px;
+            padding: 0;
+            margin: 0;
+            background-color: #000000;
+            border: 1px solid #111111;
+        }
+
+        .cell-snake {
+            background-color: #00ff00;
+        }
+
+        .cell-head {
+            background-color: #ffffff;
+        }
+
+        .cell-food {
+            background-color: #ff0000;
         }
 
         .dpad-btn {
-            width: 40px;
-            height: 30px;
+            width: 36px;
+            height: 26px;
             background-color: #c0c0c0;
             border: 2px outset #ffffff;
             font-weight: bold;
@@ -226,25 +211,24 @@
             text-align: center;
         }
 
-        /* Game 3: Memory Match Table Styling */
-        #memory-board {
-            margin: 15px auto;
+        /* Game 3: Memory Matching Card Styling */
+        #memory-table {
+            margin: 10px auto;
             border-collapse: collapse;
         }
 
-        .mem-card {
-            width: 60px;
-            height: 60px;
+        .mem-card-btn {
+            width: 55px;
+            height: 55px;
             border: 2px outset #ffffff;
             background-color: #000080;
             color: #ffffff;
-            text-align: center;
-            vertical-align: middle;
             font-family: "Georgia", serif;
-            font-size: 24px;
+            font-size: 20px;
             font-weight: bold;
             cursor: pointer;
-            padding: 2px;
+            text-align: center;
+            vertical-align: middle;
         }
 
         .mem-card-revealed {
@@ -260,144 +244,109 @@
             cursor: default;
         }
 
-        /* Footer */
-        #footer {
-            margin-top: 8px;
-            text-align: center;
+        /* Instruction Box */
+        .instructions {
+            background-color: #f5f5f5;
+            border: 1px solid #808080;
+            padding: 6px;
             font-size: 10px;
-            color: #404040;
-            border-top: 1px solid #808080;
-            padding-top: 4px;
+            color: #333333;
+            margin-top: 10px;
         }
 
-        /* Theme Overrides (Dark Retro Theme) */
-        body.dark-theme {
-            background-color: #121212;
-        }
-        body.dark-theme #wrapper {
-            background-color: #222222;
-            border-color: #444444;
-            color: #e0e0e0;
-        }
-        body.dark-theme #content-cell {
-            background-color: #1a1a1a;
-            border-color: #333333;
-            color: #ffffff;
-        }
-        body.dark-theme .panel {
-            background-color: #2a2a2a;
-            border-color: #444444;
-        }
-        body.dark-theme .nav-btn, body.dark-theme .btn-action, body.dark-theme .dpad-btn {
-            background-color: #333333;
-            color: #ffffff;
-            border-color: #555555;
-        }
-        body.dark-theme .game-title {
-            color: #6699ff;
-            border-bottom-color: #6699ff;
-        }
-        body.dark-theme .ttt-cell {
-            background-color: #2a2a2a;
-            border-color: #6699ff;
-            color: #ffffff;
+        .clear-float {
+            clear: both;
+            height: 0;
+            font-size: 0;
         }
     </style>
 </head>
 <body>
 
-<div id="wrapper">
-    <!-- Retro Header Box -->
-    <div id="header">
-        <h1>RETRO WEB ARCADE v1.0</h1>
-        <div class="tagline">Optimized for Internet Explorer 7.0+, Netscape &amp; Modern Web Browsers</div>
+<div id="outer-container">
+
+    <!-- Window Titlebar -->
+    <div id="window-titlebar">
+        <table>
+            <tr>
+                <td style="text-align: left; color: #ffffff; font-weight: bold;">
+                    Retro Arcade Portal - [Internet Explorer 7 Mode]
+                </td>
+                <td style="text-align: right; font-size: 10px; color: #ffff00;">
+                    v1.0 (ES3)
+                </td>
+            </tr>
+        </table>
     </div>
 
-    <!-- Ticker Status Bar -->
-    <div id="ticker">
-        <span id="ticker-text">Welcome! Click any game on the sidebar menu to begin playing. Compatible with IE7 ES3 standard.</span>
+    <!-- Top Tab Menu Navigation -->
+    <div id="menu-bar">
+        <button class="tab-button tab-button-active" id="tab-ttt" onclick="switchTab('ttt')">Tic-Tac-Toe</button>
+        <button class="tab-button" id="tab-snake" onclick="switchTab('snake')">DOM Snake</button>
+        <button class="tab-button" id="tab-memory" onclick="switchTab('memory')">Memory Match</button>
+        <div class="clear-float"></div>
     </div>
 
-    <!-- Main 2-Column Table Structure for IE7 Compatibility -->
-    <table id="main-table" cellpadding="0" cellspacing="0" summary="Main Layout">
+    <!-- Status Bar Ticker -->
+    <div id="status-ticker">
+        <span id="ticker-text">Welcome! Choose a game above to start playing on legacy Internet Explorer.</span>
+    </div>
+
+    <!-- Main Table Layout -->
+    <table id="main-layout-table" cellpadding="0" cellspacing="0" summary="Layout Table">
         <tr>
-            <!-- Left Navigation Sidebar -->
-            <td id="sidebar-cell">
-                <div class="panel">
-                    <div class="panel-title">SELECT GAME</div>
-                    <button class="nav-btn nav-btn-active" id="btn-menu-ttt" onclick="switchGame('ttt')">1. Tic-Tac-Toe</button>
-                    <button class="nav-btn" id="btn-menu-snake" onclick="switchGame('snake')">2. Snake Classic</button>
-                    <button class="nav-btn" id="btn-menu-memory" onclick="switchGame('memory')">3. Memory Match</button>
-                </div>
-
-                <div class="panel">
-                    <div class="panel-title">SETTINGS</div>
-                    <button class="btn-action" style="width: 100%; margin-bottom: 4px;" onclick="toggleTheme()">Toggle Theme</button>
-                    <button class="btn-action" style="width: 100%;" onclick="resetCurrentGame()">Reset Game</button>
-                </div>
-
-                <div class="panel">
-                    <div class="panel-title">SYSTEM INFO</div>
-                    <div style="font-size: 10px; color: #333333;" id="sys-info">
-                        Engine: DOM Standard<br />
-                        IE7 Compat Mode: Active<br />
-                        JavaScript: ES3/ES5
-                    </div>
-                </div>
-            </td>
-
-            <!-- Right Content Area -->
-            <td id="content-cell">
+            <!-- Left View Content Area -->
+            <td id="content-area">
 
                 <!-- GAME 1: TIC-TAC-TOE -->
-                <div id="game-ttt-view" style="display: block;">
-                    <h2 class="game-title">Tic-Tac-Toe Classic</h2>
-                    <div class="score-board">
-                        PLAYER (X): <span id="ttt-score-x">0</span> | COMPUTER (O): <span id="ttt-score-o">0</span> | DRAWS: <span id="ttt-score-d">0</span>
+                <div id="view-ttt" style="display: block;">
+                    <div class="game-title">Tic-Tac-Toe Classic</div>
+                    <div class="score-box">
+                        PLAYER (X): <span id="ttt-score-x">0</span> | CPU (O): <span id="ttt-score-o">0</span> | DRAWS: <span id="ttt-score-d">0</span>
                     </div>
-                    <div style="text-align: center; margin-bottom: 8px; font-weight: bold;" id="ttt-status">
-                        Your turn! Click an empty box.
+
+                    <div style="text-align: center; font-weight: bold; margin-bottom: 6px;" id="ttt-status">
+                        Your turn! Select an empty tile.
                     </div>
-                    
-                    <table id="ttt-board" cellpadding="0" cellspacing="0">
+
+                    <table id="ttt-table" cellpadding="0" cellspacing="4">
                         <tr>
-                            <td class="ttt-cell" id="ttt-0" onclick="handleTTTClick(0)"></td>
-                            <td class="ttt-cell" id="ttt-1" onclick="handleTTTClick(1)"></td>
-                            <td class="ttt-cell" id="ttt-2" onclick="handleTTTClick(2)"></td>
+                            <td><button class="ttt-btn" id="ttt-0" onclick="handleTTTClick(0)"></button></td>
+                            <td><button class="ttt-btn" id="ttt-1" onclick="handleTTTClick(1)"></button></td>
+                            <td><button class="ttt-btn" id="ttt-2" onclick="handleTTTClick(2)"></button></td>
                         </tr>
                         <tr>
-                            <td class="ttt-cell" id="ttt-3" onclick="handleTTTClick(3)"></td>
-                            <td class="ttt-cell" id="ttt-4" onclick="handleTTTClick(4)"></td>
-                            <td class="ttt-cell" id="ttt-5" onclick="handleTTTClick(5)"></td>
+                            <td><button class="ttt-btn" id="ttt-3" onclick="handleTTTClick(3)"></button></td>
+                            <td><button class="ttt-btn" id="ttt-4" onclick="handleTTTClick(4)"></button></td>
+                            <td><button class="ttt-btn" id="ttt-5" onclick="handleTTTClick(5)"></button></td>
                         </tr>
                         <tr>
-                            <td class="ttt-cell" id="ttt-6" onclick="handleTTTClick(6)"></td>
-                            <td class="ttt-cell" id="ttt-7" onclick="handleTTTClick(7)"></td>
-                            <td class="ttt-cell" id="ttt-8" onclick="handleTTTClick(8)"></td>
+                            <td><button class="ttt-btn" id="ttt-6" onclick="handleTTTClick(6)"></button></td>
+                            <td><button class="ttt-btn" id="ttt-7" onclick="handleTTTClick(7)"></button></td>
+                            <td><button class="ttt-btn" id="ttt-8" onclick="handleTTTClick(8)"></button></td>
                         </tr>
                     </table>
 
-                    <div style="font-size: 11px; color: #555; text-align: center; margin-top: 10px;">
-                        Instructions: Try to align 3 Xs horizontally, vertically, or diagonally!
+                    <div class="instructions">
+                        <b>Instructions:</b> Get 3 of your marks (X) in a horizontal, vertical, or diagonal row to win against the CPU.
                     </div>
                 </div>
 
-                <!-- GAME 2: DOM SNAKE (NO CANVAS REQUIRED) -->
-                <div id="game-snake-view" style="display: none;">
-                    <h2 class="game-title">Retro DOM Snake</h2>
-                    <div class="score-board">
+                <!-- GAME 2: DOM-BASED SNAKE (NO HTML5 CANVAS NEEDED) -->
+                <div id="view-snake" style="display: none;">
+                    <div class="game-title">Retro DOM Grid Snake</div>
+                    <div class="score-box">
                         SCORE: <span id="snake-score">0</span> | HIGH SCORE: <span id="snake-high">0</span>
                     </div>
 
-                    <div id="snake-container">
-                        <!-- DOM Pixels will be rendered here dynamically -->
-                    </div>
+                    <!-- 15x15 HTML Table Grid rendered dynamically via JS -->
+                    <div id="snake-grid-container" style="text-align: center;"></div>
 
-                    <!-- On-Screen D-Pad for Mouse / Touch Compatibility -->
-                    <table class="dpad-table" cellpadding="2" cellspacing="0">
+                    <!-- D-Pad Mouse Controls for Vintage Touch/Mouse compatibility -->
+                    <table style="margin: 6px auto 0 auto;" cellpadding="1" cellspacing="0">
                         <tr>
                             <td></td>
-                            <td><button class="dpad-btn" onclick="setSnakeDir('UP')">&Delta;</button></td>
+                            <td><button class="dpad-btn" onclick="setSnakeDir('UP')">^</button></td>
                             <td></td>
                         </tr>
                         <tr>
@@ -407,120 +356,151 @@
                         </tr>
                     </table>
 
-                    <div style="font-size: 11px; color: #555; text-align: center; margin-top: 6px;">
-                        Controls: Use Keyboard Arrow Keys or the On-Screen D-Pad to move.
+                    <div class="instructions">
+                        <b>Instructions:</b> Navigate using <b>Keyboard Arrow Keys</b> (or WASD) or the on-screen D-Pad buttons. Collect red dots to grow without hitting the wall or yourself.
                     </div>
                 </div>
 
                 <!-- GAME 3: MEMORY MATCH -->
-                <div id="game-memory-view" style="display: none;">
-                    <h2 class="game-title">Memory Card Match</h2>
-                    <div class="score-board">
-                        MOVES: <span id="mem-moves">0</span> | PAIRS MATCHED: <span id="mem-pairs">0</span> / 6
-                    </div>
-                    <div style="text-align: center; margin-bottom: 8px; font-weight: bold;" id="mem-status">
-                        Click on cards to flip them over and find matching pairs!
+                <div id="view-memory" style="display: none;">
+                    <div class="game-title">Memory Card Matcher</div>
+                    <div class="score-box">
+                        MOVES: <span id="mem-moves">0</span> | MATCHED PAIRS: <span id="mem-pairs">0</span> / 6
                     </div>
 
-                    <table id="memory-board" cellpadding="4" cellspacing="4">
+                    <div style="text-align: center; font-weight: bold; margin-bottom: 6px;" id="mem-status">
+                        Click cards to reveal matching symbols.
+                    </div>
+
+                    <table id="memory-table" cellpadding="0" cellspacing="4">
                         <tr>
-                            <td class="mem-card" id="mem-0" onclick="handleMemClick(0)">?</td>
-                            <td class="mem-card" id="mem-1" onclick="handleMemClick(1)">?</td>
-                            <td class="mem-card" id="mem-2" onclick="handleMemClick(2)">?</td>
-                            <td class="mem-card" id="mem-3" onclick="handleMemClick(3)">?</td>
+                            <td><button class="mem-card-btn" id="mem-0" onclick="handleMemClick(0)">?</button></td>
+                            <td><button class="mem-card-btn" id="mem-1" onclick="handleMemClick(1)">?</button></td>
+                            <td><button class="mem-card-btn" id="mem-2" onclick="handleMemClick(2)">?</button></td>
+                            <td><button class="mem-card-btn" id="mem-3" onclick="handleMemClick(3)">?</button></td>
                         </tr>
                         <tr>
-                            <td class="mem-card" id="mem-4" onclick="handleMemClick(4)">?</td>
-                            <td class="mem-card" id="mem-5" onclick="handleMemClick(5)">?</td>
-                            <td class="mem-card" id="mem-6" onclick="handleMemClick(6)">?</td>
-                            <td class="mem-card" id="mem-7" onclick="handleMemClick(7)">?</td>
+                            <td><button class="mem-card-btn" id="mem-4" onclick="handleMemClick(4)">?</button></td>
+                            <td><button class="mem-card-btn" id="mem-5" onclick="handleMemClick(5)">?</button></td>
+                            <td><button class="mem-card-btn" id="mem-6" onclick="handleMemClick(6)">?</button></td>
+                            <td><button class="mem-card-btn" id="mem-7" onclick="handleMemClick(7)">?</button></td>
                         </tr>
                         <tr>
-                            <td class="mem-card" id="mem-8" onclick="handleMemClick(8)">?</td>
-                            <td class="mem-card" id="mem-9" onclick="handleMemClick(9)">?</td>
-                            <td class="mem-card" id="mem-10" onclick="handleMemClick(10)">?</td>
-                            <td class="mem-card" id="mem-11" onclick="handleMemClick(11)">?</td>
+                            <td><button class="mem-card-btn" id="mem-8" onclick="handleMemClick(8)">?</button></td>
+                            <td><button class="mem-card-btn" id="mem-9" onclick="handleMemClick(9)">?</button></td>
+                            <td><button class="mem-card-btn" id="mem-10" onclick="handleMemClick(10)">?</button></td>
+                            <td><button class="mem-card-btn" id="mem-11" onclick="handleMemClick(11)">?</button></td>
                         </tr>
                     </table>
 
-                    <div style="font-size: 11px; color: #555; text-align: center; margin-top: 10px;">
-                        Instructions: Match all 6 pairs in as few turns as possible.
+                    <div class="instructions">
+                        <b>Instructions:</b> Flip over 2 cards at a time to find identical pairs. Find all 6 pairs in as few moves as possible.
                     </div>
                 </div>
 
             </td>
+
+            <!-- Right Controls Sidebar Area -->
+            <td id="sidebar-area">
+                <div class="panel-box">
+                    <div class="panel-header">GAME CONTROLS</div>
+                    <button class="action-button" onclick="resetActiveGame()">Restart Game</button>
+                    <button class="action-button" onclick="clearAllScores()">Reset All Scores</button>
+                </div>
+
+                <div class="panel-box">
+                    <div class="panel-header">DIAGNOSTICS</div>
+                    <div style="font-size: 10px; color: #333333; line-height: 1.4;">
+                        <b>Browser:</b> Internet Explorer / Standard<br />
+                        <b>DOM Standard:</b> Level 2<br />
+                        <b>Script Standard:</b> ES3 Compliant<br />
+                        <b>Offline File:</b> Ready
+                    </div>
+                </div>
+
+                <div class="panel-box">
+                    <div class="panel-header">RETRO TIPS</div>
+                    <div style="font-size: 10px; color: #444444;">
+                        If web pages fail on Windows XP/Vista due to HTTPS TLS errors, run HTML files locally directly via <b>file://</b> URL scheme.
+                    </div>
+                </div>
+            </td>
         </tr>
     </table>
 
-    <div id="footer">
-        Retro Web Arcade &copy; 2000-2026 | Pure HTML/CSS 2.1 &amp; ES3 JavaScript Compatible Engine
-    </div>
 </div>
 
 <script type="text/javascript">
 /* <![CDATA[ */
 
 // ---------------------------------------------------------------------
-// GLOBAL STATE & NAVIGATION ENGINE (ES3 COMPATIBLE)
+// ES3 CORE UTILITIES & TAB SYSTEM
 // ---------------------------------------------------------------------
-var currentGame = 'ttt';
-var isDarkTheme = false;
+var activeGame = 'ttt';
 
-// IE7 Compatible Element Helper
 function getEl(id) {
     return document.getElementById(id);
 }
 
-function switchGame(gameName) {
-    currentGame = gameName;
-    
-    // Hide all game views
-    getEl('game-ttt-view').style.display = 'none';
-    getEl('game-snake-view').style.display = 'none';
-    getEl('game-memory-view').style.display = 'none';
+function switchTab(gameKey) {
+    activeGame = gameKey;
 
-    // Reset button styles
-    getEl('btn-menu-ttt').className = 'nav-btn';
-    getEl('btn-menu-snake').className = 'nav-btn';
-    getEl('btn-menu-memory').className = 'nav-btn';
+    // Hide all view panels
+    getEl('view-ttt').style.display = 'none';
+    getEl('view-snake').style.display = 'none';
+    getEl('view-memory').style.display = 'none';
 
-    // Stop active timers when switching
+    // Reset tab styles
+    getEl('tab-ttt').className = 'tab-button';
+    getEl('tab-snake').className = 'tab-button';
+    getEl('tab-memory').className = 'tab-button';
+
+    // Stop background timers
     stopSnakeGame();
 
-    if (gameName === 'ttt') {
-        getEl('game-ttt-view').style.display = 'block';
-        getEl('btn-menu-ttt').className = 'nav-btn nav-btn-active';
-        getEl('ticker-text').innerHTML = 'Tic-Tac-Toe: Challenge the computer AI to a game!';
-    } else if (gameName === 'snake') {
-        getEl('game-snake-view').style.display = 'block';
-        getEl('btn-menu-snake').className = 'nav-btn nav-btn-active';
-        getEl('ticker-text').innerHTML = 'Snake Classic: Eat red food dots using Arrow Keys or the D-Pad!';
+    if (gameKey === 'ttt') {
+        getEl('view-ttt').style.display = 'block';
+        getEl('tab-ttt').className = 'tab-button tab-button-active';
+        getEl('ticker-text').innerHTML = 'Tic-Tac-Toe: Play against the AI opponent!';
+    } else if (gameKey === 'snake') {
+        getEl('view-snake').style.display = 'block';
+        getEl('tab-snake').className = 'tab-button tab-button-active';
+        getEl('ticker-text').innerHTML = 'DOM Snake: Use Arrow Keys / WASD or D-Pad to move!';
         initSnakeGame();
-    } else if (gameName === 'memory') {
-        getEl('game-memory-view').style.display = 'block';
-        getEl('btn-menu-memory').className = 'nav-btn nav-btn-active';
-        getEl('ticker-text').innerHTML = 'Memory Match: Uncover matching pairs of symbols.';
+    } else if (gameKey === 'memory') {
+        getEl('view-memory').style.display = 'block';
+        getEl('tab-memory').className = 'tab-button tab-button-active';
+        getEl('ticker-text').innerHTML = 'Memory Match: Flip cards to find matching pairs.';
         initMemoryGame();
     }
 }
 
-function toggleTheme() {
-    isDarkTheme = !isDarkTheme;
-    if (isDarkTheme) {
-        document.body.className = 'dark-theme';
-    } else {
-        document.body.className = '';
-    }
-}
-
-function resetCurrentGame() {
-    if (currentGame === 'ttt') {
+function resetActiveGame() {
+    if (activeGame === 'ttt') {
         initTTTGame();
-    } else if (currentGame === 'snake') {
+    } else if (activeGame === 'snake') {
         initSnakeGame();
-    } else if (currentGame === 'memory') {
+    } else if (activeGame === 'memory') {
         initMemoryGame();
     }
+}
+
+function clearAllScores() {
+    tttScoreX = 0;
+    tttScoreO = 0;
+    tttScoreD = 0;
+    getEl('ttt-score-x').innerHTML = '0';
+    getEl('ttt-score-o').innerHTML = '0';
+    getEl('ttt-score-d').innerHTML = '0';
+
+    snakeHighScore = 0;
+    getEl('snake-high').innerHTML = '0';
+
+    initTTTGame();
+    if (activeGame === 'snake') initSnakeGame();
+    if (activeGame === 'memory') initMemoryGame();
+
+    getEl('ticker-text').innerHTML = 'All persistent session scores have been reset.';
 }
 
 
@@ -537,11 +517,11 @@ function initTTTGame() {
     tttBoard = ['', '', '', '', '', '', '', '', ''];
     tttActive = true;
     for (var i = 0; i < 9; i++) {
-        var cell = getEl('ttt-' + i);
-        cell.innerHTML = '';
-        cell.style.color = '#000000';
+        var btn = getEl('ttt-' + i);
+        btn.innerHTML = '';
+        btn.style.color = '#000000';
     }
-    getEl('ttt-status').innerHTML = 'Your turn! Click an empty box.';
+    getEl('ttt-status').innerHTML = 'Your turn! Select an empty tile.';
 }
 
 function handleTTTClick(index) {
@@ -549,7 +529,7 @@ function handleTTTClick(index) {
         return;
     }
 
-    // Player move (X)
+    // Player Turn (X)
     makeTTTMove(index, 'X');
 
     if (checkTTTWinner('X')) {
@@ -560,66 +540,59 @@ function handleTTTClick(index) {
         return;
     }
 
-    if (isTTTBoardFull()) {
-        getEl('ttt-status').innerHTML = '<span style="color: #666;">IT\'S A DRAW!</span>';
+    if (isTTTFull()) {
+        getEl('ttt-status').innerHTML = '<span style="color: #666666;">GAME DRAW!</span>';
         tttScoreD++;
         getEl('ttt-score-d').innerHTML = tttScoreD;
         tttActive = false;
         return;
     }
 
-    // AI Move (O)
-    getEl('ttt-status').innerHTML = 'Computer is thinking...';
+    // CPU Turn (O)
+    getEl('ttt-status').innerHTML = 'CPU is deciding move...';
     tttActive = false;
 
     setTimeout(function() {
-        makeAIMove();
-    }, 400);
+        makeCPUMove();
+    }, 350);
 }
 
 function makeTTTMove(index, symbol) {
     tttBoard[index] = symbol;
-    var cell = getEl('ttt-' + index);
-    cell.innerHTML = symbol;
-    if (symbol === 'X') {
-        cell.style.color = '#000080';
-    } else {
-        cell.style.color = '#cc0000';
-    }
+    var btn = getEl('ttt-' + index);
+    btn.innerHTML = symbol;
+    btn.style.color = (symbol === 'X') ? '#000080' : '#cc0000';
 }
 
-function makeAIMove() {
-    // Basic AI strategy: check win, block opponent, or take empty
-    var emptyIndices = [];
+function makeCPUMove() {
+    var available = [];
     for (var i = 0; i < 9; i++) {
-        if (tttBoard[i] === '') {
-            emptyIndices.push(i);
-        }
+        if (tttBoard[i] === '') available.push(i);
     }
 
-    if (emptyIndices.length === 0) return;
+    if (available.length === 0) return;
 
-    var chosenIndex = -1;
+    var choice = -1;
 
-    // Check if AI can win immediately
-    for (var i = 0; i < emptyIndices.length; i++) {
-        var idx = emptyIndices[i];
+    // 1. Try to win
+    for (var i = 0; i < available.length; i++) {
+        var idx = available[i];
         tttBoard[idx] = 'O';
         if (checkTTTWinner('O')) {
-            chosenIndex = idx;
+            choice = idx;
             tttBoard[idx] = '';
             break;
         }
         tttBoard[idx] = '';
     }
 
-    // Block player win
-    if (chosenIndex === -1) {
-        for (var i = 0; i < emptyIndices.length; i++) {
-            var idx = emptyIndices[i];
+    // 2. Block Player
+    if (choice === -1) {
+        for (var i = 0; i < available.length; i++) {
+            var idx = available[i];
             tttBoard[idx] = 'X';
             if (checkTTTWinner('X')) {
-                chosenIndex = idx;
+                choice = idx;
                 tttBoard[idx] = '';
                 break;
             }
@@ -627,24 +600,24 @@ function makeAIMove() {
         }
     }
 
-    // Random choice fallback
-    if (chosenIndex === -1) {
-        var rand = Math.floor(Math.random() * emptyIndices.length);
-        chosenIndex = emptyIndices[rand];
+    // 3. Fallback Random
+    if (choice === -1) {
+        var r = Math.floor(Math.random() * available.length);
+        choice = available[r];
     }
 
-    makeTTTMove(chosenIndex, 'O');
+    makeTTTMove(choice, 'O');
 
     if (checkTTTWinner('O')) {
-        getEl('ttt-status').innerHTML = '<span style="color: red;">COMPUTER WINS!</span>';
+        getEl('ttt-status').innerHTML = '<span style="color: red;">CPU WINS!</span>';
         tttScoreO++;
         getEl('ttt-score-o').innerHTML = tttScoreO;
         tttActive = false;
         return;
     }
 
-    if (isTTTBoardFull()) {
-        getEl('ttt-status').innerHTML = '<span style="color: #666;">IT\'S A DRAW!</span>';
+    if (isTTTFull()) {
+        getEl('ttt-status').innerHTML = '<span style="color: #666666;">GAME DRAW!</span>';
         tttScoreD++;
         getEl('ttt-score-d').innerHTML = tttScoreD;
         tttActive = false;
@@ -652,25 +625,25 @@ function makeAIMove() {
     }
 
     tttActive = true;
-    getEl('ttt-status').innerHTML = 'Your turn! Click an empty box.';
+    getEl('ttt-status').innerHTML = 'Your turn! Select an empty tile.';
 }
 
-function checkTTTWinner(p) {
-    var wins = [
+function checkTTTWinner(sym) {
+    var lines = [
         [0,1,2], [3,4,5], [6,7,8], // Rows
-        [0,3,6], [1,4,7], [2,5,8], // Columns
+        [0,3,6], [1,4,7], [2,5,8], // Cols
         [0,4,8], [2,4,6]          // Diagonals
     ];
-    for (var i = 0; i < wins.length; i++) {
-        var w = wins[i];
-        if (tttBoard[w[0]] === p && tttBoard[w[1]] === p && tttBoard[w[2]] === p) {
+    for (var i = 0; i < lines.length; i++) {
+        var l = lines[i];
+        if (tttBoard[l[0]] === sym && tttBoard[l[1]] === sym && tttBoard[l[2]] === sym) {
             return true;
         }
     }
     return false;
 }
 
-function isTTTBoardFull() {
+function isTTTFull() {
     for (var i = 0; i < 9; i++) {
         if (tttBoard[i] === '') return false;
     }
@@ -679,36 +652,52 @@ function isTTTBoardFull() {
 
 
 // ---------------------------------------------------------------------
-// GAME 2: DOM-BASED SNAKE LOGIC (NO CANVAS)
+// GAME 2: DOM-BASED TABLE SNAKE (CANVAS-FREE FOR IE7)
 // ---------------------------------------------------------------------
-var snakeBody = [];
+var SNAKE_SIZE = 14; // 14x14 grid
+var snake = [];
 var snakeDir = 'RIGHT';
-var nextDir = 'RIGHT';
+var nextSnakeDir = 'RIGHT';
 var snakeFood = {x: 0, y: 0};
-var snakeTimer = null;
 var snakeScore = 0;
 var snakeHighScore = 0;
-var GRID_SIZE = 15; // 15x15 grid of 20px squares (300x300 total)
+var snakeTimer = null;
+
+function buildSnakeGridDOM() {
+    var container = getEl('snake-grid-container');
+    var html = '<table id="snake-board" cellpadding="0" cellspacing="0">';
+    for (var r = 0; r < SNAKE_SIZE; r++) {
+        html += '<tr>';
+        for (var c = 0; c < SNAKE_SIZE; c++) {
+            html += '<td class="snake-cell" id="snk-' + r + '-' + c + '"></td>';
+        }
+        html += '</tr>';
+    }
+    html += '</table>';
+    container.innerHTML = html;
+}
 
 function initSnakeGame() {
     stopSnakeGame();
-    snakeBody = [
+    buildSnakeGridDOM();
+
+    snake = [
         {x: 4, y: 7},
         {x: 3, y: 7},
         {x: 2, y: 7}
     ];
     snakeDir = 'RIGHT';
-    nextDir = 'RIGHT';
+    nextSnakeDir = 'RIGHT';
     snakeScore = 0;
     getEl('snake-score').innerHTML = snakeScore;
 
     spawnSnakeFood();
-    renderSnake();
+    renderSnakeGrid();
 
-    // Start tick loop (150ms step)
+    // 160ms interval tick suitable for vintage CPU timer threads
     snakeTimer = setInterval(function() {
-        updateSnake();
-    }, 150);
+        tickSnake();
+    }, 160);
 }
 
 function stopSnakeGame() {
@@ -719,21 +708,20 @@ function stopSnakeGame() {
 }
 
 function setSnakeDir(dir) {
-    if (dir === 'UP' && snakeDir !== 'DOWN') nextDir = 'UP';
-    if (dir === 'DOWN' && snakeDir !== 'UP') nextDir = 'DOWN';
-    if (dir === 'LEFT' && snakeDir !== 'RIGHT') nextDir = 'LEFT';
-    if (dir === 'RIGHT' && snakeDir !== 'LEFT') nextDir = 'RIGHT';
+    if (dir === 'UP' && snakeDir !== 'DOWN') nextSnakeDir = 'UP';
+    if (dir === 'DOWN' && snakeDir !== 'UP') nextSnakeDir = 'DOWN';
+    if (dir === 'LEFT' && snakeDir !== 'RIGHT') nextSnakeDir = 'LEFT';
+    if (dir === 'RIGHT' && snakeDir !== 'LEFT') nextSnakeDir = 'RIGHT';
 }
 
 function spawnSnakeFood() {
     var valid = false;
     while (!valid) {
-        var rx = Math.floor(Math.random() * GRID_SIZE);
-        var ry = Math.floor(Math.random() * GRID_SIZE);
+        var rx = Math.floor(Math.random() * SNAKE_SIZE);
+        var ry = Math.floor(Math.random() * SNAKE_SIZE);
         valid = true;
-
-        for (var i = 0; i < snakeBody.length; i++) {
-            if (snakeBody[i].x === rx && snakeBody[i].y === ry) {
+        for (var i = 0; i < snake.length; i++) {
+            if (snake[i].x === rx && snake[i].y === ry) {
                 valid = false;
                 break;
             }
@@ -744,33 +732,32 @@ function spawnSnakeFood() {
     }
 }
 
-function updateSnake() {
-    snakeDir = nextDir;
-    var head = {x: snakeBody[0].x, y: snakeBody[0].y};
+function tickSnake() {
+    snakeDir = nextSnakeDir;
+    var head = {x: snake[0].x, y: snake[0].y};
 
     if (snakeDir === 'UP') head.y--;
     if (snakeDir === 'DOWN') head.y++;
     if (snakeDir === 'LEFT') head.x--;
     if (snakeDir === 'RIGHT') head.x++;
 
-    // Collision with walls
-    if (head.x < 0 || head.x >= GRID_SIZE || head.y < 0 || head.y >= GRID_SIZE) {
-        handleSnakeGameOver();
+    // Wall collision
+    if (head.x < 0 || head.x >= SNAKE_SIZE || head.y < 0 || head.y >= SNAKE_SIZE) {
+        handleSnakeDead();
         return;
     }
 
-    // Collision with self
-    for (var i = 0; i < snakeBody.length; i++) {
-        if (snakeBody[i].x === head.x && snakeBody[i].y === head.y) {
-            handleSnakeGameOver();
+    // Self collision
+    for (var i = 0; i < snake.length; i++) {
+        if (snake[i].x === head.x && snake[i].y === head.y) {
+            handleSnakeDead();
             return;
         }
     }
 
-    // Move head forward
-    snakeBody.unshift(head);
+    snake.unshift(head);
 
-    // Food collision
+    // Food collision check
     if (head.x === snakeFood.x && head.y === snakeFood.y) {
         snakeScore += 10;
         getEl('snake-score').innerHTML = snakeScore;
@@ -780,63 +767,66 @@ function updateSnake() {
         }
         spawnSnakeFood();
     } else {
-        snakeBody.pop(); // Remove tail if no food eaten
+        snake.pop();
     }
 
-    renderSnake();
+    renderSnakeGrid();
 }
 
-function renderSnake() {
-    var container = getEl('snake-container');
-    container.innerHTML = ''; // Clear existing DOM elements
-
-    // Render snake segments
-    for (var i = 0; i < snakeBody.length; i++) {
-        var dot = document.createElement('div');
-        dot.className = 'snake-dot';
-        dot.style.left = (snakeBody[i].x * 20) + 'px';
-        dot.style.top = (snakeBody[i].y * 20) + 'px';
-        container.appendChild(dot);
+function renderSnakeGrid() {
+    // Clear board cells
+    for (var r = 0; r < SNAKE_SIZE; r++) {
+        for (var c = 0; c < SNAKE_SIZE; c++) {
+            var cell = getEl('snk-' + r + '-' + c);
+            if (cell) cell.className = 'snake-cell';
+        }
     }
 
-    // Render food
-    var food = document.createElement('div');
-    food.className = 'snake-food';
-    food.style.left = (snakeFood.x * 20) + 'px';
-    food.style.top = (snakeFood.y * 20) + 'px';
-    container.appendChild(food);
+    // Draw Snake Body
+    for (var i = 0; i < snake.length; i++) {
+        var cell = getEl('snk-' + snake[i].y + '-' + snake[i].x);
+        if (cell) {
+            cell.className = (i === 0) ? 'snake-cell cell-head' : 'snake-cell cell-snake';
+        }
+    }
+
+    // Draw Food
+    var foodCell = getEl('snk-' + snakeFood.y + '-' + snakeFood.x);
+    if (foodCell) {
+        foodCell.className = 'snake-cell cell-food';
+    }
 }
 
-function handleSnakeGameOver() {
+function handleSnakeDead() {
     stopSnakeGame();
-    getEl('ticker-text').innerHTML = 'GAME OVER! Final Score: ' + snakeScore + '. Click Reset Game to try again.';
+    getEl('ticker-text').innerHTML = 'GAME OVER! Score: ' + snakeScore + '. Click Restart Game to try again.';
 }
 
-// Global Keypress Handling for IE7 compatibility
+// Global Keyboard Handler for ES3 / legacy IE window.event
 document.onkeydown = function(e) {
-    var keyCode = 0;
+    var code = 0;
     if (window.event) {
-        keyCode = window.event.keyCode; // Legacy IE
+        code = window.event.keyCode; // Legacy IE
     } else if (e) {
-        keyCode = e.which; // Modern standard
+        code = e.which;
     }
 
-    if (currentGame === 'snake') {
-        if (keyCode === 38 || keyCode === 87) { setSnakeDir('UP'); return false; }
-        if (keyCode === 40 || keyCode === 83) { setSnakeDir('DOWN'); return false; }
-        if (keyCode === 37 || keyCode === 65) { setSnakeDir('LEFT'); return false; }
-        if (keyCode === 39 || keyCode === 68) { setSnakeDir('RIGHT'); return false; }
+    if (activeGame === 'snake') {
+        if (code === 38 || code === 87) { setSnakeDir('UP'); return false; }
+        if (code === 40 || code === 83) { setSnakeDir('DOWN'); return false; }
+        if (code === 37 || code === 65) { setSnakeDir('LEFT'); return false; }
+        if (code === 39 || code === 68) { setSnakeDir('RIGHT'); return false; }
     }
 };
 
 
 // ---------------------------------------------------------------------
-// GAME 3: MEMORY MATCH LOGIC
+// GAME 3: MEMORY MATCHING CARDS LOGIC
 // ---------------------------------------------------------------------
-var memIcons = ['A', 'A', 'B', 'B', 'C', 'C', 'D', 'D', 'E', 'E', 'F', 'F'];
+var memDeck = ['@', '@', '#', '#', '$', '$', '%', '%', '&', '&', '*', '*'];
 var memRevealed = [];
 var memMatched = [];
-var memSelected = [];
+var memSelection = [];
 var memMoves = 0;
 var memPairs = 0;
 var memLock = false;
@@ -844,37 +834,37 @@ var memLock = false;
 function initMemoryGame() {
     memRevealed = [false, false, false, false, false, false, false, false, false, false, false, false];
     memMatched = [false, false, false, false, false, false, false, false, false, false, false, false];
-    memSelected = [];
+    memSelection = [];
     memMoves = 0;
     memPairs = 0;
     memLock = false;
 
-    getEl('mem-moves').innerHTML = memMoves;
-    getEl('mem-pairs').innerHTML = memPairs;
-    getEl('mem-status').innerHTML = 'Click on cards to flip them over and find matching pairs!';
+    getEl('mem-moves').innerHTML = '0';
+    getEl('mem-pairs').innerHTML = '0';
+    getEl('mem-status').innerHTML = 'Click cards to reveal matching symbols.';
 
-    // Shuffle array (Fisher-Yates)
-    for (var i = memIcons.length - 1; i > 0; i--) {
+    // Fisher-Yates Array Shuffle
+    for (var i = memDeck.length - 1; i > 0; i--) {
         var j = Math.floor(Math.random() * (i + 1));
-        var temp = memIcons[i];
-        memIcons[i] = memIcons[j];
-        memIcons[j] = temp;
+        var temp = memDeck[i];
+        memDeck[i] = memDeck[j];
+        memDeck[j] = temp;
     }
 
-    renderMemCards();
+    renderMemoryCards();
 }
 
-function renderMemCards() {
+function renderMemoryCards() {
     for (var i = 0; i < 12; i++) {
         var card = getEl('mem-' + i);
         if (memMatched[i]) {
-            card.className = 'mem-card mem-card-matched';
-            card.innerHTML = memIcons[i];
+            card.className = 'mem-card-btn mem-card-matched';
+            card.innerHTML = memDeck[i];
         } else if (memRevealed[i]) {
-            card.className = 'mem-card mem-card-revealed';
-            card.innerHTML = memIcons[i];
+            card.className = 'mem-card-btn mem-card-revealed';
+            card.innerHTML = memDeck[i];
         } else {
-            card.className = 'mem-card';
+            card.className = 'mem-card-btn';
             card.innerHTML = '?';
         }
     }
@@ -886,46 +876,44 @@ function handleMemClick(index) {
     }
 
     memRevealed[index] = true;
-    memSelected.push(index);
-    renderMemCards();
+    memSelection.push(index);
+    renderMemoryCards();
 
-    if (memSelected.length === 2) {
+    if (memSelection.length === 2) {
         memMoves++;
         getEl('mem-moves').innerHTML = memMoves;
         memLock = true;
 
-        var idx1 = memSelected[0];
-        var idx2 = memSelected[1];
+        var i1 = memSelection[0];
+        var i2 = memSelection[1];
 
-        if (memIcons[idx1] === memIcons[idx2]) {
-            // Match found!
-            memMatched[idx1] = true;
-            memMatched[idx2] = true;
+        if (memDeck[i1] === memDeck[i2]) {
+            memMatched[i1] = true;
+            memMatched[i2] = true;
             memPairs++;
             getEl('mem-pairs').innerHTML = memPairs;
-            memSelected = [];
+            memSelection = [];
             memLock = false;
-            renderMemCards();
+            renderMemoryCards();
 
             if (memPairs === 6) {
-                getEl('mem-status').innerHTML = '<span style="color: green;">CONGRATULATIONS! You matched all pairs in ' + memMoves + ' moves!</span>';
+                getEl('mem-status').innerHTML = '<span style="color: green;">EXCELLENT! Cleared in ' + memMoves + ' moves!</span>';
             }
         } else {
-            // No match - delay hide
-            getEl('mem-status').innerHTML = 'Not a match! Try again.';
+            getEl('mem-status').innerHTML = 'No match! Hiding cards...';
             setTimeout(function() {
-                memRevealed[idx1] = false;
-                memRevealed[idx2] = false;
-                memSelected = [];
+                memRevealed[i1] = false;
+                memRevealed[i2] = false;
+                memSelection = [];
                 memLock = false;
-                getEl('mem-status').innerHTML = 'Click on cards to flip them over and find matching pairs!';
-                renderMemCards();
-            }, 1000);
+                getEl('mem-status').innerHTML = 'Click cards to reveal matching symbols.';
+                renderMemoryCards();
+            }, 900);
         }
     }
 }
 
-// Window load initialization
+// Window Onload Dispatcher
 window.onload = function() {
     initTTTGame();
 };
