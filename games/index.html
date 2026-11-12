@@ -1,0 +1,1531 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MODIOS // ARCADE HUB & DEV WORKBENCH v10.0</title>
+    <style>
+        /* CSS Reset & Embedded Theme Tokens - 100% Offline Ready */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        :root {
+            --bg-dark: #060a12;
+            --bg-panel: #0c1424;
+            --bg-glass: rgba(16, 27, 48, 0.78);
+            --border-cyan: rgba(0, 240, 255, 0.35);
+            --border-glass: rgba(255, 255, 255, 0.15);
+            --neon-cyan: #00f0ff;
+            --neon-pink: #ff007f;
+            --neon-amber: #ffb700;
+            --neon-green: #39ff14;
+            --neon-purple: #b026ff;
+            --text-main: #e2e8f0;
+            --text-muted: #94a3b8;
+            --font-main: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            --font-mono: 'Consolas', 'Courier New', monospace;
+            --font-arcade: 'Courier New', monospace;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: var(--font-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 50% 0%, rgba(0, 115, 255, 0.18) 0%, transparent 75%),
+                linear-gradient(180deg, #040710 0%, #09101d 100%);
+        }
+
+        /* CRT Overlay Effect */
+        .crt-overlay {
+            position: fixed; inset: 0; z-index: 99; pointer-events: none; opacity: 0.25;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.3) 50%), 
+                        linear-gradient(90deg, rgba(255,0,0,0.02), rgba(0,255,0,0.01), rgba(0,0,255,0.02));
+            background-size: 100% 3px, 6px 100%;
+        }
+
+        /* IE9 Aero Glass Navigation Bar */
+        .ie9-header {
+            background: linear-gradient(180deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.05) 50%, rgba(0,0,0,0.3) 51%, rgba(6,16,36,0.85) 100%);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-cyan);
+            box-shadow: 0 4px 25px rgba(0, 0, 0, 0.6);
+            position: sticky; top: 0; z-index: 50;
+        }
+
+        .window-titlebar {
+            background: rgba(8, 14, 26, 0.92);
+            padding: 4px 12px;
+            display: flex; justify-content: space-between; align-items: center;
+            font-size: 11px; font-family: var(--font-mono); color: var(--text-muted);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .window-dots { display: flex; gap: 6px; align-items: center; }
+        .dot { width: 11px; height: 11px; border-radius: 50%; display: inline-block; cursor: pointer; }
+        .dot-close { background: #ff5f56; }
+        .dot-min { background: #ffbd2e; }
+        .dot-max { background: #27c93f; }
+
+        .address-bar {
+            display: flex; align-items: center; gap: 8px;
+            background: rgba(5, 9, 18, 0.9);
+            border: 1px solid rgba(0, 240, 255, 0.35);
+            border-radius: 20px;
+            padding: 4px 14px;
+            font-family: var(--font-mono); font-size: 12px; color: var(--neon-cyan);
+            flex-grow: 1; max-width: 550px;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.6);
+        }
+
+        /* Layout Grid & Containers */
+        .container { width: 100%; max-width: 1280px; margin: 0 auto; padding: 16px; flex-grow: 1; }
+        
+        .panel {
+            background: var(--bg-panel);
+            border: 1px solid var(--border-cyan);
+            border-radius: 14px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            margin-bottom: 24px;
+        }
+
+        .panel-header {
+            background: linear-gradient(90deg, rgba(12, 20, 36, 0.95), rgba(0, 85, 234, 0.35));
+            padding: 12px 18px;
+            border-bottom: 1px solid var(--border-cyan);
+            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;
+        }
+
+        /* Buttons & Utility Styles */
+        .btn {
+            background: linear-gradient(180deg, rgba(0, 240, 255, 0.22) 0%, rgba(0, 85, 234, 0.45) 100%);
+            border: 1px solid var(--neon-cyan);
+            color: #fff; padding: 8px 16px; border-radius: 8px;
+            font-family: var(--font-mono); font-size: 12px; font-weight: bold;
+            cursor: pointer; transition: all 0.2s ease;
+            display: inline-flex; align-items: center; gap: 6px; text-decoration: none;
+            user-select: none;
+        }
+        .btn:hover {
+            background: var(--neon-cyan); color: #000;
+            box-shadow: 0 0 14px var(--neon-cyan); transform: translateY(-1px);
+        }
+        .btn:active { transform: translateY(0); }
+        
+        .btn-pink {
+            background: linear-gradient(180deg, rgba(255, 0, 127, 0.35) 0%, rgba(150, 0, 75, 0.55) 100%);
+            border-color: var(--neon-pink);
+        }
+        .btn-pink:hover { background: var(--neon-pink); color: #fff; box-shadow: 0 0 14px var(--neon-pink); }
+        
+        .btn-green {
+            background: linear-gradient(180deg, rgba(57, 255, 20, 0.25) 0%, rgba(0, 140, 40, 0.5) 100%);
+            border-color: var(--neon-green);
+        }
+        .btn-green:hover { background: var(--neon-green); color: #000; box-shadow: 0 0 14px var(--neon-green); }
+
+        .btn-sm { padding: 4px 10px; font-size: 11px; }
+
+        /* Navigation Mode Tabs */
+        .mode-tabs { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+        .tab-btn {
+            padding: 10px 18px; border-radius: 10px; background: rgba(12, 20, 36, 0.85);
+            border: 1px solid var(--border-glass); color: var(--text-muted);
+            font-family: var(--font-mono); font-weight: bold; font-size: 12px; cursor: pointer;
+            transition: all 0.2s;
+        }
+        .tab-btn.active {
+            background: linear-gradient(180deg, rgba(0,240,255,0.3), rgba(0,85,234,0.5));
+            border-color: var(--neon-cyan); color: #fff; box-shadow: 0 0 16px rgba(0,240,255,0.25);
+        }
+
+        /* Canvas & Arcade Viewport */
+        #arcadeViewport {
+            position: relative; background: #02050c; min-height: 460px;
+            display: flex; justify-content: center; align-items: center; overflow: hidden;
+        }
+        canvas { display: block; max-width: 100%; height: auto; image-rendering: pixelated; cursor: crosshair; }
+
+        .game-overlay {
+            position: absolute; inset: 0; background: rgba(4, 8, 18, 0.92);
+            backdrop-filter: blur(8px); display: flex; flex-direction: column;
+            justify-content: center; align-items: center; padding: 24px; text-center; z-index: 10;
+        }
+
+        /* Vault Cards Grid */
+        .grid-vault {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; padding: 16px;
+        }
+        .vault-card {
+            background: rgba(8, 14, 26, 0.92); border: 1px solid var(--border-glass);
+            border-radius: 10px; padding: 14px; display: flex; flex-direction: column; justify-content: space-between;
+            transition: all 0.25s ease;
+        }
+        .vault-card:hover {
+            border-color: var(--neon-cyan); transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 240, 255, 0.18);
+        }
+
+        /* Dev Workbench Styles */
+        .workbench-grid { display: grid; grid-template-columns: 1fr; gap: 20px; padding: 16px; }
+        @media(min-width: 900px) { .workbench-grid { grid-template-columns: 1fr 1fr; } }
+        
+        textarea {
+            width: 100%; height: 160px; background: rgba(3, 6, 14, 0.95);
+            border: 1px solid var(--border-cyan); border-radius: 8px; color: var(--neon-green);
+            font-family: var(--font-mono); font-size: 12px; padding: 10px; resize: vertical;
+            outline: none;
+        }
+        textarea:focus { border-color: var(--neon-cyan); box-shadow: 0 0 10px rgba(0,240,255,0.35); }
+
+        .sandbox-iframe {
+            width: 100%; height: 320px; border: 1px solid var(--border-cyan);
+            border-radius: 8px; background: #fff; margin-top: 10px;
+        }
+
+        /* Simulated Tkinter Window Host */
+        .tk-sim-window {
+            background: #0c1424;
+            border: 1px solid var(--neon-cyan);
+            border-radius: 10px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+            overflow: hidden;
+            margin-top: 12px;
+            display: flex;
+            flex-direction: column;
+        }
+        .tk-sim-header {
+            background: linear-gradient(90deg, #1e293b, #0f172a);
+            padding: 6px 12px;
+            border-bottom: 1px solid var(--border-glass);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--neon-cyan);
+        }
+        .tk-sim-body {
+            background: #030712;
+            padding: 12px;
+            min-height: 240px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            position: relative;
+            overflow: auto;
+        }
+        .py-terminal {
+            background: #020409;
+            color: var(--neon-green);
+            font-family: var(--font-mono);
+            font-size: 11px;
+            padding: 8px 12px;
+            height: 90px;
+            overflow-y: auto;
+            border-top: 1px solid var(--border-glass);
+            white-space: pre-wrap;
+        }
+
+        /* Notification Toast */
+        .toast {
+            position: fixed; bottom: 20px; right: 20px;
+            background: rgba(0, 240, 255, 0.95); color: #000;
+            padding: 10px 18px; border-radius: 8px; font-family: var(--font-mono);
+            font-size: 12px; font-weight: bold; box-shadow: 0 0 15px rgba(0,240,255,0.5);
+            z-index: 200; display: none; transition: all 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- CRT Scanline Effect -->
+    <div class="crt-overlay" id="crtOverlay"></div>
+
+    <!-- IE9 Aero Glass Navigation Shell -->
+    <header class="ie9-header">
+        <div class="window-titlebar">
+            <div class="window-dots">
+                <span class="dot dot-close" title="Close"></span>
+                <span class="dot dot-min" title="Minimize"></span>
+                <span class="dot dot-max" title="Maximize"></span>
+                <span style="margin-left: 8px; font-weight: bold; color: #cbd5e1;">Internet Explorer 9.0 - Modios Arcade & Dev Workbench</span>
+            </div>
+            <div>
+                <span id="sysClock">12:00:00 PM</span> | 
+                <button onclick="toggleCRT()" class="btn btn-sm" style="padding: 2px 6px;">CRT: ON</button>
+            </div>
+        </div>
+
+        <div style="padding: 10px 16px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+            <div style="display: flex; align-items: center; gap: 6px;">
+                <div style="width: 32px; height: 32px; background: linear-gradient(135deg, #00f0ff, #0055ea); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #000;">M</div>
+                <div>
+                    <div style="font-weight: 800; font-size: 16px; letter-spacing: 1px; color: #fff;">MODIOS<span style="color: var(--neon-cyan); font-size: 11px; font-family: var(--font-mono);">.ONLINE</span></div>
+                    <div style="font-size: 10px; font-family: var(--font-mono); color: var(--text-muted);">OFFLINE SUITE v10.0 (10 EMBEDDED GAMES)</div>
+                </div>
+            </div>
+
+            <div class="address-bar">
+                <span style="color: #10b981;">🔒 https://</span>
+                <span>modios.online/arcade/vault.html</span>
+                <span style="margin-left: auto; color: var(--text-muted); cursor: pointer;" onclick="location.reload()" title="Refresh">↻</span>
+            </div>
+
+            <div style="margin-left: auto; display: flex; align-items: center; gap: 12px; font-family: var(--font-mono); font-size: 12px;">
+                <div style="background: rgba(0,0,0,0.5); padding: 4px 10px; border-radius: 6px; border: 1px solid var(--border-cyan);">
+                    HIGH SCORE: <span id="globalHighscoreDisplay" style="color: var(--neon-amber); font-weight: bold;">000000</span>
+                </div>
+                <button id="audioMuteBtn" onclick="toggleAudio()" class="btn btn-sm">🔊 SOUND: ON</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="container">
+
+        <!-- Mode Switcher Tabs -->
+        <div class="mode-tabs">
+            <button class="tab-btn active" onclick="switchView('arcadeView', this)">🎮 ARCADE CANVAS VIEWPORT (10 GAMES)</button>
+            <button class="tab-btn" onclick="switchView('vaultView', this)">📁 GAMES VAULT (22 TITLES)</button>
+            <button class="tab-btn" onclick="switchView('devView', this)">💻 SCHOOL DEV WORKBENCH (PYTHON/TKINTER/HTML5)</button>
+        </div>
+
+        <!-- SECTION 1: PLAYABLE ARCADE VIEWPORT (10 EMBEDDED GAMES) -->
+        <section id="arcadeView" class="panel">
+            <div class="panel-header">
+                <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                    <span style="color: var(--neon-cyan); font-weight: bold; font-family: var(--font-mono);">SELECT GAME:</span>
+                    <select id="gameSelect" onchange="loadSelectedGame(this.value)" class="btn btn-sm" style="background: rgba(0,0,0,0.85); color: var(--neon-cyan); border-color: var(--neon-cyan); font-weight: bold;">
+                        <option value="tornado">1. 🌪️ TORNADO INTERCEPTOR (Storm Chaser)</option>
+                        <option value="cyber">2. 🚀 CYBER STRIKE 1999 (Space Shooter)</option>
+                        <option value="runner">3. 🏃 BYTE-RUNNER (Dino Glitch)</option>
+                        <option value="snake">4. 🐍 RETRO SNAKE (Nibbles DOS)</option>
+                        <option value="breakout">5. 🧱 BLOCK BREAKER (Breakout)</option>
+                        <option value="pong">6. 🏓 NEON PONG (Classic Retro Table Tennis)</option>
+                        <option value="minesweeper">7. 💣 MINESWEEPER (Windows 98 Grid Sweeper)</option>
+                        <option value="asteroids">8. ☄️ ASTEROIDS VECTOR (Space Rock Shooter)</option>
+                        <option value="lander">9. 🚀 GRAVITY LANDER (Lunar Physics Lander)</option>
+                        <option value="clicker">10. ⚡ CYBER CLICKER (Matrix Idle Miner)</option>
+                    </select>
+                </div>
+                <div style="font-family: var(--font-mono); font-size: 12px; display: flex; gap: 16px;">
+                    <span>STATUS: <strong id="gameStatusText" style="color: var(--neon-green);">READY</strong></span>
+                    <span>FPS: <strong id="fpsVal" style="color: var(--neon-cyan);">60</strong></span>
+                </div>
+            </div>
+
+            <!-- Arcade Canvas Center -->
+            <div id="arcadeViewport">
+                <canvas id="gameCanvas" width="800" height="460"></canvas>
+
+                <!-- Start Screen Overlay -->
+                <div id="gameOverlay" class="game-overlay">
+                    <h2 id="overlayTitle" style="font-size: 32px; font-family: var(--font-arcade); color: var(--neon-cyan); margin-bottom: 8px;">TORNADO INTERCEPTOR</h2>
+                    <p id="overlayDesc" style="max-width: 540px; font-size: 13px; color: var(--text-muted); margin-bottom: 16px; line-height: 1.5;">
+                        Drive your armored storm chasing vehicle into spinning EF0-EF5 tornadoes! Launch weather probes into the core, monitor wind speeds & pressure, collect data cash, and repair armor!
+                    </p>
+                    <div id="overlayControls" style="background: rgba(0,0,0,0.6); padding: 10px 16px; border-radius: 8px; border: 1px solid var(--border-cyan); font-family: var(--font-mono); font-size: 11px; margin-bottom: 20px; text-align: left;">
+                        <strong>CONTROLS:</strong> WASD / Arrow Keys to Move | SPACEBAR to Launch Probe / Action | P to Pause
+                    </div>
+                    <button onclick="startGame()" class="btn btn-pink" style="padding: 12px 32px; font-size: 15px;">▶ LAUNCH GAME</button>
+                </div>
+            </div>
+
+            <!-- Game Dashboard / Controls Bar -->
+            <div style="padding: 12px 18px; background: rgba(4, 8, 18, 0.95); border-top: 1px solid var(--border-cyan); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; font-family: var(--font-mono); font-size: 12px;">
+                <div id="hudStats" style="display: flex; gap: 20px; flex-wrap: wrap;">
+                    <div>SCORE: <strong id="hudScore" style="color: var(--neon-cyan); font-size: 15px;">000000</strong></div>
+                    <div>HEALTH / ARMOR: <strong id="hudLives" style="color: var(--neon-pink); font-size: 15px;">100%</strong></div>
+                    <div>PROBES / AMMO / FUEL: <strong id="hudExtra" style="color: var(--neon-amber); font-size: 15px;">5 / 5</strong></div>
+                    <div>DATA / STATS: <strong id="hudData" style="color: var(--neon-green); font-size: 15px;">0 MPH</strong></div>
+                </div>
+                <!-- On-Screen Touch Controls for Mobile & Touchscreens -->
+                <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                    <button id="btnLeft" class="btn btn-sm">◄ LEFT</button>
+                    <button id="btnUp" class="btn btn-sm">▲ UP</button>
+                    <button id="btnDown" class="btn btn-sm">▼ DOWN</button>
+                    <button id="btnRight" class="btn btn-sm">RIGHT ►</button>
+                    <button id="btnAction" class="btn btn-pink btn-sm">ACTION (SPACE)</button>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- SECTION 2: EXTENSIVE GAMES VAULT (22 TITLES DATA ARRAY) -->
+        <section id="vaultView" class="panel" style="display: none;">
+            <div class="panel-header">
+                <div style="font-weight: bold; font-family: var(--font-mono); color: #fff;">
+                    📁 ARCADE DIRECTORY & HOMEBREW VAULT (<span id="vaultCount">22</span> TITLES)
+                </div>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <input type="text" id="vaultSearch" oninput="filterVault()" placeholder="Search titles, platforms, tags..." class="btn btn-sm" style="background: rgba(0,0,0,0.85); border-color: var(--border-cyan); width: 220px; text-align: left;">
+                    <select id="vaultCategory" onchange="filterVault()" class="btn btn-sm" style="background: rgba(0,0,0,0.85); border-color: var(--border-cyan);">
+                        <option value="all">ALL CATEGORIES</option>
+                        <option value="playable">PLAYABLE NOW (10 GAMES)</option>
+                        <option value="storm">STORM & SIMULATION</option>
+                        <option value="dos">RETRO / DOSBOX</option>
+                        <option value="3ds">3DS HOMEBREW</option>
+                        <option value="ios">iOS / IPA ARCHIVE</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="vaultGrid" class="grid-vault">
+                <!-- Dynamically Populated by JS -->
+            </div>
+        </section>
+
+
+        <!-- SECTION 3: SCHOOL DEV WORKBENCH & DECODERS -->
+        <section id="devView" class="panel" style="display: none;">
+            <div class="panel-header">
+                <div style="font-weight: bold; font-family: var(--font-mono); color: var(--neon-green);">
+                    💻 SCHOOL DEV WORKBENCH: PYTHON TKINTER & HTML5 DECODERS
+                </div>
+                <div style="font-size: 11px; font-family: var(--font-mono); color: var(--text-muted);">
+                    Unpack obfuscated scripts, execute Python Tkinter GUIs & run HTML5 code offline when GitHub is blocked.
+                </div>
+            </div>
+
+            <div class="workbench-grid">
+                <!-- Python & Tkinter Payload Decoder + Simulator Panel -->
+                <div style="background: rgba(6, 12, 24, 0.8); padding: 14px; border-radius: 10px; border: 1px solid var(--border-glass);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 8px;">
+                        <h3 style="font-size: 14px; font-family: var(--font-mono); color: var(--neon-cyan);">
+                            🐍 PYTHON & TKINTER DECODER + GUI SIMULATOR
+                        </h3>
+                        <select id="pyPresetSelect" onchange="loadPythonPreset(this.value)" class="btn btn-sm" style="background: rgba(0,0,0,0.85); color: var(--neon-amber); border-color: var(--neon-amber);">
+                            <option value="">-- Load Tkinter Preset --</option>
+                            <option value="preset1">🌪️ Sample 1: Storm Intercept Radar (Tkinter Canvas Game)</option>
+                            <option value="preset2">🔐 Sample 2: Obfuscated Base64 Tkinter Clicker App</option>
+                            <option value="preset3">🔑 Sample 3: Tkinter System Info & Password Generator</option>
+                        </select>
+                    </div>
+
+                    <textarea id="pyInput" placeholder="Paste python script or encoded snippet here (e.g. import tkinter as tk... or exec(base64.b64decode('...')))"></textarea>
+                    
+                    <div style="display: flex; gap: 6px; flex-wrap: wrap; margin: 10px 0;">
+                        <button onclick="decodePython('b64')" class="btn btn-sm">Decode Base64</button>
+                        <button onclick="decodePython('hex')" class="btn btn-sm">Decode Hex</button>
+                        <button onclick="decodePython('rot13')" class="btn btn-sm">ROT13</button>
+                        <button onclick="decodePython('auto')" class="btn btn-pink btn-sm">✨ AUTO-UNPACK EXEC()</button>
+                        <button onclick="runTkinterScript()" class="btn btn-green btn-sm">▶ RUN TKINTER GUI</button>
+                        <button onclick="stopTkinter()" class="btn btn-sm" style="background: rgba(255,0,0,0.25); border-color: #ff5f56; color: #ff5f56;">⏹ STOP</button>
+                    </div>
+
+                    <textarea id="pyOutput" readonly placeholder="Clean decoded Python source code output will appear here..."></textarea>
+                    
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin: 8px 0;">
+                        <span id="pyStatus" style="font-size: 11px; font-family: var(--font-mono); color: var(--neon-green);">Status: Ready</span>
+                        <button onclick="copyToClipboard('pyOutput')" class="btn btn-sm">📋 Copy Code</button>
+                    </div>
+
+                    <!-- Interactive Simulated Tkinter Window -->
+                    <div class="tk-sim-window">
+                        <div class="tk-sim-header">
+                            <span id="tkWindowTitle">tk.Tk() - Tkinter Window Simulator</span>
+                            <div style="display: flex; gap: 4px;">
+                                <span style="width: 10px; height: 10px; border-radius: 50%; background: #ffbd2e; display: inline-block;"></span>
+                                <span style="width: 10px; height: 10px; border-radius: 50%; background: #27c93f; display: inline-block;"></span>
+                                <span onclick="stopTkinter()" style="width: 10px; height: 10px; border-radius: 50%; background: #ff5f56; display: inline-block; cursor: pointer;" title="Close Window"></span>
+                            </div>
+                        </div>
+                        <div id="tkWindowBody" class="tk-sim-body">
+                            <div style="color: var(--text-muted); font-size: 11px; font-family: var(--font-mono); margin-top: 60px; text-align: center;">
+                                Click <strong>"▶ RUN TKINTER GUI"</strong> or select a preset above to execute Python & Tkinter code offline!
+                            </div>
+                        </div>
+                        <div id="pyConsoleLog" class="py-terminal">[SYSTEM CONSOLE LOG] Python Tkinter Interpreter Idle.</div>
+                    </div>
+                </div>
+
+                <!-- HTML5 Data URI Decoder & Live Sandbox Runner -->
+                <div style="background: rgba(6, 12, 24, 0.8); padding: 14px; border-radius: 10px; border: 1px solid var(--border-glass);">
+                    <h3 style="font-size: 14px; font-family: var(--font-mono); color: var(--neon-pink); margin-bottom: 10px;">
+                        🌐 HTML5 DATA-URI DECODER & OFFLINE SANDBOX RUNNER
+                    </h3>
+                    <textarea id="htmlInput" placeholder="Paste data:text/html;base64,... or raw HTML5 code here to execute offline..."></textarea>
+                    
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0;">
+                        <button onclick="decodeHTML('datauri')" class="btn btn-sm">Decode Data URI</button>
+                        <button onclick="decodeHTML('entities')" class="btn btn-sm">Decode HTML Entities</button>
+                        <button onclick="runInSandbox()" class="btn btn-pink btn-sm">▶ RUN IN OFFLINE SANDBOX</button>
+                        <button onclick="clearSandbox()" class="btn btn-sm" style="margin-left: auto;">Clear</button>
+                    </div>
+
+                    <iframe id="sandboxFrame" class="sandbox-iframe" srcdoc="<body style='background:#0b1120;color:#94a3b8;font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;'>Live HTML5 Offline Preview Area</body>"></iframe>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Notification Toast -->
+    <div id="toastMsg" class="toast">Notification Message</div>
+
+    <!-- Footer -->
+    <footer style="border-top: 1px solid var(--border-cyan); background: rgba(4,8,16,0.95); padding: 16px; text-align: center; font-family: var(--font-mono); font-size: 11px; color: var(--text-muted);">
+        MODIOS.ONLINE ARCADE & DEV SUITE &bull; 100% EMBEDDED SINGLE-FILE OFFLINE EDITION &bull; SYSTEM NORMAL
+    </footer>
+
+    <!-- MODAL POPUP FOR GAME VAULT TITLES -->
+    <div id="vaultModal" style="position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); display: none; justify-content: center; align-items: center; z-index: 100; padding: 16px;">
+        <div style="background: var(--bg-panel); border: 1px solid var(--neon-cyan); border-radius: 14px; max-width: 550px; width: 100%; padding: 20px; box-shadow: 0 0 30px rgba(0,240,255,0.3);">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-glass); padding-bottom: 10px; margin-bottom: 14px;">
+                <h3 id="modalTitle" style="font-size: 18px; font-family: var(--font-arcade); color: var(--neon-cyan);">Game Title</h3>
+                <button onclick="closeModal()" class="btn btn-sm">✕ CLOSE</button>
+            </div>
+            <p id="modalDesc" style="font-size: 13px; color: var(--text-main); margin-bottom: 14px; line-height: 1.5;">Description</p>
+            <div style="background: rgba(0,0,0,0.5); padding: 10px; border-radius: 8px; border: 1px solid var(--border-glass); font-family: var(--font-mono); font-size: 11px; margin-bottom: 16px;">
+                <div>PLATFORM: <strong id="modalPlatform" style="color: var(--neon-amber);">N/A</strong></div>
+                <div>FILE SIZE: <strong id="modalSize" style="color: var(--neon-green);">N/A</strong></div>
+                <div>STATUS: <strong id="modalStatus" style="color: var(--neon-cyan);">Archived</strong></div>
+            </div>
+            <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                <button id="modalLaunchBtn" onclick="launchVaultGame()" class="btn btn-pink">▶ LAUNCH IN CANVAS</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- JAVASCRIPT ENGINE & ALL 10 PLAYABLE CANVAS GAMES -->
+    <script>
+        /* ----------------------------------------------------
+         * 1. AUDIO SYNTHESIZER (WEB AUDIO API - PURE JS TONES)
+         * ---------------------------------------------------- */
+        class WebAudioSynth {
+            constructor() {
+                this.ctx = null;
+                this.muted = false;
+            }
+
+            init() {
+                if (!this.ctx) {
+                    const AudioContext = window.AudioContext || window.webkitAudioContext;
+                    this.ctx = new AudioContext();
+                }
+            }
+
+            playTone(freq, type, duration, vol=0.1) {
+                if (this.muted) return;
+                this.init();
+                try {
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = type;
+                    osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+                    gain.gain.setValueAtTime(vol, this.ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + duration);
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start();
+                    osc.stop(this.ctx.currentTime + duration);
+                } catch(e){}
+            }
+
+            probeSnd() { this.playTone(850, 'sine', 0.2, 0.15); }
+            laserSnd() { this.playTone(650, 'sawtooth', 0.12, 0.1); }
+            boomSnd() { this.playTone(110, 'square', 0.25, 0.2); }
+            jumpSnd() { this.playTone(480, 'triangle', 0.15, 0.12); }
+            pointSnd() { this.playTone(980, 'sine', 0.1, 0.15); }
+            paddleSnd() { this.playTone(320, 'square', 0.08, 0.1); }
+            brickSnd() { this.playTone(720, 'sine', 0.1, 0.15); }
+            thrustSnd() { this.playTone(90, 'sawtooth', 0.05, 0.08); }
+        }
+
+        const audio = new WebAudioSynth();
+
+        function toggleAudio() {
+            audio.muted = !audio.muted;
+            document.getElementById('audioMuteBtn').textContent = audio.muted ? '🔇 SOUND: OFF' : '🔊 SOUND: ON';
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toastMsg');
+            toast.textContent = msg;
+            toast.style.display = 'block';
+            setTimeout(() => { toast.style.display = 'none'; }, 3000);
+        }
+
+        /* ----------------------------------------------------
+         * 2. MAIN ARCADE CANVAS ENGINE & INPUT HANDLERS
+         * ---------------------------------------------------- */
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let activeGameKey = 'tornado';
+        let gameState = 'STOPPED'; // 'STOPPED', 'RUNNING', 'PAUSED'
+        let globalHighscore = parseInt(localStorage.getItem('modios_hs') || '0');
+        document.getElementById('globalHighscoreDisplay').textContent = globalHighscore.toString().padStart(6, '0');
+
+        let score = 0;
+        let lives = 100;
+        let extraStat = 5;
+        let dataStat = 0;
+
+        const keys = { left: false, right: false, up: false, down: false, space: false };
+
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') keys.left = true;
+            if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') keys.right = true;
+            if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') keys.up = true;
+            if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') keys.down = true;
+            if (e.key === ' ' || e.code === 'Space') {
+                keys.space = true;
+                if (gameState === 'RUNNING') e.preventDefault();
+            }
+            if (e.key === 'p' || e.key === 'P') togglePause();
+        });
+
+        window.addEventListener('keyup', (e) => {
+            if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') keys.left = false;
+            if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') keys.right = false;
+            if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') keys.up = false;
+            if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') keys.down = false;
+            if (e.key === ' ' || e.code === 'Space') keys.space = false;
+        });
+
+        // Dynamic Touch Button Bindings
+        function setupTouchBtn(btnId, keyName) {
+            const el = document.getElementById(btnId);
+            el.addEventListener('touchstart', (e) => { e.preventDefault(); keys[keyName] = true; });
+            el.addEventListener('touchend', (e) => { e.preventDefault(); keys[keyName] = false; });
+            el.addEventListener('mousedown', (e) => { keys[keyName] = true; });
+            el.addEventListener('mouseup', (e) => { keys[keyName] = false; });
+        }
+        setupTouchBtn('btnLeft', 'left');
+        setupTouchBtn('btnRight', 'right');
+        setupTouchBtn('btnUp', 'up');
+        setupTouchBtn('btnDown', 'down');
+        setupTouchBtn('btnAction', 'space');
+
+        // Canvas Click Listener for Minesweeper and Clicker games
+        canvas.addEventListener('click', (e) => {
+            if (gameState !== 'RUNNING') return;
+            const rect = canvas.getBoundingClientRect();
+            const mouseX = (e.clientX - rect.left) * (canvas.width / rect.width);
+            const mouseY = (e.clientY - rect.top) * (canvas.height / rect.height);
+
+            if (activeGameKey === 'minesweeper') minesweeperGame.onClick(mouseX, mouseY, false);
+            if (activeGameKey === 'clicker') clickerGame.onClick(mouseX, mouseY);
+        });
+
+        canvas.addEventListener('contextmenu', (e) => {
+            if (activeGameKey === 'minesweeper' && gameState === 'RUNNING') {
+                e.preventDefault();
+                const rect = canvas.getBoundingClientRect();
+                const mouseX = (e.clientX - rect.left) * (canvas.width / rect.width);
+                const mouseY = (e.clientY - rect.top) * (canvas.height / rect.height);
+                minesweeperGame.onClick(mouseX, mouseY, true);
+            }
+        });
+
+
+        /* ----------------------------------------------------
+         * 10 FULLY EMBEDDED CANVASES IMPLEMENTATIONS
+         * ---------------------------------------------------- */
+
+        // 1. TORNADO INTERCEPTOR
+        const tornadoGame = {
+            player: { x: 400, y: 380, speed: 4, armor: 100, probes: 5, probeCooldown: 0 },
+            tornado: { x: 400, y: 150, vx: 1.5, vy: 0.5, radius: 45, ef: 3, windSpeed: 165 },
+            probes: [], debris: [],
+            init() {
+                this.player.x = 400; this.player.y = 380; this.player.armor = 100; this.player.probes = 5;
+                this.tornado = { x: 400, y: 150, vx: 1.2, vy: 0.4, radius: 40, ef: 3, windSpeed: 165 };
+                this.probes = []; this.debris = [];
+                for (let i = 0; i < 15; i++) {
+                    this.debris.push({ angle: Math.random() * Math.PI * 2, dist: 20 + Math.random() * 60, speed: 0.05 + Math.random() * 0.05 });
+                }
+            },
+            update() {
+                if (keys.left && this.player.x > 30) this.player.x -= this.player.speed;
+                if (keys.right && this.player.x < canvas.width - 30) this.player.x += this.player.speed;
+                if (keys.up && this.player.y > 50) this.player.y -= this.player.speed;
+                if (keys.down && this.player.y < canvas.height - 40) this.player.y += this.player.speed;
+
+                this.tornado.x += this.tornado.vx; this.tornado.y += this.tornado.vy;
+                if (this.tornado.x < 100 || this.tornado.x > canvas.width - 100) this.tornado.vx *= -1;
+                if (this.tornado.y < 60 || this.tornado.y > canvas.height - 180) this.tornado.vy *= -1;
+
+                if (this.player.probeCooldown > 0) this.player.probeCooldown--;
+                if (keys.space && this.player.probes > 0 && this.player.probeCooldown === 0) {
+                    this.probes.push({ x: this.player.x, y: this.player.y, vx: 0, vy: -6, captured: false });
+                    this.player.probes--; this.player.probeCooldown = 20; audio.probeSnd();
+                }
+
+                this.probes.forEach(p => {
+                    if (!p.captured) {
+                        p.y += p.vy;
+                        if (Math.hypot(p.x - this.tornado.x, p.y - this.tornado.y) < this.tornado.radius + 20) {
+                            p.captured = true; score += 500 * this.tornado.ef; audio.pointSnd();
+                            if (this.player.probes < 5) this.player.probes++;
+                        }
+                    } else {
+                        p.x += (this.tornado.x - p.x) * 0.1; p.y += (this.tornado.y - p.y) * 0.1;
+                    }
+                });
+
+                if (Math.hypot(this.player.x - this.tornado.x, this.player.y - this.tornado.y) < this.tornado.radius + 15) {
+                    this.player.armor -= 0.4; audio.boomSnd();
+                    if (this.player.armor <= 0) endGame();
+                }
+
+                lives = Math.max(0, Math.floor(this.player.armor));
+                extraStat = this.player.probes;
+                dataStat = Math.floor(this.tornado.windSpeed + (Math.random() * 6 - 3));
+            },
+            draw() {
+                ctx.fillStyle = '#05111e'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.strokeStyle = 'rgba(0, 240, 255, 0.15)'; ctx.lineWidth = 1;
+                for (let x = 0; x < canvas.width; x += 40) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke(); }
+                for (let y = 0; y < canvas.height; y += 40) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke(); }
+
+                ctx.strokeStyle = 'rgba(0, 240, 255, 0.25)'; ctx.lineWidth = 2;
+                ctx.beginPath(); ctx.arc(400, 230, 200, 0, Math.PI * 2); ctx.stroke();
+
+                ctx.fillStyle = 'rgba(255, 0, 127, 0.4)'; ctx.beginPath(); ctx.arc(this.tornado.x, this.tornado.y, this.tornado.radius + 15, 0, Math.PI * 2); ctx.fill();
+                ctx.fillStyle = 'rgba(0, 240, 255, 0.7)'; ctx.beginPath(); ctx.arc(this.tornado.x, this.tornado.y, this.tornado.radius, 0, Math.PI * 2); ctx.fill();
+
+                this.debris.forEach(d => {
+                    d.angle += d.speed;
+                    ctx.fillStyle = '#ffb700'; ctx.fillRect(this.tornado.x + Math.cos(d.angle) * d.dist, this.tornado.y + Math.sin(d.angle) * d.dist, 4, 4);
+                });
+
+                this.probes.forEach(p => {
+                    ctx.fillStyle = p.captured ? '#39ff14' : '#ffffff';
+                    ctx.beginPath(); ctx.arc(p.x, p.y, 5, 0, Math.PI * 2); ctx.fill();
+                });
+
+                ctx.fillStyle = '#1e293b'; ctx.fillRect(this.player.x - 14, this.player.y - 20, 28, 40);
+                ctx.fillStyle = '#00f0ff'; ctx.fillRect(this.player.x - 10, this.player.y - 14, 20, 10);
+                ctx.fillStyle = '#ff007f'; ctx.fillRect(this.player.x - 3, this.player.y - 4, 6, 8);
+            }
+        };
+
+        // 2. CYBER STRIKE 1999
+        const cyberGame = {
+            ship: { x: 400, y: 400, speed: 6 }, bullets: [], enemies: [],
+            init() {
+                this.ship.x = 400; this.bullets = []; this.enemies = [];
+                for (let r = 0; r < 3; r++) {
+                    for (let c = 0; c < 8; c++) this.enemies.push({ x: 120 + c * 70, y: 50 + r * 40, alive: true, dir: 1 });
+                }
+                lives = 3; extraStat = 4; dataStat = 100;
+            },
+            update() {
+                if (keys.left && this.ship.x > 30) this.ship.x -= this.ship.speed;
+                if (keys.right && this.ship.x < canvas.width - 30) this.ship.x += this.ship.speed;
+                if (keys.space && this.bullets.length < 4) {
+                    this.bullets.push({ x: this.ship.x, y: 390 }); audio.laserSnd(); keys.space = false;
+                }
+                this.bullets.forEach((b, bi) => {
+                    b.y -= 8; if (b.y < 0) this.bullets.splice(bi, 1);
+                });
+                this.enemies.forEach(e => {
+                    if (!e.alive) return;
+                    e.x += e.dir * 1.5;
+                    if (e.x > canvas.width - 40 || e.x < 40) e.dir *= -1;
+                    this.bullets.forEach((b, bi) => {
+                        if (Math.hypot(b.x - e.x, b.y - e.y) < 20) {
+                            e.alive = false; this.bullets.splice(bi, 1); score += 200; audio.boomSnd();
+                        }
+                    });
+                });
+            },
+            draw() {
+                ctx.fillStyle = '#030712'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = '#00f0ff'; ctx.beginPath(); ctx.moveTo(this.ship.x, this.ship.y - 15); ctx.lineTo(this.ship.x + 15, this.ship.y + 15); ctx.lineTo(this.ship.x - 15, this.ship.y + 15); ctx.fill();
+                ctx.fillStyle = '#ff007f'; this.bullets.forEach(b => ctx.fillRect(b.x - 2, b.y, 4, 10));
+                this.enemies.forEach(e => { if (e.alive) { ctx.fillStyle = '#ffb700'; ctx.fillRect(e.x - 15, e.y - 15, 30, 20); } });
+            }
+        };
+
+        // 3. BYTE-RUNNER
+        const runnerGame = {
+            py: 360, vy: 0, isJumping: false, obstacles: [], speed: 6,
+            init() { this.py = 360; this.vy = 0; this.isJumping = false; this.obstacles = []; lives = 1; extraStat = 1; dataStat = 60; },
+            update() {
+                if ((keys.space || keys.up) && !this.isJumping) { this.vy = -13; this.isJumping = true; audio.jumpSnd(); }
+                this.py += this.vy; this.vy += 0.7;
+                if (this.py >= 360) { this.py = 360; this.isJumping = false; }
+                if (Math.random() < 0.02 && this.obstacles.length < 3) this.obstacles.push({ x: canvas.width, width: 20, height: 30 + Math.random() * 20 });
+                this.obstacles.forEach((o, i) => {
+                    o.x -= this.speed;
+                    if (o.x < -30) { this.obstacles.splice(i, 1); score += 100; }
+                    if (o.x < 175 && o.x > 135 && this.py > 360 - o.height) { audio.boomSnd(); endGame(); }
+                });
+            },
+            draw() {
+                ctx.fillStyle = '#0a0a16'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.strokeStyle = '#00f0ff'; ctx.beginPath(); ctx.moveTo(0, 390); ctx.lineTo(canvas.width, 390); ctx.stroke();
+                ctx.fillStyle = '#39ff14'; ctx.fillRect(150, this.py - 30, 25, 30);
+                ctx.fillStyle = '#ff007f'; this.obstacles.forEach(o => ctx.fillRect(o.x, 390 - o.height, o.width, o.height));
+            }
+        };
+
+        // 4. RETRO SNAKE
+        const snakeGame = {
+            snake: [], dir: { x: 1, y: 0 }, food: { x: 10, y: 10 }, timer: 0,
+            init() { this.snake = [{ x: 10, y: 10 }, { x: 9, y: 10 }]; this.dir = { x: 1, y: 0 }; this.spawnFood(); lives = 1; extraStat = 2; dataStat = 10; },
+            spawnFood() { this.food = { x: Math.floor(Math.random() * 38) + 1, y: Math.floor(Math.random() * 21) + 1 }; },
+            update() {
+                if (keys.left && this.dir.x === 0) this.dir = { x: -1, y: 0 };
+                if (keys.right && this.dir.x === 0) this.dir = { x: 1, y: 0 };
+                if (keys.up && this.dir.y === 0) this.dir = { x: 0, y: -1 };
+                if (keys.down && this.dir.y === 0) this.dir = { x: 0, y: 1 };
+                this.timer++; if (this.timer % 6 !== 0) return;
+
+                const head = { x: this.snake[0].x + this.dir.x, y: this.snake[0].y + this.dir.y };
+                if (head.x < 0 || head.x >= 40 || head.y < 0 || head.y >= 23) { audio.boomSnd(); endGame(); return; }
+                this.snake.unshift(head);
+                if (head.x === this.food.x && head.y === this.food.y) { score += 150; audio.pointSnd(); this.spawnFood(); }
+                else this.snake.pop();
+                extraStat = this.snake.length;
+            },
+            draw() {
+                ctx.fillStyle = '#050a0f'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = '#39ff14'; this.snake.forEach(s => ctx.fillRect(s.x * 20, s.y * 20, 18, 18));
+                ctx.fillStyle = '#ff007f'; ctx.fillRect(this.food.x * 20, this.food.y * 20, 18, 18);
+            }
+        };
+
+        // 5. BLOCK BREAKER (Breakout)
+        const breakoutGame = {
+            paddle: { x: 350, w: 100, h: 14, speed: 7 },
+            ball: { x: 400, y: 350, vx: 4, vy: -4, radius: 7 },
+            bricks: [],
+            init() {
+                this.paddle.x = 350; this.ball = { x: 400, y: 350, vx: 4, vy: -4, radius: 7 };
+                this.bricks = [];
+                for (let r = 0; r < 4; r++) {
+                    for (let c = 0; c < 9; c++) this.bricks.push({ x: 45 + c * 80, y: 40 + r * 28, w: 70, h: 20, active: true });
+                }
+                lives = 3; extraStat = this.bricks.length; dataStat = 100;
+            },
+            update() {
+                if (keys.left && this.paddle.x > 10) this.paddle.x -= this.paddle.speed;
+                if (keys.right && this.paddle.x < canvas.width - 110) this.paddle.x += this.paddle.speed;
+
+                this.ball.x += this.ball.vx; this.ball.y += this.ball.vy;
+                if (this.ball.x < 10 || this.ball.x > canvas.width - 10) { this.ball.vx *= -1; audio.paddleSnd(); }
+                if (this.ball.y < 10) { this.ball.vy *= -1; audio.paddleSnd(); }
+
+                if (this.ball.y > canvas.height - 30 && this.ball.x > this.paddle.x && this.ball.x < this.paddle.x + this.paddle.w) {
+                    this.ball.vy = -Math.abs(this.ball.vy); audio.paddleSnd();
+                }
+
+                if (this.ball.y > canvas.height) {
+                    lives--; audio.boomSnd();
+                    if (lives <= 0) endGame();
+                    else { this.ball = { x: this.paddle.x + 50, y: 350, vx: 4, vy: -4, radius: 7 }; }
+                }
+
+                this.bricks.forEach(b => {
+                    if (b.active && this.ball.x > b.x && this.ball.x < b.x + b.w && this.ball.y > b.y && this.ball.y < b.y + b.h) {
+                        b.active = false; this.ball.vy *= -1; score += 100; audio.brickSnd();
+                    }
+                });
+                extraStat = this.bricks.filter(b => b.active).length;
+            },
+            draw() {
+                ctx.fillStyle = '#080d1a'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = '#00f0ff'; ctx.fillRect(this.paddle.x, canvas.height - 25, this.paddle.w, this.paddle.h);
+                ctx.fillStyle = '#ffffff'; ctx.beginPath(); ctx.arc(this.ball.x, this.ball.y, this.ball.radius, 0, Math.PI * 2); ctx.fill();
+                this.bricks.forEach(b => { if (b.active) { ctx.fillStyle = '#ff007f'; ctx.fillRect(b.x, b.y, b.w, b.h); } });
+            }
+        };
+
+        // 6. NEON PONG
+        const pongGame = {
+            p1: 180, p2: 180, ball: { x: 400, y: 230, vx: 5, vy: 3 }, p1Score: 0, p2Score: 0,
+            init() { this.p1 = 180; this.p2 = 180; this.ball = { x: 400, y: 230, vx: 5, vy: 3 }; this.p1Score = 0; this.p2Score = 0; lives = 5; extraStat = 0; dataStat = 1; },
+            update() {
+                if (keys.up && this.p1 > 10) this.p1 -= 6;
+                if (keys.down && this.p1 < canvas.height - 90) this.p1 += 6;
+                // AI Opponent
+                if (this.ball.y > this.p2 + 40 && this.p2 < canvas.height - 90) this.p2 += 4;
+                if (this.ball.y < this.p2 + 40 && this.p2 > 10) this.p2 -= 4;
+
+                this.ball.x += this.ball.vx; this.ball.y += this.ball.vy;
+                if (this.ball.y < 10 || this.ball.y > canvas.height - 10) { this.ball.vy *= -1; audio.paddleSnd(); }
+
+                if (this.ball.x < 30 && this.ball.y > this.p1 && this.ball.y < this.p1 + 80) { this.ball.vx = Math.abs(this.ball.vx) + 0.2; audio.paddleSnd(); }
+                if (this.ball.x > canvas.width - 30 && this.ball.y > this.p2 && this.ball.y < this.p2 + 80) { this.ball.vx = -Math.abs(this.ball.vx) - 0.2; audio.paddleSnd(); }
+
+                if (this.ball.x < 0) { this.p2Score++; audio.boomSnd(); this.resetBall(); }
+                if (this.ball.x > canvas.width) { this.p1Score++; score += 200; audio.pointSnd(); this.resetBall(); }
+
+                lives = 5 - this.p2Score; extraStat = this.p1Score; dataStat = Math.floor(Math.abs(this.ball.vx));
+                if (this.p2Score >= 5) endGame();
+            },
+            resetBall() { this.ball = { x: 400, y: 230, vx: (Math.random() > 0.5 ? 5 : -5), vy: (Math.random() * 4 - 2) }; },
+            draw() {
+                ctx.fillStyle = '#050a14'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.strokeStyle = 'rgba(255,255,255,0.2)'; ctx.setLineDash([8, 8]);
+                ctx.beginPath(); ctx.moveTo(400, 0); ctx.lineTo(400, canvas.height); ctx.stroke(); ctx.setLineDash([]);
+
+                ctx.fillStyle = '#00f0ff'; ctx.fillRect(15, this.p1, 12, 80);
+                ctx.fillStyle = '#ff007f'; ctx.fillRect(canvas.width - 27, this.p2, 12, 80);
+                ctx.fillStyle = '#39ff14'; ctx.beginPath(); ctx.arc(this.ball.x, this.ball.y, 8, 0, Math.PI * 2); ctx.fill();
+            }
+        };
+
+        // 7. MINESWEEPER (Windows 98 Style)
+        const minesweeperGame = {
+            gridSize: 10, cellSize: 36, grid: [], minesCount: 12, revealed: 0,
+            init() {
+                this.grid = []; this.revealed = 0;
+                for (let r = 0; r < 10; r++) {
+                    const row = [];
+                    for (let c = 0; c < 10; c++) row.push({ mine: false, count: 0, open: false, flag: false });
+                    this.grid.push(row);
+                }
+                let placed = 0;
+                while (placed < this.minesCount) {
+                    let r = Math.floor(Math.random() * 10), c = Math.floor(Math.random() * 10);
+                    if (!this.grid[r][c].mine) { this.grid[r][c].mine = true; placed++; }
+                }
+                for (let r = 0; r < 10; r++) {
+                    for (let c = 0; c < 10; c++) {
+                        if (!this.grid[r][c].mine) {
+                            let cnt = 0;
+                            for (let dr = -1; dr <= 1; dr++) {
+                                for (let dc = -1; dc <= 1; dc++) {
+                                    let nr = r + dr, nc = c + dc;
+                                    if (nr >= 0 && nr < 10 && nc >= 0 && nc < 10 && this.grid[nr][nc].mine) cnt++;
+                                }
+                            }
+                            this.grid[r][c].count = cnt;
+                        }
+                    }
+                }
+                lives = 1; extraStat = this.minesCount; dataStat = 0;
+            },
+            onClick(mx, my, isRightClick) {
+                const ox = (canvas.width - 360) / 2, oy = (canvas.height - 360) / 2;
+                if (mx < ox || mx > ox + 360 || my < oy || my > oy + 360) return;
+                const c = Math.floor((mx - ox) / 36), r = Math.floor((my - oy) / 36);
+                const cell = this.grid[r][c];
+
+                if (isRightClick) { cell.flag = !cell.flag; audio.paddleSnd(); return; }
+                if (cell.open || cell.flag) return;
+
+                cell.open = true; this.revealed++;
+                if (cell.mine) { audio.boomSnd(); endGame(); return; }
+                score += 50; audio.pointSnd();
+                if (this.revealed >= 100 - this.minesCount) { showToast("YOU CLEARED THE MINEFIELD!"); score += 2000; endGame(); }
+            },
+            update() { extraStat = this.minesCount; dataStat = this.revealed; },
+            draw() {
+                ctx.fillStyle = '#0f172a'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+                const ox = (canvas.width - 360) / 2, oy = (canvas.height - 360) / 2;
+
+                for (let r = 0; r < 10; r++) {
+                    for (let c = 0; c < 10; c++) {
+                        const cell = this.grid[r][c];
+                        const x = ox + c * 36, y = oy + r * 36;
+                        if (!cell.open) {
+                            ctx.fillStyle = '#1e293b'; ctx.fillRect(x, y, 34, 34);
+                            if (cell.flag) { ctx.fillStyle = '#ff007f'; ctx.fillText('🚩', x + 10, y + 22); }
+                        } else {
+                            ctx.fillStyle = cell.mine ? '#ff007f' : '#040914'; ctx.fillRect(x, y, 34, 34);
+                            if (cell.mine) { ctx.fillStyle = '#fff'; ctx.fillText('💣', x + 8, y + 22); }
+                            else if (cell.count > 0) { ctx.fillStyle = '#00f0ff'; ctx.font = '14px Consolas'; ctx.fillText(cell.count, x + 12, y + 22); }
+                        }
+                    }
+                }
+            }
+        };
+
+        // 8. ASTEROIDS VECTOR
+        const asteroidsGame = {
+            ship: { x: 400, y: 230, r: 14, angle: 0, rotation: 0, thrusting: false, vx: 0, vy: 0 },
+            asteroids: [], bullets: [],
+            init() {
+                this.ship = { x: 400, y: 230, r: 14, angle: 0, rotation: 0, thrusting: false, vx: 0, vy: 0 };
+                this.asteroids = []; this.bullets = [];
+                for (let i = 0; i < 5; i++) {
+                    this.asteroids.push({ x: Math.random() * canvas.width, y: Math.random() * canvas.height, r: 30, vx: Math.random() * 4 - 2, vy: Math.random() * 4 - 2 });
+                }
+                lives = 3; extraStat = this.asteroids.length; dataStat = 100;
+            },
+            update() {
+                if (keys.left) this.ship.angle -= 0.08;
+                if (keys.right) this.ship.angle += 0.08;
+                this.ship.thrusting = keys.up;
+
+                if (this.ship.thrusting) {
+                    this.ship.vx += Math.cos(this.ship.angle) * 0.15;
+                    this.ship.vy += Math.sin(this.ship.angle) * 0.15;
+                    audio.thrustSnd();
+                }
+
+                this.ship.x += this.ship.vx; this.ship.y += this.ship.vy;
+                if (this.ship.x < 0) this.ship.x = canvas.width; if (this.ship.x > canvas.width) this.ship.x = 0;
+                if (this.ship.y < 0) this.ship.y = canvas.height; if (this.ship.y > canvas.height) this.ship.y = 0;
+
+                if (keys.space && this.bullets.length < 5) {
+                    this.bullets.push({ x: this.ship.x, y: this.ship.y, vx: Math.cos(this.ship.angle) * 7, vy: Math.sin(this.ship.angle) * 7, life: 40 });
+                    audio.laserSnd(); keys.space = false;
+                }
+
+                this.bullets.forEach((b, bi) => {
+                    b.x += b.vx; b.y += b.vy; b.life--;
+                    if (b.life <= 0) this.bullets.splice(bi, 1);
+                });
+
+                this.asteroids.forEach((a, ai) => {
+                    a.x += a.vx; a.y += a.vy;
+                    if (a.x < 0) a.x = canvas.width; if (a.x > canvas.width) a.x = 0;
+                    if (a.y < 0) a.y = canvas.height; if (a.y > canvas.height) a.y = 0;
+
+                    this.bullets.forEach((b, bi) => {
+                        if (Math.hypot(b.x - a.x, b.y - a.y) < a.r) {
+                            score += 100; audio.boomSnd();
+                            this.bullets.splice(bi, 1);
+                            if (a.r > 15) {
+                                this.asteroids.push({ x: a.x, y: a.y, r: a.r / 2, vx: Math.random() * 4 - 2, vy: Math.random() * 4 - 2 });
+                                a.r /= 2;
+                            } else this.asteroids.splice(ai, 1);
+                        }
+                    });
+
+                    if (Math.hypot(this.ship.x - a.x, this.ship.y - a.y) < a.r + this.ship.r) {
+                        lives--; audio.boomSnd();
+                        if (lives <= 0) endGame();
+                        else { this.ship.x = 400; this.ship.y = 230; this.ship.vx = 0; this.ship.vy = 0; }
+                    }
+                });
+                extraStat = this.asteroids.length;
+            },
+            draw() {
+                ctx.fillStyle = '#02050b'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.strokeStyle = '#00f0ff'; ctx.lineWidth = 2;
+                ctx.save(); ctx.translate(this.ship.x, this.ship.y); ctx.rotate(this.ship.angle);
+                ctx.beginPath(); ctx.moveTo(15, 0); ctx.lineTo(-10, -10); ctx.lineTo(-10, 10); ctx.closePath(); ctx.stroke();
+                ctx.restore();
+
+                ctx.fillStyle = '#ff007f'; this.bullets.forEach(b => ctx.fillRect(b.x - 2, b.y - 2, 4, 4));
+                ctx.strokeStyle = '#ffb700';
+                this.asteroids.forEach(a => { ctx.beginPath(); ctx.arc(a.x, a.y, a.r, 0, Math.PI * 2); ctx.stroke(); });
+            }
+        };
+
+        // 9. GRAVITY LANDER (Lunar Lander Physics)
+        const landerGame = {
+            ship: { x: 400, y: 60, vx: 1, vy: 0, fuel: 100, angle: 0 },
+            pad: { x: 360, w: 80, y: 410 },
+            init() {
+                this.ship = { x: 400, y: 60, vx: 1, vy: 0, fuel: 100, angle: 0 };
+                lives = 1; extraStat = 100; dataStat = 0;
+            },
+            update() {
+                if (keys.left) this.ship.angle -= 0.05;
+                if (keys.right) this.ship.angle += 0.05;
+                if (keys.up && this.ship.fuel > 0) {
+                    this.ship.vx += Math.sin(this.ship.angle) * 0.12;
+                    this.ship.vy -= Math.cos(this.ship.angle) * 0.12;
+                    this.ship.fuel -= 0.3; audio.thrustSnd();
+                }
+
+                this.ship.vy += 0.04; // Gravity
+                this.ship.x += this.ship.vx; this.ship.y += this.ship.vy;
+
+                if (this.ship.y >= this.pad.y - 12) {
+                    if (this.ship.x > this.pad.x && this.ship.x < this.pad.x + this.pad.w && Math.abs(this.ship.vy) < 2.0) {
+                        score += 1500; showToast("PERFECT LANDING!"); audio.pointSnd(); endGame();
+                    } else {
+                        audio.boomSnd(); endGame();
+                    }
+                }
+                extraStat = Math.floor(this.ship.fuel);
+                dataStat = Math.floor(Math.abs(this.ship.vy) * 10);
+            },
+            draw() {
+                ctx.fillStyle = '#040710'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+                // Lunar Surface
+                ctx.fillStyle = '#1e293b'; ctx.fillRect(0, 420, canvas.width, 40);
+                ctx.fillStyle = '#39ff14'; ctx.fillRect(this.pad.x, this.pad.y, this.pad.w, 10);
+
+                ctx.save(); ctx.translate(this.ship.x, this.ship.y); ctx.rotate(this.ship.angle);
+                ctx.fillStyle = '#00f0ff'; ctx.fillRect(-8, -12, 16, 24);
+                ctx.restore();
+            }
+        };
+
+        // 10. CYBER CLICKER (Matrix Idle Miner)
+        const clickerGame = {
+            bits: 0, autoMiners: 0, minerCost: 50, multiplier: 1,
+            init() { this.bits = 0; this.autoMiners = 0; this.minerCost = 50; this.multiplier = 1; lives = 100; extraStat = 0; dataStat = 0; },
+            onClick(mx, my) {
+                this.bits += 10 * this.multiplier; score += 10; audio.pointSnd();
+            },
+            update() {
+                this.bits += this.autoMiners * 0.2;
+                if (keys.space && this.bits >= this.minerCost) {
+                    this.bits -= this.minerCost; this.autoMiners++; this.minerCost = Math.floor(this.minerCost * 1.3);
+                    audio.probeSnd(); keys.space = false;
+                }
+                extraStat = this.autoMiners; dataStat = Math.floor(this.bits);
+            },
+            draw() {
+                ctx.fillStyle = '#030812'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = '#39ff14'; ctx.font = '24px Consolas'; ctx.textAlign = 'center';
+                ctx.fillText(`DATA BITS MINED: ${Math.floor(this.bits)}`, 400, 140);
+                ctx.font = '14px Consolas'; ctx.fillStyle = '#00f0ff';
+                ctx.fillText(`[CLICK CANVAS TO MINE BITS] | PRESS SPACE TO BUY AUTO-MINER (Cost: ${this.minerCost})`, 400, 220);
+                ctx.fillText(`AUTO MINERS OWNED: ${this.autoMiners}`, 400, 260);
+            }
+        };
+
+
+        /* ----------------------------------------------------
+         * GAME ROUTER & MAIN ENGINE LOOPER
+         * ---------------------------------------------------- */
+        const gamesMap = {
+            tornado: tornadoGame, cyber: cyberGame, runner: runnerGame, snake: snakeGame,
+            breakout: breakoutGame, pong: pongGame, minesweeper: minesweeperGame,
+            asteroids: asteroidsGame, lander: landerGame, clicker: clickerGame
+        };
+
+        function loadSelectedGame(key) {
+            activeGameKey = key;
+            const descriptions = {
+                tornado: ['TORNADO INTERCEPTOR', 'Drive your interceptor into EF0-EF5 tornadoes, launch probes & monitor wind pressure.'],
+                cyber: ['CYBER STRIKE 1999', 'Defend against rogue malware streams in deep space!'],
+                runner: ['BYTE-RUNNER GLITCH', 'Jump over retro glitch obstacles and test your reflexes!'],
+                snake: ['RETRO SNAKE DOS', 'Classic DOS grid snake game. Collect items and avoid walls!'],
+                breakout: ['BLOCK BREAKER', 'Classic breakout brick destruction arcade game.'],
+                pong: ['NEON PONG', 'Retro paddle table tennis against AI opponent.'],
+                minesweeper: ['MINESWEEPER GRID', 'Classic minefield sweeper. Left click to open, right click to flag!'],
+                asteroids: ['ASTEROIDS VECTOR', 'Blast floating vector asteroids in deep space!'],
+                lander: ['GRAVITY LANDER', 'Control lunar lander thrust physics and land safely on pad.'],
+                clicker: ['CYBER CLICKER MINER', 'Click canvas to mine bits, buy auto-miners with spacebar!']
+            };
+            document.getElementById('overlayTitle').textContent = descriptions[key][0];
+            document.getElementById('overlayDesc').textContent = descriptions[key][1];
+            stopGame();
+        }
+
+        function startGame() {
+            score = 0; gameState = 'RUNNING';
+            gamesMap[activeGameKey].init();
+            document.getElementById('gameOverlay').style.display = 'none';
+            document.getElementById('gameStatusText').textContent = 'ACTIVE';
+            audio.init();
+        }
+
+        function stopGame() {
+            gameState = 'STOPPED';
+            document.getElementById('gameOverlay').style.display = 'flex';
+            document.getElementById('gameStatusText').textContent = 'READY';
+        }
+
+        function togglePause() {
+            if (gameState === 'RUNNING') { gameState = 'PAUSED'; document.getElementById('gameStatusText').textContent = 'PAUSED'; }
+            else if (gameState === 'PAUSED') { gameState = 'RUNNING'; document.getElementById('gameStatusText').textContent = 'ACTIVE'; }
+        }
+
+        function endGame() {
+            gameState = 'STOPPED';
+            document.getElementById('gameOverlay').style.display = 'flex';
+            document.getElementById('overlayTitle').textContent = 'GAME OVER';
+            document.getElementById('gameStatusText').textContent = 'OVER';
+        }
+
+        function gameLoop() {
+            if (gameState === 'RUNNING') {
+                gamesMap[activeGameKey].update();
+                gamesMap[activeGameKey].draw();
+                
+                document.getElementById('hudScore').textContent = score.toString().padStart(6, '0');
+                document.getElementById('hudLives').textContent = lives + '%';
+                document.getElementById('hudExtra').textContent = extraStat;
+                document.getElementById('hudData').textContent = dataStat + ' MPH/PTS';
+
+                if (score > globalHighscore) {
+                    globalHighscore = score;
+                    localStorage.setItem('modios_hs', globalHighscore);
+                    document.getElementById('globalHighscoreDisplay').textContent = globalHighscore.toString().padStart(6, '0');
+                }
+            }
+            requestAnimationFrame(gameLoop);
+        }
+        requestAnimationFrame(gameLoop);
+
+
+        /* ----------------------------------------------------
+         * 3. EMBEDDED GAMES VAULT DATA ARRAY (22 TITLES)
+         * ---------------------------------------------------- */
+        const VAULT_DATA = [
+            { id: 'tornado', title: 'Tornado Interceptor 2D', cat: 'storm', playable: true, plat: 'Canvas HTML5', size: '512 KB', status: 'Ready to Play' },
+            { id: 'cyber', title: 'Cyber Strike 1999', cat: 'playable', playable: true, plat: 'Canvas HTML5', size: '380 KB', status: 'Ready to Play' },
+            { id: 'runner', title: 'Byte-Runner Glitch', cat: 'playable', playable: true, plat: 'WebGL / JS', size: '210 KB', status: 'Ready to Play' },
+            { id: 'snake', title: 'Nibbles DOS Snake', cat: 'dos', playable: true, plat: 'MS-DOS / JS', size: '128 KB', status: 'Ready to Play' },
+            { id: 'breakout', title: 'Block Breaker Arcade', cat: 'playable', playable: true, plat: 'Canvas HTML5', size: '290 KB', status: 'Ready to Play' },
+            { id: 'pong', title: 'Neon Pong 2P/AI', cat: 'playable', playable: true, plat: 'Canvas JS', size: '150 KB', status: 'Ready to Play' },
+            { id: 'minesweeper', title: 'Minesweeper Windows 98', cat: 'playable', playable: true, plat: 'Canvas HTML5', size: '310 KB', status: 'Ready to Play' },
+            { id: 'asteroids', title: 'Asteroids Vector Space', cat: 'playable', playable: true, plat: 'Vector JS', size: '420 KB', status: 'Ready to Play' },
+            { id: 'lander', title: 'Gravity Lunar Lander', cat: 'playable', playable: true, plat: 'Physics Canvas', size: '350 KB', status: 'Ready to Play' },
+            { id: 'clicker', title: 'Cyber Clicker Idle Miner', cat: 'playable', playable: true, plat: 'Canvas JS', size: '200 KB', status: 'Ready to Play' },
+            { id: 'beamng', title: 'BeamNG-Lite 2D Physics', cat: 'storm', playable: false, plat: 'Box2D / HTML5', size: '1.4 MB', status: 'Archive Mirror' },
+            { id: 'doom', title: 'DOOM (1993 Shareware)', cat: 'dos', playable: false, plat: 'DOSBox WASM', size: '2.4 MB', status: 'Archive Mirror' },
+            { id: 'duke', title: 'Duke Nukem 3D DOS', cat: 'dos', playable: false, plat: 'MS-DOS x86', size: '5.1 MB', status: 'Archive Mirror' },
+            { id: 'pop', title: 'Prince of Persia 1989', cat: 'dos', playable: false, plat: 'MS-DOS 16bit', size: '480 KB', status: 'Archive Mirror' },
+            { id: 'simcity', title: 'SimCity 2000 DOS', cat: 'dos', playable: false, plat: 'DOSBox JS', size: '3.8 MB', status: 'Archive Mirror' },
+            { id: 'pokemon', title: 'Pokémon Sun Homebrew', cat: '3ds', playable: false, plat: '3DS CIA ROM', size: '3.1 GB', status: 'CFW Direct' },
+            { id: 'zelda', title: 'Zelda: Ocarina 3D Patch', cat: '3ds', playable: false, plat: '3DS / Citra', size: '512 MB', status: 'CFW Direct' },
+            { id: 'smash', title: 'Super Smash Bros 3DS', cat: '3ds', playable: false, plat: '3DS CIA', size: '1.2 GB', status: 'CFW Direct' },
+            { id: 'flappy', title: 'Flappy Bird iOS 1.2', cat: 'ios', playable: false, plat: 'iOS IPA Package', size: '2.2 MB', status: 'Sideload IPA' },
+            { id: 'infinity', title: 'Infinity Blade III Archive', cat: 'ios', playable: false, plat: 'iOS 64-bit IPA', size: '1.8 GB', status: 'Sideload IPA' },
+            { id: 'angry', title: 'Angry Birds Classic 2011', cat: 'ios', playable: false, plat: 'iOS IPA', size: '45 MB', status: 'Sideload IPA' },
+            { id: 'storm3d', title: 'Super Cell Tracker 3D', cat: 'storm', playable: false, plat: 'Three.js Sim', size: '8.5 MB', status: 'Web Mirror' }
+        ];
+
+        function renderVault() {
+            const grid = document.getElementById('vaultGrid');
+            grid.innerHTML = '';
+            VAULT_DATA.forEach(game => {
+                const card = document.createElement('div');
+                card.className = 'vault-card';
+                card.innerHTML = `
+                    <div>
+                        <div style="font-size: 11px; font-family: var(--font-mono); color: var(--neon-cyan); margin-bottom: 4px;">${game.plat}</div>
+                        <h4 style="font-size: 15px; font-family: var(--font-arcade); color: #fff; margin-bottom: 8px;">${game.title}</h4>
+                        <div style="font-size: 11px; color: var(--text-muted); font-family: var(--font-mono);">SIZE: ${game.size}</div>
+                    </div>
+                    <div style="margin-top: 14px; display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-size: 10px; font-family: var(--font-mono); color: var(--neon-green);">${game.status}</span>
+                        <button onclick="openVaultModal('${game.id}')" class="btn btn-sm">INFO / PLAY</button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+        renderVault();
+
+        function filterVault() {
+            const search = document.getElementById('vaultSearch').value.toLowerCase();
+            const cat = document.getElementById('vaultCategory').value;
+            const cards = document.querySelectorAll('.vault-card');
+
+            VAULT_DATA.forEach((game, idx) => {
+                const matchCat = cat === 'all' || game.cat === cat || (cat === 'playable' && game.playable);
+                const matchSearch = game.title.toLowerCase().includes(search) || game.plat.toLowerCase().includes(search);
+                cards[idx].style.display = (matchCat && matchSearch) ? 'flex' : 'none';
+            });
+        }
+
+        let currentModalGame = null;
+        function openVaultModal(id) {
+            currentModalGame = VAULT_DATA.find(g => g.id === id);
+            if (!currentModalGame) return;
+            document.getElementById('modalTitle').textContent = currentModalGame.title;
+            document.getElementById('modalDesc').textContent = `Official Modios embedded entry for ${currentModalGame.title}. Fully integrated single-file package.`;
+            document.getElementById('modalPlatform').textContent = currentModalGame.plat;
+            document.getElementById('modalSize').textContent = currentModalGame.size;
+            document.getElementById('modalStatus').textContent = currentModalGame.status;
+            document.getElementById('vaultModal').style.display = 'flex';
+        }
+
+        function closeModal() { document.getElementById('vaultModal').style.display = 'none'; }
+
+        function launchVaultGame() {
+            closeModal();
+            if (currentModalGame && currentModalGame.playable) {
+                document.getElementById('gameSelect').value = currentModalGame.id;
+                loadSelectedGame(currentModalGame.id);
+                switchView('arcadeView', document.querySelectorAll('.tab-btn')[0]);
+            } else {
+                showToast('Downloaded mirror metadata for: ' + currentModalGame.title);
+            }
+        }
+
+
+        /* ----------------------------------------------------
+         * 4. SCHOOL DEV WORKBENCH (PYTHON, TKINTER & HTML5 DECODERS)
+         * ---------------------------------------------------- */
+        let activeTkTimers = [];
+        let tkKeyListeners = [];
+
+        function stopTkinter() {
+            activeTkTimers.forEach(t => clearTimeout(t));
+            activeTkTimers = [];
+            tkKeyListeners.forEach(l => window.removeEventListener('keydown', l));
+            tkKeyListeners = [];
+
+            const body = document.getElementById('tkWindowBody');
+            if (body) {
+                body.innerHTML = `
+                    <div style="color: var(--text-muted); font-size: 11px; font-family: var(--font-mono); margin-top: 60px; text-align: center;">
+                        Process terminated. Click <strong>"▶ RUN TKINTER GUI"</strong> to restart.
+                    </div>
+                `;
+            }
+            const consoleLog = document.getElementById('pyConsoleLog');
+            if (consoleLog) consoleLog.textContent += '\n[SYSTEM] Tkinter mainloop exited.\n';
+        }
+
+        const PY_PRESETS = {
+            preset1: `import tkinter as tk
+import random
+
+root = tk.Tk()
+root.title("Tornado Radar Track - Tkinter Mini-Game")
+root.geometry("440x380")
+root.configure(bg="#0b1329")
+
+score = 0
+car_x = 200
+tornado_x = 200
+tornado_y = 70
+
+radar_canvas = tk.Canvas(root, width=400, height=210, bg="#040914")
+radar_canvas.pack(pady=8)
+
+status_lbl = tk.Label(root, text="STORM RADAR: ACTIVE | Score: 0", fg="#00f0ff", bg="#0b1329", font=("Consolas", 10))
+status_lbl.pack()
+
+def update_radar():
+    global tornado_x, tornado_y, car_x, score
+    radar_canvas.delete("all")
+    
+    radar_canvas.create_line(0, 105, 400, 105, fill="#1e293b", width=1)
+    radar_canvas.create_line(200, 0, 200, 210, fill="#1e293b", width=1)
+    radar_canvas.create_oval(100, 10, 300, 200, outline="#00f0ff", width=1)
+    
+    tornado_x += random.choice([-4, -2, 2, 4])
+    tornado_y += random.choice([-2, 0, 2])
+    
+    radar_canvas.create_oval(tornado_x-18, tornado_y-18, tornado_x+18, tornado_y+18, fill="#ff007f", outline="#ffb700")
+    radar_canvas.create_text(tornado_x, tornado_y, text="EF4", fill="#ffffff")
+    radar_canvas.create_rectangle(car_x-12, car_y-10, car_x+12, car_y+10, fill="#39ff14", outline="#ffffff")
+    
+    root.after(120, update_radar)
+
+def move_left():
+    global car_x
+    car_x = max(25, car_x - 18)
+
+def move_right():
+    global car_x
+    car_x = min(375, car_x + 18)
+
+root.bind("<KeyPress>", lambda e: move_left() if e=='Left' else move_right())
+
+btn_frame = tk.Frame(root, bg="#0b1329")
+btn_frame.pack(pady=4)
+tk.Button(btn_frame, text="◄ Left", command=move_left).pack(side="left", padx=6)
+tk.Button(btn_frame, text="Right ►", command=move_right).pack(side="left", padx=6)
+
+print("Tornado Tracker Tkinter Started!")
+update_radar()
+root.mainloop()`,
+
+            preset2: `import base64
+payload = "aW1wb3J0IHRraW50ZXIgYXMgdGsKCnJvb3QgPSB0ay5UaygpCnJvb3QudGl0bGUoIk1vZGlvcyBDbGlja2VyIEFwcCIpCnJvb3QuZ2VvbWV0cnkoIjM2MHgwNTAiKQpyb290LmNvbmZpZ3VyZShiZz0iIzBiMTMyOSIpCgpjb3VudCA9IDAKCmxibCA9IHRrLkxhYmVsKHJvb3QsIHRleHQ9IkNvdW50OiAwIiwgZmc9IiMwMGYwZmYiLCBiZz0iIzBiMTMyOSIsIGZvbnQ9KCNDb25zb2xhcyIsIDE2KSkKbGJsLnBhY2socGFkeT0xNSkKCmRlZiBpbmNyZW1lbnQoKToKICAgIGdsb2JhbCBjb3VudAogICAgY291bnQgKz0gMQogICAgbGJsLmNvbmZpZyh0ZXh0PWYoIkNvdW50OiB7Y291bnR9IikpCiAgICBwcmludChmIltDTElDS0VSXSBDb3VudCBpbmNyZWFzZWQgdG8ge2NvdW50fSIpCgpidG4gPSB0ay5CdXR0b24ocm9vdCwgdGV4dD0iKzEgQ0xJQ0sgTUUiLCBjb21tYW5kPWluY3JlbWVudCwgYmc9IiNmZjAwN2YiLCBmZz0iI2ZmZmZmZiIpCmJ0bi5wYWNrKHBhZHk9MTApCgpwcmludCgiT2JmdX obfuscated Tkinter Clicker Loaded!\")\nroot.mainloop()"
+exec(base64.b64decode("aW1wb3J0IHRraW50ZXIgYXMgdGsKCnJvb3QgPSB0ay5UaygpCnJvb3QudGl0bGUoIk1vZGlvcyBDbGlja2VyIEFwcCIpCnJvb3QuZ2VvbWV0cnkoIjM2MHgwNTAiKQpyb290LmNvbmZpZ3VyZShiZz0iIzBiMTMyOSIpCgpjb3VudCA9IDAKCmxibCA9IHRrLkxhYmVsKHJvb3QsIHRleHQ9IkNvdW50OiAwIiwgZmc9IiMwMGYwZmYiLCBiZz0iIzBiMTMyOSIsIGZvbnQ9KCNDb25zb2xhcyIsIDE2KSkKbGJsLnBhY2socGFkeT0xNSkKCmRlZiBpbmNyZW1lbnQoKToKICAgIGdsb2JhbCBjb3VudAogICAgY291bnQgKz0gMQogICAgbGJsLmNvbmZpZyh0ZXh0PWYoIkNvdW50OiB7Y291bnR9IikpCiAgICBwcmludChmIltDTElDS0VSXSBDb3VudCBpbmNyZWFzZWQgdG8ge2NvdW50fSIpCgpidG4gPSB0ay5CdXR0b24ocm9vdCwgdGV4dD0iKzEgQ0xJQ0sgTUUiLCBjb21tYW5kPWluY3JlbWVudCwgYmc9IiNmZjAwN2YiLCBmZz0iI2ZmZmZmZiIpCmJ0bi5wYWNrKHBhZHk9MTApCgpwcmludCgiT2JmdXNjYXRlZCBUa2ludGVyIENsaWNrZXIgTG9hZGVkISIpCnJvb3QubWFpbmxvb3AoKQ=="))`,
+
+            preset3: `import tkinter as tk
+import random
+
+root = tk.Tk()
+root.title("Modios Retro SysInfo & PassGen")
+root.geometry("400x320")
+root.configure(bg="#0b1329")
+
+tk.Label(root, text="SECURITY PASS GEN v2.0", fg="#ffb700", bg="#0b1329").pack(pady=8)
+entry = tk.Entry(root, bg="#040914", fg="#39ff14")
+entry.pack(pady=6)
+
+def generate_key():
+    chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$"
+    key = "".join(random.choice(chars) for _ in range(12))
+    entry.delete(0, 'end')
+    entry.insert(0, key)
+    print(f"[GEN] Created Secure Passcode: {key}")
+
+tk.Button(root, text="🔑 GENERATE KEY", command=generate_key).pack(pady=10)
+root.mainloop()`
+        };
+
+        function loadPythonPreset(key) {
+            if (PY_PRESETS[key]) {
+                document.getElementById('pyInput').value = PY_PRESETS[key];
+                document.getElementById('pyStatus').textContent = 'Status: Preset Loaded!';
+            }
+        }
+
+        function decodePython(mode) {
+            let input = document.getElementById('pyInput').value.trim();
+            const output = document.getElementById('pyOutput');
+            const status = document.getElementById('pyStatus');
+
+            try {
+                if (mode === 'b64') { output.value = atob(input); status.textContent = 'Status: Base64 Decoded!'; }
+                else if (mode === 'hex') {
+                    let str = ''; for (let i = 0; i < input.length; i += 2) str += String.fromCharCode(parseInt(input.substr(i, 2), 16));
+                    output.value = str; status.textContent = 'Status: Hex Decoded!';
+                } else if (mode === 'rot13') {
+                    output.value = input.replace(/[a-zA-Z]/g, c => String.fromCharCode((c <= 'Z' ? 90 : 122) >= (c = c.charCodeAt(0) + 13) ? c : c - 26));
+                    status.textContent = 'Status: ROT13 Transformed!';
+                } else if (mode === 'auto') {
+                    const b64Match = input.match(/b64decode\(['"]([^'"]+)['"]\)/);
+                    if (b64Match) { output.value = atob(b64Match[1]); status.textContent = 'Status: Auto-Unpacked exec() Payload!'; }
+                    else { output.value = atob(input.replace(/\s/g, '')); status.textContent = 'Status: Raw Base64 Decoded!'; }
+                }
+            } catch(e) { status.textContent = 'Error: Invalid Payload!'; }
+        }
+
+        function runTkinterScript() {
+            stopTkinter();
+            let code = document.getElementById('pyInput').value;
+            const b64Match = code.match(/b64decode\(['"]([^'"]+)['"]\)/);
+            if (b64Match) { try { code = atob(b64Match[1]); } catch(e){} }
+
+            const tkBody = document.getElementById('tkWindowBody');
+            const tkTitle = document.getElementById('tkWindowTitle');
+            const consoleLog = document.getElementById('pyConsoleLog');
+
+            tkBody.innerHTML = '';
+            consoleLog.textContent = '[SYSTEM INITIALIZING PYTHON TKINTER ENGINE...]\n';
+
+            const scope = { score: 0, car_x: 200, car_y: 190, tornado_x: 200, tornado_y: 70, count: 0 };
+            const log = (msg) => { consoleLog.textContent += msg + '\n'; consoleLog.scrollTop = consoleLog.scrollHeight; };
+            log('[INFO] Loaded Tkinter script runtime.');
+
+            const titleMatch = code.match(/title\(['"]([^'"]+)['"]\)/);
+            if (titleMatch) tkTitle.textContent = titleMatch[1];
+
+            let canvasCtx = null;
+            if (code.includes('tk.Canvas') || code.includes('Canvas(')) {
+                const canvasEl = document.createElement('canvas');
+                canvasEl.width = 400; canvasEl.height = 210;
+                canvasEl.style.border = '1px solid rgba(0,240,255,0.3)';
+                canvasEl.style.borderRadius = '6px'; canvasEl.style.background = '#040914';
+                tkBody.appendChild(canvasEl); canvasCtx = canvasEl.getContext('2d');
+            }
+
+            const canvasObj = {
+                delete: () => canvasCtx && canvasCtx.clearRect(0, 0, 400, 210),
+                create_line: (x1, y1, x2, y2, opts={}) => {
+                    if (!canvasCtx) return; canvasCtx.strokeStyle = opts.fill || '#00f0ff';
+                    canvasCtx.beginPath(); canvasCtx.moveTo(x1, y1); canvasCtx.lineTo(x2, y2); canvasCtx.stroke();
+                },
+                create_oval: (x1, y1, x2, y2, opts={}) => {
+                    if (!canvasCtx) return;
+                    canvasCtx.beginPath(); canvasCtx.ellipse((x1+x2)/2, (y1+y2)/2, Math.abs(x2-x1)/2, Math.abs(y2-y1)/2, 0, 0, Math.PI*2);
+                    if (opts.fill) { canvasCtx.fillStyle = opts.fill; canvasCtx.fill(); }
+                    if (opts.outline) { canvasCtx.strokeStyle = opts.outline; canvasCtx.stroke(); }
+                },
+                create_rectangle: (x1, y1, x2, y2, opts={}) => {
+                    if (!canvasCtx) return;
+                    if (opts.fill) { canvasCtx.fillStyle = opts.fill; canvasCtx.fillRect(x1, y1, x2-x1, y2-y1); }
+                },
+                create_text: (x, y, opts={}) => {
+                    if (!canvasCtx) return; canvasCtx.fillStyle = opts.fill || '#fff';
+                    canvasCtx.font = '11px Consolas'; canvasCtx.textAlign = 'center'; canvasCtx.fillText(opts.text || '', x, y+4);
+                }
+            };
+
+            // Setup buttons
+            const btnFrame = document.createElement('div');
+            btnFrame.style.display = 'flex'; btnFrame.style.gap = '8px'; btnFrame.style.marginTop = '8px';
+            tkBody.appendChild(btnFrame);
+
+            if (code.includes('move_left')) {
+                const btnL = document.createElement('button'); btnL.className = 'btn btn-sm'; btnL.textContent = '◄ Left';
+                btnL.onclick = () => { scope.car_x = Math.max(25, scope.car_x - 18); log('[INPUT] Move Left'); };
+                btnFrame.appendChild(btnL);
+            }
+            if (code.includes('move_right')) {
+                const btnR = document.createElement('button'); btnR.className = 'btn btn-sm'; btnR.textContent = 'Right ►';
+                btnR.onclick = () => { scope.car_x = Math.min(375, scope.car_x + 18); log('[INPUT] Move Right'); };
+                btnFrame.appendChild(btnR);
+            }
+            if (code.includes('increment')) {
+                const btnC = document.createElement('button'); btnC.className = 'btn btn-pink btn-sm'; btnC.textContent = '+1 Click Me';
+                btnC.onclick = () => { scope.count++; log(`[CLICKER] Count: ${scope.count}`); };
+                btnFrame.appendChild(btnC);
+            }
+
+            if (code.includes('update_radar')) {
+                function loopStep() {
+                    canvasObj.delete();
+                    canvasObj.create_line(0, 105, 400, 105, { fill: '#1e293b' });
+                    canvasObj.create_line(200, 0, 200, 210, { fill: '#1e293b' });
+                    canvasObj.create_oval(100, 10, 300, 200, { outline: '#00f0ff' });
+
+                    scope.tornado_x += (Math.random() > 0.5 ? 3 : -3);
+                    canvasObj.create_oval(scope.tornado_x-18, scope.tornado_y-18, scope.tornado_x+18, scope.tornado_y+18, { fill: '#ff007f', outline: '#ffb700' });
+                    canvasObj.create_text(scope.tornado_x, scope.tornado_y, { text: 'EF4' });
+                    canvasObj.create_rectangle(scope.car_x-12, scope.car_y-10, scope.car_x+12, scope.car_y+10, { fill: '#39ff14' });
+
+                    const tid = setTimeout(loopStep, 120); activeTkTimers.push(tid);
+                }
+                loopStep();
+            }
+
+            log('[SUCCESS] Tkinter GUI initialized offline!');
+            document.getElementById('pyStatus').textContent = 'Status: Tkinter GUI Running!';
+        }
+
+        function decodeHTML(mode) {
+            const input = document.getElementById('htmlInput').value.trim();
+            if (mode === 'datauri') {
+                const b64 = input.split(',')[1] || input;
+                try { document.getElementById('htmlInput').value = atob(b64); } catch(e){}
+            } else if (mode === 'entities') {
+                const doc = new DOMParser().parseFromString(input, 'text/html');
+                document.getElementById('htmlInput').value = doc.documentElement.textContent;
+            }
+        }
+
+        function runInSandbox() {
+            document.getElementById('sandboxFrame').srcdoc = document.getElementById('htmlInput').value;
+        }
+
+        function clearSandbox() {
+            document.getElementById('htmlInput').value = '';
+            document.getElementById('sandboxFrame').srcdoc = '';
+        }
+
+        function copyToClipboard(id) {
+            const text = document.getElementById(id).value;
+            navigator.clipboard.writeText(text);
+            showToast('Copied to clipboard!');
+        }
+
+
+        /* ----------------------------------------------------
+         * 5. GENERAL VIEW SWITCHER & SYSTEM CLOCK
+         * ---------------------------------------------------- */
+        function switchView(viewId, btn) {
+            document.getElementById('arcadeView').style.display = 'none';
+            document.getElementById('vaultView').style.display = 'none';
+            document.getElementById('devView').style.display = 'none';
+            document.getElementById(viewId).style.display = 'block';
+
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        }
+
+        function toggleCRT() {
+            const crt = document.getElementById('crtOverlay');
+            crt.style.display = crt.style.display === 'none' ? 'block' : 'none';
+        }
+
+        setInterval(() => {
+            document.getElementById('sysClock').textContent = new Date().toLocaleTimeString();
+        }, 1000);
+    </script>
+</body>
+</html>
