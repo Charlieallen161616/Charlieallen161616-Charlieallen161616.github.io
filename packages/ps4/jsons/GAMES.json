@@ -1,0 +1,14 @@
+{
+  "DATA": {
+    "https://archive.org/download/ps4-fpkg-collection-english-d/DOOM%20%281993%29%20-%20%5BEU%5D%20%5BEN%5D%20%5B1.09%5D.pkg": {
+      "title_id": "CUSA15565",
+      "region": "Europe",
+      "name": "DOOM (1993)",
+      "version": "01.09",
+      "release": "1993-012-10",
+      "size": 385875968,
+      "min_fw": "9.00",
+      "cover_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTlePlXKBUowwBq9ABTtrHiOtFczjZOtt0xYLL0SGPtJQ&s=10"
+    }
+  }
+}
